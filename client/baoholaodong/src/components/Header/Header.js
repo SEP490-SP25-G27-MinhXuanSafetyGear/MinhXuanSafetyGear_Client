@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import logo from "../images/logo.gif";
+import logo from "../../images/logo.gif";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaSearch } from "react-icons/fa";
 
 function Header() {
