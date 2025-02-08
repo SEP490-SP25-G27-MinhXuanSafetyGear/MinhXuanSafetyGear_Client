@@ -1,0 +1,44 @@
+.product-card {
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px #EC221F solid;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.product-image {
+  align-self: stretch;
+  height: 247px;
+}
+
+.product-info {
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.product-name {
+  align-self: stretch;
+  color: #EC221F;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22.40px;
+  word-wrap: break-word;
+}
+
+.product-price {
+  color: #1E1E1E;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22.40px;
+  word-wrap: break-word;
+}
