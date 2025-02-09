@@ -1,14 +1,4 @@
-
-
-.sidebar {
-    transition: transform 0.3s ease-in-out;
-    z-index: 50;
-}
-
-.overlay {
-    z-index: 40;
-}
-
+/* General styles for discounted products */
 .deal {
     display: flex;
     justify-content: center;
@@ -39,6 +29,7 @@
     height: auto; /* Explicitly set the height to auto */
     flex-shrink: 0;
 }
+
 .deal-info {
     display: flex;
     flex-direction: column;
@@ -48,6 +39,7 @@
     white-space: nowrap; /* Prevent text from wrapping */
     flex-shrink: 0; /* Prevent shrinking */
 }
+
 .product-container {
     margin-top: 20px; /* Adjust this value if needed */
     margin-left: 40px; /* Add left margin to shift products to the right */
@@ -60,18 +52,7 @@
 .deal h2 {
     color: white;
     white-space: nowrap; /* Prevent text from wrapping */
-
 }
-
-
-.product-container {
-    margin-top: 20px; /* Adjust this value if needed */
-    margin-left: 40px; /* Add left margin to shift products to the right */
-    overflow-x: auto; /* Ensure horizontal scrolling if needed */
-    display: flex;
-    flex-wrap: nowrap; /* Prevent wrapping to a new line */
-}
-
 
 .deal-title-text {
     color: white;
@@ -96,11 +77,14 @@
     width: 140%; /* Extend the underline further to the right */
     height: 3px; /* Adjust the height of the underline */
     background-color: gold; /* Gold color for the underline */
+    clip-path: polygon(0% 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
 }
+
 .navigate-button-container {
     display: flex;
+    justify-content: center;
     gap: 10px; /* Add space between the buttons */
-    margin-left: 40px;
+    margin-top: 20px; /* Add margin to position below product cards */
 }
 
 .navigate-button {
@@ -116,9 +100,11 @@
     font-size: 1.2rem; /* Reduce the font size */
     line-height: 1; /* Adjust line height to make icons thinner */
 }
+
 .navigate-button:hover {
     background-color: yellow; /* Change background color to yellow on hover */
 }
+
 .view-all-button {
     position: relative;
     width: 200px;
@@ -132,13 +118,14 @@
     display: inline-block;
     text-transform: uppercase;
     font-weight: bold;
-    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%); /* Parallelogram shape */
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); /* Parallelogram shape */
     overflow: hidden; /* Hide overflow to prevent scrollbars */
-    border-top: 2px solid red; /* Red top border */
-    border-bottom: 2px solid red; /* Red bottom border */
+    border-top: 2px solid #b50a00; /* Red top border */
+    border-bottom: 2px solid #b50a00; /* Red bottom border */
     border-left: none; /* Remove left border */
     border-right: none; /* Remove right border */
     transition: color 0.5s ease; /* Smooth transition for text color */
+    margin-top: 20px; /* Add margin to position below navigation buttons */
 }
 
 .view-all-button:hover {
@@ -174,4 +161,61 @@
     right: 0;
     width: 10%;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 100%);
+}
+
+.text-gold {
+    color: goldenrod;
+}
+
+/* Responsive styles for discounted products */
+@media (max-width: 768px) {
+    .deal {
+        height: auto; /* Adjust height for smaller screens */
+        background-size: cover; /* Cover the background image */
+    }
+
+    .deal .container {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .deal-info {
+        margin-left: 0;
+        margin-right: 0;
+        align-items: center;
+        text-align: center;
+        margin-top: 65px; /* Move down slightly on mobile */
+    }
+
+    .product-container {
+        flex-wrap: nowrap; /* Prevent wrapping to a new line */
+        margin-left: 0;
+        width: 100%;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        scroll-behavior: smooth; /* Smooth scrolling */
+    }
+
+    .product-card {
+        width: 80%; /* Adjust the width of product cards on mobile */
+        margin: 0 10px; /* Add margin between product cards */
+    }
+
+    .navigate-button-container {
+        display: flex; /* Show navigation buttons */
+        justify-content: center;
+        gap: 10px; /* Add space between the buttons */
+        margin-top: -9px; /* Add margin to position below product cards */
+    }
+
+    .view-all-button {
+        width: 100%;
+        margin-top: 20px; /* Add margin to position below navigation buttons */
+    }
+
+    .deal-title-text {
+        font-size: 24px;
+        line-height: 36px;
+
+    }
 }

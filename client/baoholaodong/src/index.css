@@ -1,17 +1,41 @@
+/* General styles for larger screens */
 body {
+  font-family: 'Roboto Condensed', sans-serif;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+.container {
+  width: 100%;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+}
+
+/* Sidebar styles */
+.sidebar {
+  transition: transform 0.3s ease-in-out;
+  z-index: 50;
+}
+
+/* Overlay styles */
+.overlay {
+  z-index: 40;
+}
+
+/* Code block styles */
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+/* Header styles */
 .header-gradient {
   background: linear-gradient(to top, #620805, #c7170e);
 }
@@ -35,7 +59,6 @@ code {
   margin-top: 4px; /* Add top margin to create space between icon and text */
 }
 
-
 .header-gradient .flex.items-center.space-x-6 .relative.flex.items-center {
   margin-right: -100px; /* Adjust this value to move the cart button further to the right */
 }
@@ -49,4 +72,42 @@ code {
 
 .header-gradient .search-container input {
   width: 100%; /* Make the search bar take the full width */
+}
+
+/* Responsive styles for header */
+@media (max-width: 768px) {
+  .header-gradient .container {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px; /* Add padding for better spacing on mobile */
+  }
+
+  .header-gradient .container .flex.items-center button {
+    margin-left: 0;
+  }
+
+  .header-gradient .flex.items-center.space-x-6 .relative.flex.items-center {
+    margin-right: 0;
+  }
+
+  .header-gradient .search-container {
+    margin: 10px 0;
+  }
+
+  .header-gradient .container .flex.items-center {
+    flex-direction: column; /* Stack items vertically on mobile */
+    align-items: center;
+  }
+
+  .header-gradient .container .flex.items-center img {
+    margin-bottom: 10px; /* Add margin below the logo */
+  }
+
+  .header-gradient .container .flex.items-center h1 {
+    text-align: center; /* Center align the text */
+  }
+
+  .header-gradient .container .flex.items-center p {
+    text-align: center; /* Center align the text */
+  }
 }

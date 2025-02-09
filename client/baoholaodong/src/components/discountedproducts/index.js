@@ -1,20 +1,16 @@
 import React, { useRef } from "react";
-import { FaArrowRight } from "react-icons/fa";
-import { FaArrowLeft } from "react-icons/fa";
-import './style.css'
-
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import './style.css';
 
 const index = [
-    { id: 1, name: "Product 1", price: "100,000 VND", discountPrice: "80,000 VND", image: "path/to/image1.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", image: "path/to/image2.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
-    { id: 3, name: "Product 3", price: "300,000 VND", discountPrice: "250,000 VND", image: "path/to/image3.jpg" },
+    { id: 1, name: "Product 1", price: "100,000 VND", discountPrice: "80,000 VND", discountPercentage: " Giảm 20%", image: "path/to/image1.jpg" },
+    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
+    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
+    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
+    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
+    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
+    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
+    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
 
 ];
 
@@ -42,18 +38,19 @@ export default function DiscountedProducts() {
                             <FaArrowRight />
                         </button>
                     </div>
-                    <button
-                        className="view-all-button mt-4">Xem tất cả <FaArrowRight className="inline" />
-                    </button>
+                    <button className="view-all-button mt-4">Xem tất cả <FaArrowRight className="inline" /></button>
                 </div>
                 <div ref={scrollRef} className="flex overflow-x-auto space-x-4 product-container">
                     {index.map((product) => (
                         <div key={product.id} className="w-64 flex-shrink-0 bg-white shadow-lg rounded-lg p-4">
                             <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-t-lg" />
                             <div className="mt-4">
-                                <h3 className="text-lg font-bold">{product.name}</h3>
-                                <p className="text-red-600 line-through">{product.price}</p>
-                                <p className="text-green-600 font-bold">{product.discountPrice}</p>
+                                <h3 className="product-name">{product.name}</h3>
+                                <div className="flex items-center">
+                                    <p className="text-red-600 font-bold">{product.discountPrice}</p>
+                                    <p className="text-gray-500 line-through text-sm ml-2">{product.price}</p>
+                                </div>
+                                <p className="text-gold font-bold">{product.discountPercentage}</p>
                             </div>
                         </div>
                     ))}
