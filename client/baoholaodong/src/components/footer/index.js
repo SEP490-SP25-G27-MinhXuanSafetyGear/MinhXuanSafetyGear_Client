@@ -14,21 +14,15 @@ const Footer = () => {
                 </div>
                 <div className="footer-section">
                     <div className="footer-contact">
+                        <div className="footer-policy-title">Liên hệ</div>
                         <div className="footer-contact-item">
-                            <span className="footer-contact-title">Địa chỉ: </span>
-                            <span className="footer-contact-detail">Hai bà trưng, Hà Nội</span>
+                            <span className="footer-contact-title">Địa chỉ: Hai bà Trưng, Hà Nội</span>
                         </div>
                         <div className="footer-contact-item">
-                            <span className="footer-contact-title">Điện thoại: </span>
-                            <span className="footer-contact-detail">0912.423.062</span>
+                            <span className="footer-contact-title">Điện thoại: 0912.423.062 </span>
                         </div>
                         <div className="footer-contact-item">
-                            <span className="footer-contact-title">Zalo: </span>
-                            <span className="footer-contact-detail">0912.423.062</span>
-                        </div>
-                        <div className="footer-contact-item">
-                            <span className="footer-contact-title">Email: </span>
-                            <span className="footer-contact-detail">minhxuanbhld@gmail.com</span>
+                            <span className="footer-contact-title">Email: minhxuanbhld@gmail.com </span>
                         </div>
                     </div>
                 </div>

@@ -8,7 +8,7 @@ const Logout = () => {
 		Cookies.remove('authToken');
 		Cookies.remove('userRole');
 		
-		// Chuyển hướng về trang login sau khi logout
+		// Chuyển hướng về trang signin sau khi logout
 		navigate("/login");
 	}, [navigate]);
 	

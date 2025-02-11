@@ -19,7 +19,9 @@ function Header() {
                             {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
                             <span className="ml-2">Menu</span>
                         </button>
-                        <img alt="Company Logo" className="h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />
+                        <a href="/">
+                            <img alt="Company Logo" className="h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />
+                        </a>
                         <div className="ml-4">
                             <h1 className="text-xl font-bold text-white">
                                 BẢO HỘ LAO ĐỘNG MINH XUÂN
@@ -69,8 +71,8 @@ function Header() {
                                 </div>
                             </div>
                             <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                                <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
-                                <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
+                                <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
+                                <a href="/signin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
                             </div>
                         </div>
                         <div className="relative flex items-center">
