@@ -30,7 +30,7 @@ const LoginEmployee = () => {
 			
 			navigate('/dashboard');  // Điều hướng đến trang dashboard sau khi đăng nhập thành công
 		} catch (err) {
-			setError('Failed to login. Please check your credentials.');
+			setError('Failed to signin. Please check your credentials.');
 			console.error(err);
 		}
 	};

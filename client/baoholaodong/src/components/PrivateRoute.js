@@ -16,7 +16,7 @@ const PrivateRoute = ({ element, roleRequired }) => {
 	const userIsAuthenticated = isAuthenticated();
 	const location = useLocation();  // Get current location for redirection
 	
-	// If the user is not authenticated and role is not 'guest', redirect to login
+	// If the user is not authenticated and role is not 'guest', redirect to signin
 	if (!userIsAuthenticated && roleRequired !== 'guest') {
 		return <Navigate to="/login" state={{ from: location }} />;
 	}

@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
-import LoginEmployee from './pages/Login';
+import Register from "./pages/register";
+import Signin from "./pages/signin";
 import Dashboard from './pages/manager/Dashboard';
 import About from './pages/About';
 import PrivateRoute from "./components/PrivateRoute";
@@ -12,7 +13,8 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/login" element={<LoginEmployee />} />
+                <Route path="/register" element={<Register />} />
+                <Route path={"/signin"} element={<Signin />} />
                 <Route path="/logout" element={<Logout />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
