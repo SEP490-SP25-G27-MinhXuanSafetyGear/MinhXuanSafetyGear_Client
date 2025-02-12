@@ -4,10 +4,18 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import {ProductProvider} from "./contexts/ProductContext";
+import {BlogPosts} from "./pages/manager";
+import {BlogPostProvider} from "./contexts/BlogPostContext";
+
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+      <ProductProvider>
+          <App/>
+      </ProductProvider>
   </React.StrictMode>
 );
 
