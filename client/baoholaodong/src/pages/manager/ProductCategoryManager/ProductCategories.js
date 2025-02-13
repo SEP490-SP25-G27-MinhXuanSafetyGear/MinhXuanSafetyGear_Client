@@ -1,9 +1,9 @@
 ﻿import React, { useContext, useState } from "react";
-import { ProductContext } from "../../contexts/ProductContext";
+import { ProductContext } from "../../../contexts/ProductContext";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
-import Modal from "../../components/Modal/Modal";
-import Loading from "../../components/Loading/Loading";
+import Modal from "../../../components/Modal/Modal";
+import Loading from "../../../components/Loading/Loading";
 
 const ProductCategories = () => {
     const { categories ,createCategory,updateCategory} = useContext(ProductContext);
@@ -113,7 +113,7 @@ const CreateCategoryForm = ({createCategory}) => {
                     <label className="block text-gray-700 font-medium">Tên danh mục</label>
                     <input
                         type="text"
-                        name="name"
+                        name="categoryName"
                         value={category.categoryName}
                         onChange={handleChange}
                         className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

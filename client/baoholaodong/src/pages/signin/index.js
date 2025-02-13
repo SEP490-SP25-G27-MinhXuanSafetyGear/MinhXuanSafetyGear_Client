@@ -1,39 +1,47 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "../../components/header";
 import Footer from '../../components/footer';
-import axios from 'axios';
 import './style.css';
-
-const apiUrl = process.env.REACT_APP_BASE_URL_API;
+import { AuthContext } from "../../contexts/AuthContext";
+import Loading from "../../components/Loading/Loading";
 
 const Signin = () => {
     const [formSignin, setFormSignin] = useState({
         email: '',
         password: ''
     });
+    const { user,login ,setUser} = useContext(AuthContext);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const handleSignin = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
-            await axios.post(`${apiUrl}/api/authentication/login`, formSignin);
-            navigate('/dashboard');
+            var result = await login(formSignin.email, formSignin.password);
+            setUser(result);
+            if(result.role ==='Admin'){
+                navigate('/manager');
+            }else{
+                navigate("/");
+            }
         } catch (err) {
-            setError('Failed to signin. Please check your credentials.');
+            setError('Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.');
             console.error(err);
+        }finally {
+            setLoading(false);
         }
     };
 
     const handleGoogleSignIn = () => {
-        // Implement Google Sign-In logic here
         console.log('Google Sign-In clicked');
     };
 
     return (
         <>
-            <Header />
+            <Loading isLoading={loading} />
             <div className="signin-form-container">
                 <div className="signin-form-header">
                     <h2>ĐĂNG NHẬP</h2>
@@ -57,6 +65,7 @@ const Signin = () => {
                             placeholder="Mật khẩu"
                         />
                     </div>
+                    {error && <p className="error-text">{error}</p>}
                     <button type="submit" className="signin-submit-button">Đăng nhập</button>
                 </form>
                 <div className="signin-links">
@@ -68,11 +77,10 @@ const Signin = () => {
                     </div>
                 </div>
                 <div className="or-text">hoặc đăng nhập bằng</div>
-                <button
-                    onClick={handleGoogleSignIn} className="google-signin-button">
+                <button onClick={handleGoogleSignIn} className="google-signin-button">
+                    Đăng nhập với Google
                 </button>
             </div>
-            <Footer />
         </>
     );
 };

@@ -12,19 +12,21 @@ import {
     LogOut,
     Menu,
     ChevronLeft,
+    Boxes,
 } from 'lucide-react';
-import { ProductContext } from "../contexts/ProductContext";
+import {AuthContext} from "../contexts/AuthContext";
 const AdminLayout = () => {
+    const {user,logout} = useContext(AuthContext);
     const location = useLocation();
     const navigate = useNavigate();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const navItems = useMemo(
         () => [
             { path: '/manager/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { path: '/manager/users', icon: Users, label: 'Users' },
             { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
             { path: '/manager/products', icon: Package, label: 'Products' },
-            { path: '/manager/product_categories', icon: Package, label: 'ProductCategories' },
+            { path: '/manager/product_categories', icon: Boxes, label: 'ProductCategories' },
             { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
             { path: '/manager/invoices', icon: Receipt, label: 'Invoices' },
             { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
@@ -40,7 +42,7 @@ const AdminLayout = () => {
             } bg-white shadow-lg transition-all duration-300 z-20`}>
                 <div className="p-4 border-b flex justify-between items-center">
                     {!isCollapsed && (
-                        <h1 className="text-2xl font-bold text-gray-800">MinhXuan Admin</h1>
+                        <h1 className="text-2xl font-bold text-gray-800">{user.role}</h1>
                     )}
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -68,7 +70,7 @@ const AdminLayout = () => {
                         ))}
                         <li className="mt-auto">
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={() => {logout()}}
                                 className="flex items-center p-2 text-red-600 hover:bg-red-50 rounded-lg"
                             >
                                 <LogOut className="w-5 h-5"/>
@@ -95,7 +97,7 @@ const AdminLayout = () => {
                                     alt="Admin"
                                     className="w-8 h-8 rounded-full"
                                 />
-                                <span className="text-sm font-medium text-gray-700">Admin User</span>
+                                <span className="text-sm font-medium text-gray-700">{user.email}</span>
                             </div>
                         </div>
                     </div>

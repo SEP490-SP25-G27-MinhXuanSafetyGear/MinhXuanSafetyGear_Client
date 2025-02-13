@@ -1,14 +1,14 @@
-﻿import React, { useContext } from "react";
+﻿import React, {useContext, useEffect, useState} from "react";
 import { Package, Edit, Trash2, Plus } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { ProductContext } from "../../contexts/ProductContext";
+import { ProductContext } from "../../../contexts/ProductContext";
+import Loading from "../../../components/Loading/Loading";
 
 const Products = () => {
 	const navigate = useNavigate();
 	const { products, loading, selectedCategory, setSelectedCategory, page, setPage,categories,search,setSearch } =
 		useContext(ProductContext);
-	
 	const handleCreate = () => navigate("/manager/createproduct");
 	const handleUpdate = (product) => navigate(`/manager/updateproduct/${product.id}`);
 	const handleDelete = (id) => {
@@ -17,9 +17,11 @@ const Products = () => {
 			console.log("Xóa sản phẩm có ID:", id);
 		}
 	};
+
 	return (
 		<div className="space-y-6">
 			<div className="bg-white rounded-lg shadow">
+				<Loading isLoading={loading} />
 				<div className="p-6 border-b flex justify-between items-center">
 					<h3 className="text-lg font-semibold text-gray-800">Danh sách sản phẩm</h3>
 					<div className="flex space-x-4">

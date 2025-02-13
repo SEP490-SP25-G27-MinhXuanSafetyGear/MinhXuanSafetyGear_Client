@@ -24,10 +24,13 @@ export const ProductProvider = ({ children }) => {
 				params: { category: selectedCategory, page, pagesize: size },
 			});
 			setProducts(response.data.items || []);
+
 		} catch (error) {
 			console.error("Lỗi khi lấy sản phẩm:", error.response?.data || error.message);
 		} finally {
-			setLoading(false);
+			setTimeout(() => {
+				setLoading(false);
+			}, 0); //
 		}
 	};
 
@@ -149,6 +152,27 @@ export const ProductProvider = ({ children }) => {
 			throw error;
 		}
 	}
+
+	/** create variant */
+	const createVariant= async (variant)=>{
+		try{
+			const response = await axios.post(`${BASE_URL}/api/Product/create-product-variant`, variant);
+			return response.data;
+		}catch(error){
+			throw error;
+		}
+	}
+
+	// update variant
+	const updateVariant = async (variant) => {
+		try{
+			const response = await axios.put(`${BASE_URL}/api/Product/update-product-variant`, variant);
+			return response.data;
+		}catch(error){
+			throw error;
+		}
+	}
+
 	/** Kết nối với SignalR */
 	useEffect(() => {
 		const connection = new signalR.HubConnectionBuilder()
@@ -234,6 +258,8 @@ export const ProductProvider = ({ children }) => {
 				updateProduct,
 				uploadImage,
 				updateImage,
+				createVariant,
+				updateVariant,
 				deleteImage,
 				createCategory,
 				updateCategory,

@@ -1,5 +1,5 @@
 ﻿import React, { useContext, useState } from 'react';
-import { ProductContext } from "../../contexts/ProductContext";
+import { ProductContext } from "../../../contexts/ProductContext";
 
 const Loading = ({ isLoading }) => {
 	if (!isLoading) return null;
