@@ -6,7 +6,6 @@ import Footer from "../components/footer";
 const About = () => {
 	return (
 		<div>
-			<Header/>
 			<Nav/>
 			<div className="container mx-auto p-4">
 				<h1 className="text-3xl font-bold text-center mb-6">Giới Thiệu Về Bảo Hộ Lao Động Minh Xuân</h1>
@@ -36,7 +35,6 @@ const About = () => {
 					</li>
 				</ul>
 			</div>
-			<Footer/>
 		</div>
 
 	);

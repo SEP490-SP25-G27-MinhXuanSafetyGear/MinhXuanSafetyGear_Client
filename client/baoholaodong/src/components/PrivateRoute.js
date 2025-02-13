@@ -1,34 +1,22 @@
-﻿import { Navigate, useLocation } from 'react-router-dom';
-import Cookies from 'js-cookie';  // Import thư viện js-cookie
+﻿import { Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
-// Lấy thông tin vai trò người dùng từ cookie
-const getUserRole = () => {
-	return Cookies.get('userRole'); // 'guest', 'manager', 'admin'
-};
+const PrivateRoute = ({ element, roleRequired = [] }) => {
+	const { user } = useContext(AuthContext);
 
-// Kiểm tra người dùng có đăng nhập hay không bằng cách kiểm tra cookie authToken
-const isAuthenticated = () => {
-	return Cookies.get('authToken') !== undefined;  // Nếu authToken có trong cookie, người dùng đã đăng nhập
-};
-
-const PrivateRoute = ({ element, roleRequired }) => {
-	const userRole = getUserRole();
-	const userIsAuthenticated = isAuthenticated();
-	const location = useLocation();  // Get current location for redirection
-	
-	// If the user is not authenticated and role is not 'guest', redirect to signin
-	if (!userIsAuthenticated && roleRequired !== 'guest') {
-		return <Navigate to="/login" state={{ from: location }} />;
+	// Kiểm tra nếu chưa đăng nhập
+	if (!user || !user.email || !user.token) {
+		return <Navigate to="/login" replace />;
 	}
-	
-	// If user role does not match required role, redirect to home page
-	if (userRole && roleRequired && !roleRequired.includes(userRole)) {
-		return <Navigate to="/home" />;
+
+	// Kiểm tra quyền truy cập (roleRequired là danh sách)
+	if (roleRequired.length > 0 && !roleRequired.includes(user.role)) {
+		return <Navigate to="/unauthorized" replace />;
 	}
-	
-	// Return the element if the user is authenticated and has the correct role
+
+	// Nếu hợp lệ, hiển thị element
 	return element;
 };
-
 
 export default PrivateRoute;

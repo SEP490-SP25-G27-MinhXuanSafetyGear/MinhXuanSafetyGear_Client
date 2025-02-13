@@ -1,12 +1,12 @@
 ﻿import React from "react";
 import { X } from "lucide-react";
 
-const Modal = ({ isOpen, onClose, children ,title}) => {
+const Modal = ({ isOpen, onClose, children, title }) => {
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center border-b pb-3">
                     <h2 className="text-xl font-bold">{title}</h2>
@@ -15,8 +15,10 @@ const Modal = ({ isOpen, onClose, children ,title}) => {
                     </button>
                 </div>
 
-                {/* Body */}
-                <div className="mt-4">{children}</div>
+                {/* Body - Cuộn khi nội dung quá dài */}
+                <div className="mt-4 overflow-y-auto max-h-[70vh]">
+                    {children}
+                </div>
             </div>
         </div>
     );

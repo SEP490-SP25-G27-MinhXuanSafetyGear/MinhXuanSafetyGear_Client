@@ -7,14 +7,13 @@ import Feedbacks from "../components/feedbacks";
 import NewBlog from "../components/newblog";
 import Footer from "../components/footer";
 function Home(){
+
 	return (<div>
-		<Header />
 		<Banner/>
 		<DiscountedProducts/>
 		<Products/>
 		<Feedbacks/>
 		<NewBlog/>
-		<Footer/>
 	</div>)
 }
 

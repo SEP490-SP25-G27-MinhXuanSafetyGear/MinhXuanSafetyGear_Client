@@ -72,7 +72,7 @@ function Header() {
                             </div>
                             <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
                                 <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
-                                <a href="/signin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
+                                <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
                             </div>
                         </div>
                         <div className="relative flex items-center">

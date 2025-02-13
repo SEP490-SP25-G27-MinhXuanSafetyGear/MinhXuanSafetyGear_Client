@@ -4,18 +4,22 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import {ProductProvider} from "./contexts/ProductContext";
-import {BlogPosts} from "./pages/manager";
+import {ProductContext, ProductProvider} from "./contexts/ProductContext";
 import {BlogPostProvider} from "./contexts/BlogPostContext";
+import {AuthProvider} from "./contexts/AuthContext";
 
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-      <ProductProvider>
-          <App/>
-      </ProductProvider>
+      <AuthProvider>
+           <ProductProvider >
+               <BlogPostProvider>
+                   <App/>
+               </BlogPostProvider>
+           </ProductProvider>
+      </AuthProvider>
   </React.StrictMode>
 );
 

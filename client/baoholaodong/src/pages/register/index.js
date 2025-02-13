@@ -35,7 +35,6 @@ const Register = () => {
 
     return (
         <>
-            <Header />
             <div className="form-container">
                 <div className="form-header">
                     <h2>Đăng ký</h2>
@@ -96,7 +95,6 @@ const Register = () => {
                     onClick={handleGoogleSignIn} className="google-signin-button">
                 </button>
             </div>
-            <Footer />
         </>
     );
 };
