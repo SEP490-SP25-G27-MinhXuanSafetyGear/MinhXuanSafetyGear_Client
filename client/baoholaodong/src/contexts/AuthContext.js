@@ -8,42 +8,44 @@ const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    // Lấy user từ cookies nếu có, nếu không thì null
+    // Lấy user từ Cookies nếu có, nếu không thì null
     const [user, setUser] = useState(() => {
-        const storedUser = Cookies.get("user");
-        return storedUser ? JSON.parse(storedUser) : null;
+        try {
+            const storedUser = Cookies.get("user");
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch (error) {
+            console.error("Lỗi khi đọc Cookies:", error);
+            return null;
+        }
     });
 
     // Hàm login
     const login = async (email, password) => {
         try {
-            const result = await axios.post(`${BASE_URL}/api/Authentication/authenticate/loginby-email-password`, {
+            const response = await axios.post(`${BASE_URL}/api/Authentication/authenticate/loginby-email-password`, {
                 email,
                 password,
             });
-            setUser(result.data); // Cập nhật state
-            return result.data; // Trả về user
+
+            if (response.data) {
+                setUser(response.data); // Cập nhật state
+                Cookies.set("user", JSON.stringify(response.data), { expires: 1 }); // Lưu Cookies (hết hạn sau 1 ngày)
+            }
+            return response.data;
         } catch (error) {
-            throw error;
+            console.error("Đăng nhập thất bại:", error);
+            throw new Error("Email hoặc mật khẩu không chính xác!");
         }
     };
 
     // Hàm logout
     const logout = () => {
-        setUser(null);
+        setUser(null); // Reset state
+        Cookies.remove("user"); // Xóa Cookies
     };
 
-    // Cập nhật cookies mỗi khi user thay đổi
-    useEffect(() => {
-        if (user) {
-            Cookies.set("user", JSON.stringify(user), { expires: 1 });
-        } else {
-            Cookies.remove("user");
-        }
-    }, [user]);
-
     return (
-        <AuthContext.Provider value={{ user, login, logout ,setUser}}>
+        <AuthContext.Provider value={{ user, login, logout, setUser }}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,14 +1,12 @@
-﻿import { useEffect } from "react";
+﻿import {useContext, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import {AuthContext} from "../contexts/AuthContext";
 const Logout = () => {
 	const navigate = useNavigate();
-	
+	const {logout} = useContext(AuthContext);
 	useEffect(() => {
-		Cookies.remove('authToken');
-		Cookies.remove('userRole');
-		
-		// Chuyển hướng về trang signin sau khi logout
+		logout();
 		navigate("/login");
 	}, [navigate]);
 	

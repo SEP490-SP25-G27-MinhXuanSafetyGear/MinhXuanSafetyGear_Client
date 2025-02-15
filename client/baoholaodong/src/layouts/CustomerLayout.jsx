@@ -1,16 +1,16 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Header from "../components/header"
+import Header from "../components/header";
 import Footer from "../components/footer";
 
 const CustomerLayout = () => {
     return (
-        <div>
-            <Header />
-            <main className="min-h-screen">
-                <Outlet />
+        <div className="h-screen w-full overflow-x-hidden flex flex-col">
+            <Header/>
+            <main>
+                <Outlet/>
             </main>
-            <Footer />
+            <Footer/>
         </div>
     );
 };

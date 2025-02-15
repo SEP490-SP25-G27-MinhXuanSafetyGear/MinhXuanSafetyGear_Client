@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaSearch, FaBars, FaTimes } from "react-icons/fa";
 import Sidebar from "./Sidebar"; // Import the Sidebar component
 import "./style.css";
+import {AuthContext} from "../../contexts/AuthContext";
 
 function Header() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-
+    const {user} = useContext(AuthContext);
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
-
     return (
         <>
             <header className="header-gradient shadow">
@@ -70,14 +70,18 @@ function Header() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                                <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
-                                <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
+
+                            <div
+                                className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
+                                    ký</a>
+                                <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
+                                    nhập</a>
                             </div>
                         </div>
                         <div className="relative flex items-center">
                             <div className="relative">
-                                <FaShoppingCart className="text-white h-8 w-8 cursor-pointer" />
+                                <FaShoppingCart className="text-white h-8 w-8 cursor-pointer"/>
                                 <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-block w-4 h-4 bg-white text-red-600 text-xs font-bold rounded-full text-center">3</span>
                             </div>
                             <span className="ml-2 text-lg font-bold text-white">

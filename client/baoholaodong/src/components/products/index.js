@@ -1,44 +1,41 @@
 ﻿import React, { useState } from "react";
 import { FaArrowRight, FaCheck, FaShoppingCart, FaStar } from "react-icons/fa";
-import './style.css';
+import "./style.css";
+import {useNavigate, useNavigation} from "react-router-dom";
 
-const Content = () => {
+const Products = ({ products = [] ,title=""}) => {
 	const [selectedFilter, setSelectedFilter] = useState(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const productsPerPage = 10;
-
-	const products = [
-		{ name: "Mũ bảo hộ", image: "https://placehold.co/150x150", price: "200,000 VND", rating: 4, stock: "Còn hàng" },
-		{ name: "Găng tay chống cắt", image: "https://placehold.co/150x150", price: "150,000 VND", rating: 5, stock: "Còn hàng" },
-		{ name: "Kính bảo hộ", image: "https://placehold.co/150x150", price: "100,000 VND", rating: 3, stock: "Hết hàng" },
-		{ name: "Áo phản quang", image: "https://placehold.co/150x150", price: "300,000 VND", rating: 4, stock: "Còn hàng" },
-		{ name: "Giày bảo hộ", image: "https://placehold.co/150x150", price: "500,000 VND", rating: 5, stock: "Còn hàng" },
-		{ name: "Mặt nạ phòng độc", image: "https://placehold.co/150x150", price: "700,000 VND", rating: 4, stock: "Hết hàng" },
-		{ name: "Mặt nạ phòng độc", image: "https://placehold.co/150x150", price: "700,000 VND", rating: 4, stock: "Hết hàng" },
-		{ name: "Mặt nạ phòng độc", image: "https://placehold.co/150x150", price: "700,000 VND", rating: 4, stock: "Hết hàng" },
-		{ name: "Mặt nạ phòng độc", image: "https://placehold.co/150x150", price: "700,000 VND", rating: 4, stock: "Hết hàng" },
-		{ name: "Mặt nạ phòng độc", image: "https://placehold.co/150x150", price: "700,000 VND", rating: 4, stock: "Hết hàng" },
-		{ name: "Mặt nạ phòng độc", image: "https://placehold.co/150x150", price: "700,000 VND", rating: 4, stock: "Hết hàng" },
-	];
-
 	const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
 	const totalPages = Math.ceil(products.length / productsPerPage);
-
+	const navigate = useNavigate();
 	const handlePageChange = (page) => {
 		if (page > 0 && page <= totalPages) {
 			setCurrentPage(page);
 		}
 	};
 
-	const currentProducts = products.slice(
+	const sortedProducts = [...products];
+	if (selectedFilter === "Giá tăng dần") {
+		sortedProducts.sort((a, b) => a.price - b.price);
+	} else if (selectedFilter === "Giá giảm dần") {
+		sortedProducts.sort((a, b) => b.price - a.price);
+	} else if (selectedFilter === "Rating") {
+		sortedProducts.sort((a, b) => b.averageRating - a.averageRating);
+	}
+
+	const currentProducts = sortedProducts.slice(
 		(currentPage - 1) * productsPerPage,
 		currentPage * productsPerPage
 	);
-
+	const handleDetailProduct =(id)=>{
+		navigate("/product/"+id);
+	}
 	return (
 		<main className="container mx-auto p-4">
-			<div className="flex justify-between items-center mb-4" style={{ marginTop: '30px' }}>
-				<h2 className="best-products">TOP SẢN PHẨM BÁN CHẠY</h2>
+			<div className="flex justify-between items-center mb-4" style={{ marginTop: "30px" }}>
+				<h2 className="best-products">{title}</h2>
 				<div className="flex space-x-4">
 					{filters.map((filter, index) => (
 						<button
@@ -55,11 +52,15 @@ const Content = () => {
 			<div className="product-container-best-products">
 				{currentProducts.map((product, index) => (
 					<div key={index} className="product-card">
-						<img className="product-image" src={product.image} alt={product.name} />
+						<img onClick={()=>{handleDetailProduct(product.id)}}
+							className="product-image"
+							src={product.productImages?.[0]?.image || "/images/default.png"}
+							alt={product.name}
+						/>
 						<div className="product-info">
 							<div className="product-rating-price">
 								<div className="product-rating">
-									{Array.from({ length: product.rating }, (_, i) => (
+									{Array.from({ length: product.averageRating }, (_, i) => (
 										<FaStar key={i} />
 									))}
 								</div>
@@ -70,7 +71,7 @@ const Content = () => {
 							<div className="product-actions">
 								<input type="number" className="quantity-input" min="1" defaultValue="1" />
 								<button className="add-to-cart-button">
-									<FaShoppingCart className="icon" /> Thêm vào giỏ
+									<FaShoppingCart className="icon" /> <span>Thêm vào giỏ</span>
 								</button>
 							</div>
 						</div>
@@ -78,20 +79,19 @@ const Content = () => {
 				))}
 			</div>
 			<div className="flex justify-center mt-4">
-			<div className="new-blog-read-more">
-				<button className="new-blog-read-more-button">
-					<div className="new-blog-read-more-text">Xem tất cả <FaArrowRight className="inline" /></div>
-				</button>
+				<button className="pagination-button" onClick={() => handlePageChange(currentPage - 1)}>Trước</button>
+				<span className="pagination-info">Trang {currentPage} / {totalPages}</span>
+				<button className="pagination-button" onClick={() => handlePageChange(currentPage + 1)}>Sau</button>
 			</div>
+			<div className="flex justify-center mt-4">
+				<div className="new-blog-read-more">
+					<button className="new-blog-read-more-button">
+						<div className="new-blog-read-more-text">Xem tất cả <FaArrowRight className="inline" /></div>
+					</button>
+				</div>
 			</div>
-
-
-
-
-
-
 		</main>
 	);
 };
 
-export default Content;
+export default Products;
