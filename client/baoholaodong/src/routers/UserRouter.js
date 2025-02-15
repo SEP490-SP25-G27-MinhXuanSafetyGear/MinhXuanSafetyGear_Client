@@ -4,7 +4,6 @@ import Signin from "../pages/signin";
 import Home from "../pages/Home";
 import About from "../pages/About";
 import PrivateRoute from "../components/PrivateRoute";
-import Dashboard from "../pages/manager/Dashboard";
 import AdminLayout from "../layouts/AdminLayout";
 import Users from "../pages/manager/Users";
 import {Orders} from "../pages/manager/OrderManager";
@@ -16,36 +15,56 @@ import Settings from "../pages/manager/Settings";
 import ProductCategories from "../pages/manager/ProductCategoryManager/ProductCategories";
 import React from "react";
 import CustomerLayout from "../layouts/CustomerLayout";
+import Cart from "../pages/Cart";
+import ProductDetail from "../pages/ProductDetail";
+import { CustomerProductProvider} from "../contexts/CustomerProductContext";
+import {BlogPostProvider} from "../contexts/BlogPostContext";
+import {ProductProvider} from "../contexts/ProductContext";
+import {Taxes} from "../pages/manager/TaxManager";
+import VerificationPage from "../pages/register/Verification";
+import UnauthorizedPage from "../pages/UnauthorizedPage";
+import Logout from "../pages/Logout";
 
 const UserRouter = () => {
     return (
         <Router>
-            <Routes>
-                <Route path="/" element={<CustomerLayout/>}>
-                    <Route index element={<Home />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path={"/login"} element={<Signin />} />
-                    <Route path="/about" element={<About />} />
-                </Route>
-
-            </Routes>
-            <Routes>
-                <Route
-                    path="/manager/*"
-                    element={<PrivateRoute element={<AdminLayout />} roleRequired={['Admin', 'Manager']} />}
-                >
-                    <Route path="users" element={<Users />} />
-                    <Route path="orders" element={<Orders />} />
-                    <Route path="products" element={<Products />} />
-                    <Route path="blog-posts" element={<BlogPosts/>} />
-                    <Route path="invoices" element={<Invoices />} />
-                    <Route path="notifications" element={<Notifications />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="createproduct" element={<CreateProduct />} />
-                    <Route path="updateproduct/:id" element={<UpdateProduct />} />
-                    <Route path="product_categories" element={<ProductCategories />} />
-                </Route>
-            </Routes>
+            <CustomerProductProvider>
+                <Routes>
+                    <Route path="/" element={<CustomerLayout/>}>
+                        <Route index element={<Home />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path={"/login"} element={<Signin />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/cart" element={<Cart />} />
+                        <Route path="/product/:id" element={<ProductDetail />}/>
+                        <Route path="/verification" element={<VerificationPage />} />
+                        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                        <Route path="/logout" element={<Logout/>} />
+                    </Route>
+                </Routes>
+            </CustomerProductProvider>
+            <ProductProvider >
+                <BlogPostProvider>
+                    <Routes>
+                        <Route
+                            path="/manager/"
+                            element={<PrivateRoute element={<AdminLayout />} roleRequired={['Admin', 'Manager']} />}
+                        >
+                            <Route path="users" element={<Users />} />
+                            <Route path="orders" element={<Orders />} />
+                            <Route path="products" element={<Products />} />
+                            <Route path="blog-posts" element={<BlogPosts/>} />
+                            <Route path="invoices" element={<Invoices />} />
+                            <Route path="notifications" element={<Notifications />} />
+                            <Route path="settings" element={<Settings />} />
+                            <Route path="createproduct" element={<CreateProduct />} />
+                            <Route path="updateproduct/:id" element={<UpdateProduct />} />
+                            <Route path="product_categories" element={<ProductCategories />} />
+                            <Route path="taxes" element={<Taxes />} />
+                        </Route>
+                    </Routes>
+                </BlogPostProvider>
+            </ProductProvider>
         </Router>
     )
 }

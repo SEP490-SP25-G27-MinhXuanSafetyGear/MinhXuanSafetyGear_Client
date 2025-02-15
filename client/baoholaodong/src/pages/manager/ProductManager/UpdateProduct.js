@@ -8,7 +8,45 @@ import Loading from "../../../components/Loading/Loading";
 const UpdateProduct = () => {
 	const {id} = useParams();
 	const { getProductById, categories,updateProduct ,uploadImage,updateImage,deleteImage,updateVariant,createVariant } = useContext(ProductContext);
-	const [product, setProduct] = useState(null);
+	const [product, setProduct] = useState({
+		id: parseInt(id),
+		name: "",
+		description: "",
+		material: "oke nha",
+		origin: "han quoc",
+		categoryId: 1,
+		categoryName: "",
+		quantity: 0,
+		price: 0,
+		priceDiscount: 0,
+		discount: 0,
+		createdAt: "2025-02-11T18:30:25.43",
+		updatedAt: "2025-02-14T22:16:08.1",
+		status: true,
+		averageRating: 0,
+		qualityCertificate:"",
+		productImages: [
+			{
+				id: 0,
+				fileName: "",
+				image: "",
+				description: null,
+				isPrimary: true
+			}
+		],
+		productVariants: [
+			{
+				variantId: 0,
+				productId: 0,
+				size: "",
+				color: "",
+				quantity: 0,
+				price: 0.01,
+				discount: 0,
+				status: true
+			}
+		]
+	});
 	const [isOpenUpdateInformation, setIsOpenUpdateInformation] = useState(false);
 	const [isOpenAddMoreImage, setIsOpenAddMoreImage] = useState(false);
 	const [isOpenUpdateVariant, setIsOpenUpdateVariant] = useState(false);
@@ -95,6 +133,9 @@ const UpdateProduct = () => {
 					</div>
 					<div className="col-span-2">
 						<p className="text-gray-700 font-semibold">Danh mục: {product.categoryName}</p>
+					</div>
+					<div className="col-span-2">
+						<p className="text-gray-700 font-semibold">Chứng nhận chất lượng: {product.qualityCertificate}</p>
 					</div>
 				</div>
 
@@ -190,6 +231,7 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 		discount: product?.discount || 0,
 		categoryId: product?.categoryId || "",
 		status: product?.status || false,
+		qualityCertificate:product.qualityCertificate
 	});
 
 	const [productIsValid, setProductIsValid] = useState(true);
@@ -230,7 +272,6 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!productIsValid) return; // Không cho submit nếu dữ liệu không hợp lệ
-
 		try {
 			setLoading(true);
 			const updatedProduct = await onUpdate(productUpdate);
@@ -249,47 +290,62 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 			<form onSubmit={handleSubmit} className="space-y-4 ">
 				<div>
 					<label className="block font-medium">Tên sản phẩm:</label>
-					<input type="text" name="name" value={productUpdate.name} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" required />
+					<input type="text" name="name" value={productUpdate.name} onChange={handleChange}
+						   className="w-full border rounded-lg px-3 py-2" required/>
 				</div>
 
 				<div>
 					<label className="block font-medium">Mô tả:</label>
-					<textarea rows={10} name="description" value={productUpdate.description} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" required />
+					<textarea rows={10} name="description" value={productUpdate.description} onChange={handleChange}
+							  className="w-full border rounded-lg px-3 py-2" required/>
+				</div>
+				<div>
+					<label className="block font-medium">Chứng nhận:</label>
+					<textarea rows={3} name="qualityCertificate" value={productUpdate.qualityCertificate} onChange={handleChange}
+							  className="w-full border rounded-lg px-3 py-2" required/>
 				</div>
 
 				<div className="grid grid-cols-2 gap-4">
 					<div>
 						<label className="block font-medium">Chất liệu:</label>
-						<input type="text" name="material" value={productUpdate.material} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" />
+						<input type="text" name="material" value={productUpdate.material} onChange={handleChange}
+							   className="w-full border rounded-lg px-3 py-2"/>
 					</div>
 					<div>
 						<label className="block font-medium">Xuất xứ:</label>
-						<input type="text" name="origin" value={productUpdate.origin} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" />
+						<input type="text" name="origin" value={productUpdate.origin} onChange={handleChange}
+							   className="w-full border rounded-lg px-3 py-2"/>
 					</div>
 					<div>
 						<label className="block font-medium">Trạng thái</label>
-						<input type="checkbox" name="status" checked={Boolean(productUpdate.status)} onChange={handleChange} className="border rounded-lg px-3 py-2" />
+						<input type="checkbox" name="status" checked={Boolean(productUpdate.status)}
+							   onChange={handleChange} className="border rounded-lg px-3 py-2"/>
 					</div>
 				</div>
 
 				<div className="grid grid-cols-3 gap-4">
 					<div>
 						<label className="block font-medium">Số lượng:</label>
-						<input type="number" name="quantity" value={productUpdate.quantity} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" min="1" required />
+						<input type="number" name="quantity" value={productUpdate.quantity} onChange={handleChange}
+							   className="w-full border rounded-lg px-3 py-2" min="1" required/>
 					</div>
 					<div>
 						<label className="block font-medium">Giá ($):</label>
-						<input type="number" name="price" value={productUpdate.price} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" step="0.01" min="0.01" required />
+						<input type="number" name="price" value={productUpdate.price} onChange={handleChange}
+							   className="w-full border rounded-lg px-3 py-2" step="0.01" min="0.01" required/>
 					</div>
 					<div>
 						<label className="block font-medium">Giảm giá (%):</label>
-						<input type="number" name="discount" value={productUpdate.discount} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" min="0" max="100" required />
+						<input type="number" name="discount" value={productUpdate.discount} onChange={handleChange}
+							   className="w-full border rounded-lg px-3 py-2" min="0" max="100" required/>
 					</div>
+
 				</div>
 
 				<div>
 					<label className="block font-medium">Danh mục:</label>
-					<select name="categoryId" value={productUpdate.categoryId} onChange={handleChange} className="w-full border rounded-lg px-3 py-2" required>
+					<select name="categoryId" value={productUpdate.categoryId} onChange={handleChange}
+							className="w-full border rounded-lg px-3 py-2" required>
 						<option value="">Chọn danh mục</option>
 						{categories.map((cat) => (
 							<option key={cat.categoryId} value={cat.categoryId}>
@@ -316,7 +372,7 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 
 
 // add more image
-const AddMoreImageForm = ({ product, uploadImage ,fetchProduct ,setLoading}) => {
+const AddMoreImageForm = ({product, uploadImage, fetchProduct, setLoading}) => {
 	const [image, setImage] = useState({
 		productId: product.id,
 		description: "",

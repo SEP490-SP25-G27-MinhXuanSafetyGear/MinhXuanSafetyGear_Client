@@ -13,6 +13,7 @@ import {
     Menu,
     ChevronLeft,
     Boxes,
+    Percent
 } from 'lucide-react';
 import {AuthContext} from "../contexts/AuthContext";
 const AdminLayout = () => {
@@ -26,15 +27,17 @@ const AdminLayout = () => {
             { path: '/manager/users', icon: Users, label: 'Users' },
             { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
             { path: '/manager/products', icon: Package, label: 'Products' },
-            { path: '/manager/product_categories', icon: Boxes, label: 'ProductCategories' },
+            { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
             { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
             { path: '/manager/invoices', icon: Receipt, label: 'Invoices' },
             { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
+            { path: '/manager/taxes', icon: Percent, label: 'Taxes' }, // Thêm mục Taxes
             { path: '/manager/settings', icon: Settings, label: 'Settings' },
         ],
         []
     );
-    
+
+
     return (
         <div className="flex h-screen bg-gray-100">
             <div className={`${

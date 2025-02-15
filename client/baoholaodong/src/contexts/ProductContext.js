@@ -15,7 +15,7 @@ export const ProductProvider = ({ children }) => {
 	const [categories, setCategories] = useState([]);
 	const [hubConnection, setHubConnection] = useState(null);
 	const [search, setSearch] = useState("");
-
+	const [taxes, setTaxes] = useState([]);
 	/** Lấy danh sách sản phẩm */
 	const fetchProducts = async () => {
 		setLoading(true);
@@ -54,6 +54,15 @@ export const ProductProvider = ({ children }) => {
 			setCategories([]);
 		}
 	};
+
+	const fetchTaxes = async () => {
+		try{
+			const response = await axios.get(`${BASE_URL}/api/tax/getall`);
+			setTaxes(response.data || []);
+		}catch(error){
+
+		}
+	}
 
 	/** Thêm danh mục sản phẩm */
 	const createCategory = async (category) => {
@@ -195,7 +204,9 @@ export const ProductProvider = ({ children }) => {
 	useEffect(() => {
 		if (!hubConnection) return;
 
-		const handleProductChange = () => fetchProducts();
+		const handleProductChange = () => {
+			fetchProducts();
+		};
 		const handleCategoriesChange = () => {fetchCategories()};
 		hubConnection.on("ProductUpdated", handleProductChange);
 		hubConnection.on("ProductAdded", handleProductChange);
@@ -210,6 +221,8 @@ export const ProductProvider = ({ children }) => {
 			hubConnection.off("ProductCategoryUpdated",handleCategoriesChange);
 		};
 	}, [hubConnection]);
+	// lắng nghe sư kiện update của product
+
 
 	/** Gọi API khi thay đổi danh mục, trang hoặc kích thước trang */
 	useEffect(() => {
@@ -218,9 +231,10 @@ export const ProductProvider = ({ children }) => {
 		}
 	}, [selectedCategory, page, size]);
 
-	/** Lấy danh mục ngay khi khởi động */
+	/** Lấy danh mục và thuế ngay khi khởi động */
 	useEffect(() => {
 		fetchCategories();
+		fetchTaxes();
 	}, []);
 
 	/** Delay tìm kiếm để tránh spam API */
@@ -263,7 +277,7 @@ export const ProductProvider = ({ children }) => {
 				deleteImage,
 				createCategory,
 				updateCategory,
-
+				taxes,
 			}}
 		>
 			{children}

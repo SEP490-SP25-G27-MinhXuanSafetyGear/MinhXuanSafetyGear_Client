@@ -24,7 +24,8 @@ const Signin = () => {
             setUser(result);
             if(result.role ==='Admin'){
                 navigate('/manager');
-            }else{
+            }else if(result.role ==='Customer'){
+                localStorage.setItem("welcomeBack", "true");
                 navigate("/");
             }
         } catch (err) {

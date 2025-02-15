@@ -174,3 +174,66 @@
     transform: translateX(0);
   }
 }
+@media (max-width: 1200px) {
+  .product-container-best-products {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .product-container-best-products {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .product-card {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-container-best-products {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .product-image {
+    height: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .product-container-best-products {
+    grid-template-columns: repeat(2, 1fr); /* 2 cột thay vì 1 */
+    gap: 15px; /* Giảm khoảng cách */
+  }
+  .product-image {
+    height: 160px; /* Điều chỉnh kích thước ảnh */
+  }
+  .product-card {
+    padding: 10px;
+  }
+  .add-to-cart-button{
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #b50a00;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .add-to-cart-button span {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .product-container-best-products {
+    grid-template-columns: repeat(2, 1fr); /* Giữ nguyên 2 cột */
+  }
+  .product-image {
+    height: 150px;
+  }
+  .view-all-button-products {
+    width: 100%;
+  }
+}
+
