@@ -1,19 +1,12 @@
 ﻿import React, { useContext, useState } from 'react';
 import { ProductContext } from "../../../contexts/ProductContext";
-
-const Loading = ({ isLoading }) => {
-	if (!isLoading) return null;
-	return (
-		<div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-50">
-			<div className="p-6 bg-white rounded-lg shadow-lg flex items-center gap-3">
-				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-				<span className="text-lg font-semibold">Saving product...</span>
-			</div>
-		</div>
-	);
-};
-
+import {useNavigate} from "react-router-dom";
+import Loading from "../../../components/Loading/Loading";
+import {isImageSizeValid,compressImageToTargetSize} from "../../../utils/imageUtils";
+const MAX_IMAGE_SIZE_MB = 0.5; // 2MB
+const TARGET_IMAGE_SIZE_KB = 300; // 300KB
 const CreateProduct = () => {
+	const navigate = useNavigate();
 	const { categories, createProduct } = useContext(ProductContext);
 	const [product, setProduct] = useState({
 		name: "",
@@ -73,10 +66,21 @@ const CreateProduct = () => {
 	};
 
 	// Xử lý chọn ảnh
-	const handleImageChange = (e) => {
+	const handleImageChange = async (e) => {
 		const selectedFiles = Array.from(e.target.files);
-		setImages((prevImages) => [...prevImages, ...selectedFiles]);
+		const validImages = await Promise.all(
+			selectedFiles.map(async (file) => {
+				if (!isImageSizeValid(file, MAX_IMAGE_SIZE_MB)) { // Kiểm tra giới hạn 5MB
+					alert("File quá lớn! Chỉ chấp nhận ảnh dưới 5MB.");
+					return null;
+				}
+				return await compressImageToTargetSize(file, TARGET_IMAGE_SIZE_KB); // Nén ảnh nếu quá lớn
+			})
+		);
+
+		setImages(prevImages => [...prevImages, ...validImages.filter(img => img !== null)]);
 	};
+
 
 	// Xóa ảnh đã chọn
 	const removeImage = (index) => {
@@ -113,10 +117,10 @@ const CreateProduct = () => {
 				formData.append("files", image);
 			});
 			var result= await createProduct(formData);
-			console.log(result);
+			navigate("/manager/updateproduct/"+result.id);
 			setIsLoading(false);
 		}catch(err){
-
+			console.log(err);
 		}
 		finally {
 			setIsLoading(false);

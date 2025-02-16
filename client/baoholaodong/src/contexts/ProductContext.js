@@ -6,6 +6,10 @@ const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
+	/**
+	 * danh sach sản phẩm
+	 * @return {products}
+	 * */
 	const [products, setProducts] = useState([]);
 	const [product, setProduct] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -24,7 +28,6 @@ export const ProductProvider = ({ children }) => {
 				params: { category: selectedCategory, page, pagesize: size },
 			});
 			setProducts(response.data.items || []);
-
 		} catch (error) {
 			console.error("Lỗi khi lấy sản phẩm:", error.response?.data || error.message);
 		} finally {
@@ -37,7 +40,7 @@ export const ProductProvider = ({ children }) => {
 	/** Lấy thông tin chi tiết sản phẩm */
 	const getProductById = async (id) => {
 		try {
-			const response = await axios.get(`${BASE_URL}/api/Product/get-product-by-id/${id}`);
+			const response = await axios.get(`${BASE_URL}/api/product/get-product-by-id/${id}`);
 			return response.data;
 		} catch (error) {
 			console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message);
@@ -54,7 +57,9 @@ export const ProductProvider = ({ children }) => {
 			setCategories([]);
 		}
 	};
-
+	/**
+	 * lấy danh sách thuế
+	 * */
 	const fetchTaxes = async () => {
 		try{
 			const response = await axios.get(`${BASE_URL}/api/tax/getall`);
@@ -83,6 +88,7 @@ export const ProductProvider = ({ children }) => {
 			throw error;
 		}
 	};
+
 	/** Tạo sản phẩm */
 	const createProduct = async (product) => {
 		try {
@@ -93,6 +99,7 @@ export const ProductProvider = ({ children }) => {
 			throw error;
 		}
 	};
+
 
 	/** Xóa sản phẩm */
 	const deleteProduct = async (id) => {
@@ -181,7 +188,37 @@ export const ProductProvider = ({ children }) => {
 			throw error;
 		}
 	}
-
+	/**
+	 * them thue cho san pham
+	 * @param {number} productId
+	 * @param {number} taxId
+	 * @return {object} product
+	 * */
+	const addProductTax= async (productId,taxId) => {
+		try{
+			var productTax = {
+				productId: productId,
+				taxId: taxId
+			}
+			const response = await axios.post(`${BASE_URL}/api/product/add-tax`, productTax);
+			return response.data;
+		}catch(error){
+			throw error;
+		}
+	}
+	/**
+	 * them thue cho san pham
+	 * @param {number} id
+	 * @return {object} product
+	 * */
+	const deleteProductTax= async (id) => {
+		try{
+			const response = await axios.delete(`${BASE_URL}/api/product/remove-tax/?productTaxid=${id}`);
+			return response.data;
+		}catch(error){
+			throw error;
+		}
+	}
 	/** Kết nối với SignalR */
 	useEffect(() => {
 		const connection = new signalR.HubConnectionBuilder()
@@ -278,6 +315,8 @@ export const ProductProvider = ({ children }) => {
 				createCategory,
 				updateCategory,
 				taxes,
+				addProductTax,
+				deleteProductTax,
 			}}
 		>
 			{children}

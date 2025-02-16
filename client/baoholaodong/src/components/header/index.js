@@ -57,32 +57,42 @@ function Header() {
                         </div>
                         <div className="relative group">
                             <div className="flex items-center cursor-pointer">
-                                <FaUser className="text-white h-6 w-6" />
+                                {user ? (
+                                    <img
+                                        src={user.imageUrl}
+                                        alt="Avatar"
+                                        className="h-8 w-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <FaUser className="text-white h-6 w-6"/>
+                                )}
                                 <div className="ml-2">
-                                    <p className="text-sm text-white">
-                                        Thông tin
-                                    </p>
+                                    <p className="text-sm text-white">Thông tin</p>
                                     <div className="flex items-center">
-                                        <p className="text-lg font-bold text-white">
-                                            Tài khoản
-                                        </p>
+                                        <p className="text-lg font-bold text-white">Tài khoản</p>
                                         <span className="ml-1 text-white">&#9662;</span>
                                     </div>
                                 </div>
                             </div>
-
                             <div
                                 className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                                <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
-                                    ký</a>
-                                <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
-                                    nhập</a>
+                                {user? (
+                                    <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
+                                        suất</a>
+                                ) : (
+                                    <>
+                                        <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
+                                            ký</a>
+                                        <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
+                                            nhập</a></>
+                                )}
                             </div>
                         </div>
                         <div className="relative flex items-center">
                             <div className="relative">
                                 <FaShoppingCart className="text-white h-8 w-8 cursor-pointer"/>
-                                <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-block w-4 h-4 bg-white text-red-600 text-xs font-bold rounded-full text-center">3</span>
+                                <span
+                                    className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-block w-4 h-4 bg-white text-red-600 text-xs font-bold rounded-full text-center">3</span>
                             </div>
                             <span className="ml-2 text-lg font-bold text-white">
                                 Giỏ hàng
