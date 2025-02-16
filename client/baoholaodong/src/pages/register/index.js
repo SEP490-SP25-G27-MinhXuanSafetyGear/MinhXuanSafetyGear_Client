@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "../../components/header";
 import Footer from '../../components/footer';
 import axios from 'axios';
 import './style.css';
 import Loading from "../../components/Loading/Loading";
+import RegisterByGoogle from "./RegisterByGoogle";
+import {AuthContext} from "../../contexts/AuthContext";
 const apiUrl = process.env.REACT_APP_BASE_URL_API;
 
 const Register = () => {
@@ -14,11 +16,14 @@ const Register = () => {
         password: "",
         phoneNumber: "",
         dateOfBirth: "2000-02-15",
+        imageUrl: "",
+        isEmailVerified: false,
         gender: true
     });
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+    const {setUser} = useContext(AuthContext);
     const handleRegister = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -48,11 +53,6 @@ const Register = () => {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const handleGoogleSignIn = () => {
-        // Implement Google Sign-In logic here
-        console.log('Google Sign-In clicked');
     };
 
     return (
@@ -115,9 +115,7 @@ const Register = () => {
                     <button type="button" onClick={(e)=>{handleRegister(e)}} className="submit-button">Đăng ký</button>
                 </form>
                 <div className="or-text">hoặc đăng nhập bằng</div>
-                <button
-                    onClick={handleGoogleSignIn} className="google-signin-button">
-                </button>
+                <RegisterByGoogle setUserData={setUser}/>
             </div>
         </>
     );

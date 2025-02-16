@@ -1,11 +1,10 @@
 import React, {useContext, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from "../../components/header";
-import Footer from '../../components/footer';
 import './style.css';
 import { AuthContext } from "../../contexts/AuthContext";
 import Loading from "../../components/Loading/Loading";
-
+import LoginGoogle from "./LoginGoogle";
+const clientId ="389645565421-f4i91jcfq910iulpmps1go62ounqbnt4.apps.googleusercontent.com";
 const Signin = () => {
     const [formSignin, setFormSignin] = useState({
         email: '',
@@ -34,10 +33,6 @@ const Signin = () => {
         }finally {
             setLoading(false);
         }
-    };
-
-    const handleGoogleSignIn = () => {
-        console.log('Google Sign-In clicked');
     };
 
     return (
@@ -78,9 +73,7 @@ const Signin = () => {
                     </div>
                 </div>
                 <div className="or-text">hoặc đăng nhập bằng</div>
-                <button onClick={handleGoogleSignIn} className="google-signin-button">
-                    Đăng nhập với Google
-                </button>
+                <LoginGoogle setUser={setUser}/>
             </div>
         </>
     );
