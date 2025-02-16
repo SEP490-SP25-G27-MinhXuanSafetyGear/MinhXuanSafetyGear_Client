@@ -24,7 +24,7 @@ import {Taxes} from "../pages/manager/TaxManager";
 import VerificationPage from "../pages/register/Verification";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 import Logout from "../pages/Logout";
-
+import { GoogleOAuthProvider } from "@react-oauth/google";
 const UserRouter = () => {
     return (
         <Router>
