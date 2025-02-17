@@ -1,6 +1,6 @@
 import React, {useContext, useState} from "react";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaSearch, FaBars, FaTimes } from "react-icons/fa";
-import Sidebar from "./Sidebar"; // Import the Sidebar component
+import Sidebar from "./Sidebar";
 import "./style.css";
 import {AuthContext} from "../../contexts/AuthContext";
 
@@ -36,7 +36,7 @@ function Header() {
                         <input
                             type="text"
                             placeholder="Tìm kiếm..."
-                            className="w-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-white"
+                            className="w-3/4 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-white"
                         />
                     </div>
                     <div className="flex items-center space-x-6">
@@ -49,7 +49,7 @@ function Header() {
                                     </p>
                                     <div className="flex items-center">
                                         <p className="text-lg font-bold text-white">
-                                            0123456789
+                                            0912.201.309
                                         </p>
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@ function Header() {
                                 className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
                                 {user? (
                                     <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
-                                        suất</a>
+                                        xuất</a>
                                 ) : (
                                     <>
                                         <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
