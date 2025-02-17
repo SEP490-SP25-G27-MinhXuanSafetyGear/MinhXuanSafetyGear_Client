@@ -2,7 +2,7 @@
 import { Package, Edit, Trash2, Plus } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { ProductContext } from "../../../contexts/ProductContext";
+import { ProductContext } from "../../../contexts/AdminProductContext";
 import Loading from "../../../components/Loading/Loading";
 
 const Products = () => {
@@ -53,7 +53,7 @@ const Products = () => {
 						</button>
 					</div>
 				</div>
-				
+
 				<div className="p-6">
 					{loading ? (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -73,7 +73,7 @@ const Products = () => {
 									Array.isArray(productImages) && productImages.length > 0
 										? productImages[0].image
 										: "https://via.placeholder.com/150";
-								
+
 								return (
 									<div key={id} className="bg-white border rounded-lg overflow-hidden">
 										<img src={image} alt={name} className="w-full h-48 object-cover" />
@@ -104,7 +104,7 @@ const Products = () => {
 						</div>
 					)}
 				</div>
-				
+
 				<div className="p-6 flex justify-between items-center">
 					<button
 						className={`px-4 py-2 border rounded-lg ${page === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}

@@ -6,7 +6,8 @@ const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const CustomerProductContext = createContext();
 export const CustomerProductProvider =({ children }) => {
     const [topSaleProducts,setTopSaleProducts] = useState([]);
-
+    const [hubConnection, setHubConnection] = useState(null);
+    const [groupCategories, setGroupCategories] = useState([]);
     /** Lấy thông tin chi tiết sản phẩm */
     const getProductById = async (id) => {
         try {
@@ -29,15 +30,78 @@ export const CustomerProductProvider =({ children }) => {
             throw error;
         }
     }
+    /**
+     * get categories
+     * */
+    const fetchProductCategories = async () => {
+        try{
+            const response = await axios.get(`${BASE_URL}/api/product/getall-category`);
+            setGroupCategories(response.data);
+        }catch(error){
+            throw error;
+        }
+    }
+    /** Kết nối với SignalR */
+    useEffect(() => {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(`${BASE_URL}/productHub`)
+            .withAutomaticReconnect()
+            .build();
+
+        connection.start()
+            .then(() => setHubConnection(connection))
+            .catch(err => console.error("Lỗi khi kết nối SignalR:", err));
+
+        return () => {
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.stop();
+            }
+        };
+    }, []);
+
+    /** Lắng nghe sự kiện từ SignalR */
+    useEffect(() => {
+        if (!hubConnection) return;
+        const handleProductChange = (productUpdated) => {
+            setTopSaleProducts((prevProducts) =>
+                prevProducts.map((product) =>
+                    product.id === productUpdated.id ? productUpdated : product
+                )
+            );
+
+        };
+        hubConnection.on("ProductUpdated", handleProductChange);
+        hubConnection.on("ProductAdded", handleProductChange);
+        hubConnection.on("ProductDeleted", handleProductChange);
+        hubConnection.on("ProductCategoryAdded");
+        hubConnection.on("ProductCategoryUpdated");
+        return () => {
+            hubConnection.off("ProductUpdated", handleProductChange);
+            hubConnection.off("ProductAdded", handleProductChange);
+            hubConnection.off("ProductDeleted", handleProductChange);
+            hubConnection.off("ProductCategoryAdded");
+            hubConnection.off("ProductCategoryUpdated");
+        };
+    }, [hubConnection]);
 
     useEffect(() => {
-        fetchTopSaleProducts();
-    },[])
+        const loadData = async () => {
+            if (topSaleProducts.length === 0) {
+                await fetchTopSaleProducts();
+            }
+            if (groupCategories.length === 0) {
+                await fetchProductCategories();
+            }
+        };
+        loadData();
+    }, [topSaleProducts.length, groupCategories.length]);
+
     return (
         <CustomerProductContext.Provider
             value={{
                 topSaleProducts,
                 getProductById,
+                groupCategories,
             }}
         >
             {children}

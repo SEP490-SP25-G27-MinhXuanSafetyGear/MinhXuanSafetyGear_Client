@@ -20,7 +20,7 @@ import Cart from "../pages/Cart";
 import ProductDetail from "../pages/ProductDetail";
 import { CustomerProductProvider} from "../contexts/CustomerProductContext";
 import {BlogPostProvider} from "../contexts/BlogPostContext";
-import {ProductProvider} from "../contexts/ProductContext";
+import {AdminProductProvider} from "../contexts/AdminProductContext";
 import {Taxes} from "../pages/manager/TaxManager";
 import VerificationPage from "../pages/register/Verification";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
@@ -46,7 +46,7 @@ const UserRouter = () => {
                     </Route>
                 </Routes>
             </CustomerProductProvider>
-            <ProductProvider >
+            <AdminProductProvider >
                 <BlogPostProvider>
                     <Routes>
                         <Route
@@ -67,7 +67,7 @@ const UserRouter = () => {
                         </Route>
                     </Routes>
                 </BlogPostProvider>
-            </ProductProvider>
+            </AdminProductProvider>
         </Router>
     )
 }

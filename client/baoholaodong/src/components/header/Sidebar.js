@@ -1,21 +1,47 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaHardHat, FaBolt, FaTint, FaShieldAlt, FaBiohazard, FaFireExtinguisher, FaTimes, FaChevronDown, FaChevronUp } from "react-icons/fa";
-
-// Define menu items with sub-items
-const menuItems = [
-    { icon: <FaHardHat />, label: "Trang thiết bị bảo hộ", subItems: ["Mũ bảo hộ", "Găng tay bảo hộ", "Kính bảo hộ"] },
-    { icon: <FaBolt />, label: "An toàn ngành điện", subItems: ["Găng tay cách điện", "Ủng cách điện"] },
-    { icon: <FaTint />, label: "An toàn ngành nước", subItems: ["Áo phao", "Phao cứu sinh"] },
-    { icon: <FaShieldAlt />, label: "Thiết bị chống ồn", subItems: ["Tai nghe chống ồn", "Nút tai chống ồn"] },
-    { icon: <FaBiohazard />, label: "Thiết bị phòng độc", subItems: ["Mặt nạ phòng độc", "Bộ lọc khí độc"] },
-    { icon: <FaFireExtinguisher />, label: "Phòng cháy chữa cháy", subItems: ["Bình chữa cháy", "Mặt nạ chống khói"] },
-];
+import { CustomerProductContext } from "../../contexts/CustomerProductContext";
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
     const [openIndex, setOpenIndex] = useState(null); // State to track which menu item is open
+    const { groupCategories } = useContext(CustomerProductContext);
+    const [menuItems, setMenuItems] = useState([]); // Initialize menuItems as an empty array
 
     const handleItemClick = (index) => {
         setOpenIndex(openIndex === index ? null : index); // Toggle the dropdown list
+    };
+
+    useEffect(() => {
+        if (groupCategories.length > 0) {
+            const updatedMenuItems = groupCategories.map(group => {
+                return {
+                    icon: getIconForGroup(group.groupName), // Lấy icon theo nhóm
+                    label: group.groupName,
+                    subItems: group.categories.map(category => category.categoryName)
+                };
+            });
+            setMenuItems(updatedMenuItems);
+        }
+    }, [groupCategories]);
+
+    // Hàm trả về icon phù hợp với tên nhóm
+    const getIconForGroup = (groupName) => {
+        switch (groupName) {
+            case "Trang Thiết bị bảo hộ":
+                return <FaHardHat />;
+            case "An toàn ngành điện":
+                return <FaBolt />;
+            case "An toàn ngành nước":
+                return <FaTint />;
+            case "Thiết bị chống ồn":
+                return <FaShieldAlt />;
+            case "Thiết bị phòng độc":
+                return <FaBiohazard />;
+            case "Phòng cháy chữa cháy":
+                return <FaFireExtinguisher />;
+            default:
+                return null;
+        }
     };
 
     return (
