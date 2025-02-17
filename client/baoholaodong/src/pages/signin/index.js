@@ -29,7 +29,6 @@ const Signin = () => {
             }
         } catch (err) {
             setError('Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.');
-            console.error(err);
         }finally {
             setLoading(false);
         }
@@ -73,7 +72,7 @@ const Signin = () => {
                     </div>
                 </div>
                 <div className="or-text">hoặc đăng nhập bằng</div>
-                <LoginGoogle setUser={setUser}/>
+                <LoginGoogle setUser={setUser} setError={setError}/>
             </div>
         </>
     );

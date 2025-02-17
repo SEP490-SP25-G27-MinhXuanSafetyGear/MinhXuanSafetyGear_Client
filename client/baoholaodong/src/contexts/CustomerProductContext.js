@@ -31,10 +31,8 @@ export const CustomerProductProvider =({ children }) => {
     }
 
     useEffect(() => {
-        if(topSaleProducts.length === 0) {
-            fetchTopSaleProducts();
-        }
-    },[topSaleProducts])
+        fetchTopSaleProducts();
+    },[])
     return (
         <CustomerProductContext.Provider
             value={{

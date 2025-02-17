@@ -1,13 +1,16 @@
-﻿import React, { useContext, useEffect, useState } from 'react';
+﻿import React, { useContext, useEffect, useState ,useCallback} from 'react';
 import { ProductContext } from "../../../contexts/ProductContext";
 import { useParams } from "react-router-dom";
 import { Edit, Plus } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
 import Loading from "../../../components/Loading/Loading";
+import {isImageSizeValid,compressImageToTargetSize} from "../../../utils/imageUtils";
+const MAX_IMAGE_SIZE_MB = 0.5; // 2MB
+const TARGET_IMAGE_SIZE_KB = 10; // 100KB
 const UpdateProduct = () => {
 	const {id} = useParams();
-	const { getProductById, categories,updateProduct ,uploadImage,updateImage,deleteImage,updateVariant,createVariant } = useContext(ProductContext);
+	const { getProductById, categories,updateProduct ,uploadImage,updateImage,deleteImage,updateVariant,createVariant,addProductTax ,taxes,deleteProductTax} = useContext(ProductContext);
 	const [product, setProduct] = useState({
 		id: parseInt(id),
 		name: "",
@@ -25,6 +28,7 @@ const UpdateProduct = () => {
 		status: true,
 		averageRating: 0,
 		qualityCertificate:"",
+		totalTax :0,
 		productImages: [
 			{
 				id: 0,
@@ -45,7 +49,15 @@ const UpdateProduct = () => {
 				discount: 0,
 				status: true
 			}
-		]
+		],
+		taxes:[{
+			productTaxId: 0,
+			productId: 0,
+			taxId: 0,
+			taxName: "",
+			taxRate: 0,
+			description: ""
+		}]
 	});
 	const [isOpenUpdateInformation, setIsOpenUpdateInformation] = useState(false);
 	const [isOpenAddMoreImage, setIsOpenAddMoreImage] = useState(false);
@@ -55,6 +67,7 @@ const UpdateProduct = () => {
 	const [imageSelected, setImageSelected] = useState(null);
 	const [variantSelected , setVariantSelected] = useState(null);
 	const [isLoading, setLoading] = useState(false);
+	const [isOpenAddTax, setIsOpenAddTax] = useState(false);
 	useEffect(() => {
 		fetchProduct();
 	}, [id]);
@@ -99,6 +112,10 @@ const UpdateProduct = () => {
 						}} className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
 							<Edit size={20}/> Thêm biến thể
 						</button>
+						<button onClick={() => setIsOpenAddTax(true)}
+								className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+							<Edit size={20}/> Cập nhật thuế
+						</button>
 					</div>
 				</div>
 
@@ -135,8 +152,24 @@ const UpdateProduct = () => {
 						<p className="text-gray-700 font-semibold">Danh mục: {product.categoryName}</p>
 					</div>
 					<div className="col-span-2">
-						<p className="text-gray-700 font-semibold">Chứng nhận chất lượng: {product.qualityCertificate}</p>
+						<p className="text-gray-700 font-semibold">Chứng nhận chất
+							lượng: {product.qualityCertificate}</p>
 					</div>
+					<div className="col-span-2">
+						<p className="text-gray-700 font-semibold">Thuế: {product.totalTax}%</p>
+						{product && product.taxes && product.taxes.length > 0 ? (
+							<ul className="mt-1">
+								{product.taxes.map((tax) => (
+									<li key={tax.productTaxId} className="text-gray-600">
+										{tax.taxName} - {tax.taxRate}%
+									</li>
+								))}
+							</ul>
+						) : (
+							<p className="text-gray-500">Không có thuế</p>
+						)}
+					</div>
+
 				</div>
 
 				{/* Hiển thị ảnh sản phẩm */}
@@ -213,6 +246,10 @@ const UpdateProduct = () => {
 									 close={() => {
 										 setIsOpenUpdateImage(false)
 									 }} onDelete={deleteImage} setLoading={setLoading}/>
+				</Modal>
+				<Modal onClose={()=>{setIsOpenAddTax(false)}} isOpen={isOpenAddTax} title={"Cập nhật thuế"} >
+					<AddProductTaxForm setLoading={setLoading} onAddProductTax={addProductTax} close={()=>{setIsOpenAddTax(false)}}
+									   taxes={taxes} product={product} setProduct={setProduct} onDeleteProductTax={deleteProductTax}/>
 				</Modal>
 			</div>
 		</div>
@@ -370,7 +407,6 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 	);
 };
 
-
 // add more image
 const AddMoreImageForm = ({product, uploadImage, fetchProduct, setLoading}) => {
 	const [image, setImage] = useState({
@@ -382,13 +418,29 @@ const AddMoreImageForm = ({product, uploadImage, fetchProduct, setLoading}) => {
 	const [preview, setPreview] = useState(null);
 
 	// Xử lý khi người dùng chọn ảnh
-	const handleFileChange = (event) => {
+	const handleFileChange = async (event) => {
 		const selectedFile = event.target.files[0];
-		if (selectedFile) {
-			setImage({ ...image, file: selectedFile });
-			setPreview(URL.createObjectURL(selectedFile));
+
+		if (!selectedFile) return;
+
+
+		// Kiểm tra kích thước ảnh trước khi xử lý
+		if (!isImageSizeValid(selectedFile, MAX_IMAGE_SIZE_MB)) {
+			alert("Ảnh quá lớn! Vui lòng chọn ảnh dưới 2MB.");
+			return;
+		}
+
+		try {
+			// Nén ảnh xuống dưới 500KB (nếu cần)
+			const compressedFile = await compressImageToTargetSize(selectedFile, TARGET_IMAGE_SIZE_KB);
+			setImage({ ...image, file: compressedFile });
+			setPreview(URL.createObjectURL(compressedFile));
+		} catch (error) {
+			console.error("Lỗi khi nén ảnh:", error);
+			alert("Không thể xử lý ảnh!");
 		}
 	};
+
 	const clearImage =() =>{
 		setImage({
 			productId: product.id,
@@ -776,11 +828,24 @@ const UpdateImageForm = ({image, onUpdateImage, fetchProduct, close, onDelete ,s
 	});
 
 	// Khi người dùng chọn ảnh mới
-	const handleFileChange = (e) => {
+	const handleFileChange = async (e) => {
 		const file = e.target.files[0];
-		if (file) {
-			setPreview(URL.createObjectURL(file)); // Hiển thị ảnh xem trước
-			setNewImage((prev) => ({...prev, file})); // Cập nhật ảnh mới vào newImage
+		if (!file) return;
+
+		// Kiểm tra dung lượng ảnh trước khi upload
+		if (!isImageSizeValid(file, MAX_IMAGE_SIZE_MB)) {
+			alert("Ảnh vượt quá 0.5MB! Hệ thống sẽ tự động nén ảnh...");
+			try {
+				const compressedFile = await compressImageToTargetSize(file, TARGET_IMAGE_SIZE_KB);
+				setPreview(URL.createObjectURL(compressedFile));
+				setNewImage((prev) => ({ ...prev, file: compressedFile }));
+			} catch (error) {
+				console.error("Lỗi khi nén ảnh:", error);
+				alert("Không thể nén ảnh, vui lòng chọn ảnh khác.");
+			}
+		} else {
+			setPreview(URL.createObjectURL(file));
+			setNewImage((prev) => ({ ...prev, file }));
 		}
 	};
 
@@ -900,6 +965,97 @@ const UpdateImageForm = ({image, onUpdateImage, fetchProduct, close, onDelete ,s
 	);
 };
 
+
+const AddProductTaxForm = ({ setLoading, onAddProductTax, onDeleteProductTax,close, taxes, product, setProduct }) => {
+	const [productTaxes, setProductTaxes] = useState(product.taxes || []);
+	const [taxMap, setTaxMap] = useState([]);
+
+	useEffect(() => {
+		const updatedTaxMap = (taxes || []).map(tax => {
+			// Tìm kiếm productTaxId trong productTaxes
+			const relatedProductTax = productTaxes.find(productTax => productTax.taxId === tax.taxId);
+			return {
+				...tax,
+				productTaxId: relatedProductTax ? relatedProductTax.productTaxId : null, // Nếu có productTax thì lấy productTaxId, nếu không có thì gán null
+				added: productTaxes.some(productTax => productTax.taxId === tax.taxId) // Kiểm tra xem thuế đã được thêm chưa
+			};
+		});
+		setTaxMap(updatedTaxMap); // Cập nhật lại taxMap
+	}, [taxes, productTaxes]);
+	console.log(taxMap);
+	const addTax = async (tax) =>{
+		setLoading(true);
+		try{
+		    const result =await onAddProductTax(product.id, tax.taxId);
+			setProduct(result)
+			close();
+		}catch (error){
+			console.log(error);
+		}finally {
+			setLoading(false);
+		}
+	}
+	const removeTax = async (tax) => {
+		setLoading(true);
+		try{
+			const result =await onDeleteProductTax(tax.productTaxId);
+			setProduct(result)
+			close();
+		}catch (error){
+			console.log(error);
+		}finally {
+			setLoading(false);
+		}
+	};
+
+	return (
+		<div className="p-6 bg-white rounded-lg shadow-md">
+			{/* Danh sách thuế */}
+			<div className="mb-4">
+				<label className="block text-gray-700 font-semibold mb-2">Taxes</label>
+				<table className="w-full border-collapse border border-gray-300">
+					<thead>
+					<tr className="bg-gray-200">
+						<th className="border border-gray-300 px-4 py-2 text-left">Tên Thuế</th>
+						<th className="border border-gray-300 px-4 py-2 text-left">Tỷ Lệ (%)</th>
+						<th className="border border-gray-300 px-4 py-2 text-left">Cập nhât</th>
+					</tr>
+					</thead>
+					<tbody>
+					{taxMap.map((tax) => (
+						<tr key={tax.taxId} className="border border-gray-300">
+							<td className="border border-gray-300 px-4 py-2">{tax.taxName}</td>
+							<td className="border border-gray-300 px-4 py-2">{tax.taxRate}%</td>
+							<td className="border border-gray-300 px-4 py-2">
+								{!tax.added ? (
+									<button
+										onClick={() => addTax(tax)}
+										className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400">
+										Thêm
+									</button>
+								) : (
+									<button
+										onClick={() => removeTax(tax)}
+										className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400">
+										Xóa
+									</button>
+								)}
+							</td>
+						</tr>
+					))}
+					</tbody>
+				</table>
+			</div>
+
+			{/* Nút cập nhật */}
+			<div className="flex justify-end mt-4">
+				<button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400">
+					Save
+				</button>
+			</div>
+		</div>
+	);
+};
 export default UpdateProduct;
 
 

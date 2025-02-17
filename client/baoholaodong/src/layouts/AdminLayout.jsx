@@ -96,7 +96,7 @@ const AdminLayout = () => {
                             </button>
                             <div className="flex items-center space-x-2">
                                 <img
-                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                    src={user.imageUrl}
                                     alt="Admin"
                                     className="w-8 h-8 rounded-full"
                                 />

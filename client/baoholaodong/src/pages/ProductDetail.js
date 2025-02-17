@@ -118,11 +118,11 @@ const ProductDetail = () => {
                 <div className="flex flex-col md:flex-row">
                     <div className="md:w-1/2">
                         <img
-                            key={product.productImages[0].image} // Thêm key để React nhận biết thay đổi
+                            key={(product.productImages.length!==0)?product.productImages[0].image:0} // Thêm key để React nhận biết thay đổi
                             alt="Protective workwear displayed in an industrial setting"
                             className="rounded-lg"
                             height="500"
-                            src={product.productImages[0].image}
+                            src={(product.productImages.length!==0)?product.productImages[0].image:""}
                             width="500"
                         />
 
