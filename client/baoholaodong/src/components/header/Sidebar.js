@@ -55,9 +55,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 </ul>
                 {/* Additional links */}
                 <div className="p-4 mt-4 border-t text-red-600">
-                    <p className="cursor-pointer hover:underline">Về Bảo hộ lao động Minh Xuân</p>
-                    <p className="cursor-pointer hover:underline mt-2">Các tin tức</p>
-                    <p className="cursor-pointer hover:underline mt-2">Liên hệ chúng tôi</p>
+                    <a href="/about" className="cursor-pointer hover:underline block mb-2">Về Bảo hộ lao động Minh Xuân</a>
+                    <a href="/blog" className="cursor-pointer hover:underline block mb-2">Kiến thức an toàn lao động</a>
+                    <a href="/contact" className="cursor-pointer hover:underline block">Liên hệ chúng tôi</a>
                 </div>
                 {/* Hotline section */}
                 <div className="absolute bottom-0 w-full p-4 bg-gray-100 flex items-center justify-center">

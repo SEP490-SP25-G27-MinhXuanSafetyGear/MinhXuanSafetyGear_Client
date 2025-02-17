@@ -3,6 +3,7 @@ import Register from "../pages/register";
 import Signin from "../pages/signin";
 import Home from "../pages/Home";
 import About from "../pages/About";
+import BlogList from "../pages/BlogList";
 import PrivateRoute from "../components/PrivateRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import Users from "../pages/manager/Users";
@@ -37,6 +38,8 @@ const UserRouter = () => {
                         <Route path="/about" element={<About />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/product/:id" element={<ProductDetail />}/>
+                        <Route path="/blog" element={<BlogList />} />
+                        <Route path="/about" element={<About />} />
                         <Route path="/verification" element={<VerificationPage />} />
                         <Route path="/unauthorized" element={<UnauthorizedPage />} />
                         <Route path="/logout" element={<Logout/>} />
