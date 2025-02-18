@@ -1,6 +1,6 @@
 ﻿import { useParams } from "react-router-dom";
 import React, { useContext, useEffect, useState } from "react";
-import { ProductContext } from "../contexts/ProductContext";
+import { ProductContext } from "../contexts/AdminProductContext";
 import Loading from "../components/Loading/Loading";
 import * as signalR from "@microsoft/signalr";
 import {CustomerProductContext} from "../contexts/CustomerProductContext";
@@ -89,9 +89,8 @@ const ProductDetail = () => {
 
         const handleProductChange = (updatedProduct) => {
             console.log(`Received update for product ID: ${updatedProduct}`);
-            if (updatedProduct.id.toString() === id) {
-                console.log(`Product ${updatedProduct} matches current product. Fetching data...`);
-                fetchProduct();
+            if (updatedProduct.id === parseInt(id)) {
+                setProduct(updatedProduct)
             }
         };
 

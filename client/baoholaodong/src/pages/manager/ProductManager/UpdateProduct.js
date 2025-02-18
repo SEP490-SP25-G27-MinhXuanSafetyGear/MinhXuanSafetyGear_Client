@@ -1,5 +1,5 @@
 ﻿import React, { useContext, useEffect, useState ,useCallback} from 'react';
-import { ProductContext } from "../../../contexts/ProductContext";
+import { ProductContext } from "../../../contexts/AdminProductContext";
 import { useParams } from "react-router-dom";
 import { Edit, Plus } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
@@ -226,10 +226,10 @@ const UpdateProduct = () => {
 				<Modal onClose={() => setIsOpenUpdateInformation(false)} isOpen={isOpenUpdateInformation}
 					   title={"Cập nhật thông tin"}>
 					<UpdateInformationProductForm product={product} categories={categories} onUpdate={updateProduct}
-											setProduct={setProduct} setLoading={setLoading}/>
+											setProduct={setProduct} setLoading={setLoading} close={()=>setIsOpenUpdateInformation(false)} />
 				</Modal>
 				<Modal onClose={() => setIsOpenAddMoreImage(false)} isOpen={isOpenAddMoreImage} title={"Thêm ảnh mới"}>
-					<AddMoreImageForm product={product} uploadImage={uploadImage} fetchProduct={fetchProduct}
+					<AddMoreImageForm product={product} uploadImage={uploadImage} setProduct={setProduct} close={()=>{setIsOpenAddMoreImage(false)}}
 									  setLoading={setLoading}/>
 				</Modal>
 				<Modal onClose={() => setIsOpenUpdateVariant(false)} isOpen={isOpenUpdateVariant}
@@ -256,7 +256,7 @@ const UpdateProduct = () => {
 	);
 };
 // update information product
-const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduct, setLoading }) => {
+const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduct, setLoading,close }) => {
 	const [productUpdate, setProductUpdate] = useState({
 		id: product?.id || "",
 		name: product?.name || "",
@@ -312,9 +312,8 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 		try {
 			setLoading(true);
 			const updatedProduct = await onUpdate(productUpdate);
-			if (updatedProduct) {
-				setProduct(updatedProduct);
-			}
+			setProduct(updatedProduct);
+			close();
 		} catch (error) {
 			alert(error.message);
 		} finally {
@@ -408,7 +407,7 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 };
 
 // add more image
-const AddMoreImageForm = ({product, uploadImage, fetchProduct, setLoading}) => {
+const AddMoreImageForm = ({product, uploadImage, setProduct,close, setLoading}) => {
 	const [image, setImage] = useState({
 		productId: product.id,
 		description: "",
@@ -471,10 +470,9 @@ const AddMoreImageForm = ({product, uploadImage, fetchProduct, setLoading}) => {
 		    var result = await uploadImage(formData); // Gửi form-data lên server
 			if(result){
 				clearImage();
-				await fetchProduct();
-				return;
+				setProduct(result);
+				close();
 			}
-			alert(result);
 		} catch (error) {
 			console.error("Lỗi khi tải ảnh lên:", error);
 		} finally {

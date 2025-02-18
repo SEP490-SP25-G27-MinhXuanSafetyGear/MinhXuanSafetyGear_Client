@@ -1,5 +1,5 @@
 ﻿import React, { useContext, useState } from "react";
-import { ProductContext } from "../../../contexts/ProductContext";
+import { ProductContext } from "../../../contexts/AdminProductContext";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";

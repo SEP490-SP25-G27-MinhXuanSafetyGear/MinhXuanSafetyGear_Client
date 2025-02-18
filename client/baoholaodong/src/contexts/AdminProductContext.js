@@ -5,7 +5,7 @@ import * as signalR from "@microsoft/signalr";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const ProductContext = createContext();
 
-export const ProductProvider = ({ children }) => {
+export const AdminProductProvider = ({ children }) => {
 	/**
 	 * danh sach sản phẩm
 	 * @return {products}
@@ -16,13 +16,14 @@ export const ProductProvider = ({ children }) => {
 	const [selectedCategory, setSelectedCategory] = useState(0);
 	const [page, setPage] = useState(1);
 	const [size, setSize] = useState(10);
-	const [categories, setCategories] = useState([]);
+	const [groupCategories, setGroupCategories] = useState([]);
 	const [hubConnection, setHubConnection] = useState(null);
 	const [search, setSearch] = useState("");
 	const [taxes, setTaxes] = useState([]);
+	const [categories, setCategories] = useState([]);
 	/** Lấy danh sách sản phẩm */
 	const fetchProducts = async () => {
-		setLoading(true);
+		//setLoading(true);
 		try {
 			const response = await axios.get(`${BASE_URL}/api/Product/get-product-page`, {
 				params: { category: selectedCategory, page, pagesize: size },
@@ -32,7 +33,7 @@ export const ProductProvider = ({ children }) => {
 			console.error("Lỗi khi lấy sản phẩm:", error.response?.data || error.message);
 		} finally {
 			setTimeout(() => {
-				setLoading(false);
+				//setLoading(false);
 			}, 0); //
 		}
 	};
@@ -48,13 +49,13 @@ export const ProductProvider = ({ children }) => {
 	};
 
 	/** Lấy danh sách danh mục */
-	const fetchCategories = async () => {
+	const fetchGroupCategories = async () => {
 		try {
 			const response = await axios.get(`${BASE_URL}/api/Product/getall-category`);
-			setCategories(response.data || []);
+			setGroupCategories(response.data || []);
 		} catch (error) {
 			console.error("Lỗi khi lấy danh mục sản phẩm:", error.response?.data || error.message);
-			setCategories([]);
+			setGroupCategories([]);
 		}
 	};
 	/**
@@ -241,10 +242,17 @@ export const ProductProvider = ({ children }) => {
 	useEffect(() => {
 		if (!hubConnection) return;
 
-		const handleProductChange = () => {
-			fetchProducts();
+		const handleProductChange = (productUpdated) => {
+			setProducts((prevProducts) =>
+				prevProducts.map((product) =>
+					product.id === productUpdated.id ? productUpdated : product
+				)
+			);
+
 		};
-		const handleCategoriesChange = () => {fetchCategories()};
+		const handleCategoriesChange = (groups) => {
+			setGroupCategories(groups);
+		}
 		hubConnection.on("ProductUpdated", handleProductChange);
 		hubConnection.on("ProductAdded", handleProductChange);
 		hubConnection.on("ProductDeleted", handleProductChange);
@@ -270,9 +278,18 @@ export const ProductProvider = ({ children }) => {
 
 	/** Lấy danh mục và thuế ngay khi khởi động */
 	useEffect(() => {
-		fetchCategories();
-		fetchTaxes();
-	}, []);
+		if(taxes.length===0){
+			fetchTaxes();
+		}if(groupCategories.length ===0){
+			fetchGroupCategories();
+		}
+	}, [taxes,groupCategories]);
+
+	useEffect(()=>{
+		setCategories(()=>{
+			return groupCategories.flatMap(group => group.categories);
+		});
+	},[groupCategories])
 
 	/** Delay tìm kiếm để tránh spam API */
 	useEffect(() => {
@@ -299,8 +316,8 @@ export const ProductProvider = ({ children }) => {
 				setPage,
 				size,
 				setSize,
-				categories,
-				setCategories,
+				groupCategories,
+				setGroupCategories,
 				createProduct,
 				deleteProduct,
 				search,
@@ -317,6 +334,7 @@ export const ProductProvider = ({ children }) => {
 				taxes,
 				addProductTax,
 				deleteProductTax,
+				categories,
 			}}
 		>
 			{children}
