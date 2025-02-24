@@ -1,15 +1,17 @@
 ﻿import React, { useState } from "react";
 import { FaArrowRight, FaCheck, FaShoppingCart, FaStar } from "react-icons/fa";
 import "./style.css";
-import {useNavigate, useNavigation} from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
-const Products = ({ products = [] ,title=""}) => {
+const Products = ({ products = [], title = "" }) => {
 	const [selectedFilter, setSelectedFilter] = useState(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const productsPerPage = 10;
 	const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
 	const totalPages = Math.ceil(products.length / productsPerPage);
 	const navigate = useNavigate();
+	const { addToCart } = useOutletContext();
+
 	const handlePageChange = (page) => {
 		if (page > 0 && page <= totalPages) {
 			setCurrentPage(page);
@@ -29,9 +31,11 @@ const Products = ({ products = [] ,title=""}) => {
 		(currentPage - 1) * productsPerPage,
 		currentPage * productsPerPage
 	);
-	const handleDetailProduct =(id)=>{
-		navigate("/product/"+id);
-	}
+
+	const handleDetailProduct = (id) => {
+		navigate("/product/" + id);
+	};
+
 	return (
 		<main className="container mx-auto p-4">
 			<div className="flex justify-between items-center mb-4" style={{ marginTop: "30px" }}>
@@ -52,10 +56,10 @@ const Products = ({ products = [] ,title=""}) => {
 			<div className="product-container-best-products">
 				{currentProducts.map((product, index) => (
 					<div key={index} className="product-card">
-						<img onClick={()=>{handleDetailProduct(product.id)}}
-							className="product-image"
-							src={product.productImages?.[0]?.image || "/images/default.png"}
-							alt={product.name}
+						<img onClick={() => { handleDetailProduct(product.id) }}
+							 className="product-image"
+							 src={product.productImages?.[0]?.image || "/images/default.png"}
+							 alt={product.name}
 						/>
 						<div className="product-info">
 							<div className="product-rating-price">
@@ -70,7 +74,7 @@ const Products = ({ products = [] ,title=""}) => {
 							<div className="product-stock">{product.stock}</div>
 							<div className="product-actions">
 								<input type="number" className="quantity-input" min="1" defaultValue="1" />
-								<button className="add-to-cart-button">
+								<button className="add-to-cart-button" onClick={() => addToCart(product)}>
 									<FaShoppingCart className="icon" /> <span>Thêm vào giỏ</span>
 								</button>
 							</div>

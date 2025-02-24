@@ -1,15 +1,36 @@
-import React, {useContext, useState} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaSearch, FaBars, FaTimes } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import CartDropdown from "../Cartdropdown/CartDropdown";
 import "./style.css";
-import {AuthContext} from "../../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 
-function Header() {
+function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const {user} = useContext(AuthContext);
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [cartCount, setCartCount] = useState(0);
+    const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        updateCartCount();
+    }, [cartItems]);
+
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
+    const updateCartCount = () => {
+        const count = cartItems.reduce((total, item) => total + item.quantity, 0);
+        setCartCount(count);
+    };
+
+    const handleCartClick = () => {
+        navigate("/cart");
+    };
+
     return (
         <>
             <header className="header-gradient shadow">
@@ -88,15 +109,18 @@ function Header() {
                                 )}
                             </div>
                         </div>
-                        <div className="relative flex items-center">
+                        <div className="relative flex items-center"
+                             onMouseEnter={() => location.pathname !== "/cart" && setDropdownVisible(true)}
+                             onMouseLeave={() => setDropdownVisible(false)}>
                             <div className="relative">
-                                <FaShoppingCart className="text-white h-8 w-8 cursor-pointer"/>
+                                <FaShoppingCart className="text-white h-8 w-8 cursor-pointer" onClick={handleCartClick} />
                                 <span
-                                    className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-block w-4 h-4 bg-white text-red-600 text-xs font-bold rounded-full text-center">3</span>
+                                    className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-block w-4 h-4 bg-white text-red-600 text-xs font-bold rounded-full text-center">{cartCount}</span>
                             </div>
                             <span className="ml-2 text-lg font-bold text-white">
                                 Giỏ hàng
                             </span>
+                            {dropdownVisible && <CartDropdown cartItems={cartItems} removeFromCart={removeFromCart} updateCartItemQuantity={updateCartItemQuantity} showToast={showToast} />}
                         </div>
                     </div>
                 </div>
