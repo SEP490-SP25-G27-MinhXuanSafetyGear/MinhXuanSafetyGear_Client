@@ -1,14 +1,20 @@
 import { useContext, useEffect, useState } from "react";
 import { FaHardHat, FaBolt, FaTint, FaShieldAlt, FaBiohazard, FaFireExtinguisher, FaTimes, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CustomerProductContext } from "../../contexts/CustomerProductContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
     const [openIndex, setOpenIndex] = useState(null); // State to track which menu item is open
     const { groupCategories } = useContext(CustomerProductContext);
     const [menuItems, setMenuItems] = useState([]); // Initialize menuItems as an empty array
+    const navigate = useNavigate(); // Initialize useNavigate
 
-    const handleItemClick = (index) => {
-        setOpenIndex(openIndex === index ? null : index); // Toggle the dropdown list
+    const handleItemClick = (index, label, event) => {
+        if (event.target.classList.contains('arrow-icon')) {
+            setOpenIndex(openIndex === index ? null : index); // Toggle the dropdown list
+        } else if (label === "Trang Thiết bị bảo hộ") {
+            navigate("/products"); // Navigate to ProductList page
+        }
     };
 
     useEffect(() => {
@@ -64,9 +70,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 <ul className="p-4 text-red-700">
                     {menuItems.map((item, index) => (
                         <li key={index} className="flex flex-col">
-                            <div className="flex items-center gap-3 p-3 border-b cursor-pointer hover:bg-gray-100" onClick={() => handleItemClick(index)}>
+                            <div className="flex items-center gap-3 p-3 border-b cursor-pointer hover:bg-gray-100" onClick={(event) => handleItemClick(index, item.label, event)}>
                                 {item.icon} {item.label}
-                                {openIndex === index ? <FaChevronUp /> : <FaChevronDown />}
+                                {openIndex === index ? <FaChevronUp className="arrow-icon" /> : <FaChevronDown className="arrow-icon" />}
                             </div>
                             {/* Dropdown list for sub-items */}
                             {openIndex === index && (

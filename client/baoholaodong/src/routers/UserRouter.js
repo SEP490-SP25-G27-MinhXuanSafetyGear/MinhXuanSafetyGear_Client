@@ -17,6 +17,7 @@ import ProductCategories from "../pages/manager/ProductCategoryManager/ProductCa
 import React from "react";
 import CustomerLayout from "../layouts/CustomerLayout";
 import Cart from "../pages/Cart";
+import ProductList from "../pages/ProductList";
 import ProductDetail from "../pages/ProductDetail";
 import { CustomerProductProvider} from "../contexts/CustomerProductContext";
 import {BlogPostProvider} from "../contexts/BlogPostContext";
@@ -37,6 +38,7 @@ const UserRouter = () => {
                         <Route path={"/login"} element={<Signin />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/cart" element={<Cart />} />
+                        <Route path="/products" element={<ProductList />} />
                         <Route path="/product/:id" element={<ProductDetail />}/>
                         <Route path="/blog" element={<BlogList />} />
                         <Route path="/about" element={<About />} />
