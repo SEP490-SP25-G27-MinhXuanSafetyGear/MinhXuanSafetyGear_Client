@@ -3,8 +3,8 @@
     flex-direction: column;
     align-items: stretch;
     padding: 20px;
-    max-width: 1780px; /* Set the maximum width */
-    margin: 0 auto; /* Center the container */
+    max-width: 1780px;
+    margin: 0 auto;
 }
 
 .page-title {

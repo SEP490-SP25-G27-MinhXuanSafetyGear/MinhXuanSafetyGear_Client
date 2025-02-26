@@ -54,11 +54,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         <>
             {/* Overlay to darken the rest of the screen */}
             <div
-                className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                className={`fixed inset-0 bg-black bg-opacity-50 sidebar-overlay transition-opacity duration-300 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={toggleSidebar}
             ></div>
             {/* Sidebar container */}
-            <div className={`fixed top-0 left-0 h-full w-72 bg-white shadow-lg z-50 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
+            <div className={`fixed top-0 left-0 h-full w-72 bg-white shadow-lg sidebar-container transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
                 {/* Sidebar header */}
                 <div className="header-gradient text-yellow-500 p-4 flex justify-between items-center">
                     <h2 className="text-lg font-bold">DANH MỤC</h2>

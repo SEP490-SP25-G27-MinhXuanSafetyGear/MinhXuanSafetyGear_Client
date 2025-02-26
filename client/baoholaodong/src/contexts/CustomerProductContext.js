@@ -36,6 +36,7 @@ export const CustomerProductProvider =({ children }) => {
     const fetchProductCategories = async () => {
         try{
             const response = await axios.get(`${BASE_URL}/api/product/getall-category`);
+            console.log("Fetched categories:", response.data); // Debug log
             setGroupCategories(response.data);
         }catch(error){
             throw error;
@@ -102,6 +103,7 @@ export const CustomerProductProvider =({ children }) => {
                 topSaleProducts,
                 getProductById,
                 groupCategories,
+                fetchProductCategories,
             }}
         >
             {children}

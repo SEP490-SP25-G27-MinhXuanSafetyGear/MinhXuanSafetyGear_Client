@@ -1,7 +1,7 @@
 .blog-list-container {
     display: flex;
     width: 100%;
-    padding: 20px;
+    padding: 60px;
 }
 
 .blog-filter {
@@ -63,6 +63,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    margin-top: 5px;
 }
 
 .all-blog-item {

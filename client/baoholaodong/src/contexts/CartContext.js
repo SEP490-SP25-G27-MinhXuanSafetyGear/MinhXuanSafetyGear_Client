@@ -9,6 +9,7 @@ const CartProvider = ({ children }) => {
 
     useEffect(() => {
         const savedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+        console.log(savedCartItems);
         setCartItems(savedCartItems);
         updateTotalPrice(savedCartItems);
     }, []);

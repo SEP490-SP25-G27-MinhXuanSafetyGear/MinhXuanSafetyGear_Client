@@ -1,10 +1,12 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useContext } from 'react';
 import './style.css';
 import { FaFilter, FaCartPlus } from 'react-icons/fa';
+import { CustomerProductContext } from '../../contexts/CustomerProductContext';
 
 const ProductList = () => {
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [products, setProducts] = useState([]);
+    const { groupCategories, fetchProductCategories } = useContext(CustomerProductContext);
 
     const priceFilters = [
         "Dưới 1 triệu",
@@ -13,16 +15,13 @@ const ProductList = () => {
         "Trên 5 triệu",
     ];
 
-    const categoryFilters = [
-        "Category 1",
-        "Category 2",
-        "Category 3",
-        "Category 4",
-        "Category 5",
-    ];
+    useEffect(() => {
+        fetchProductCategories();
+    }, [fetchProductCategories]);
 
     useEffect(() => {
-        // Hardcoded example products
+        console.log("Group categories:", groupCategories); // Debug log
+
         const exampleProducts = [
             {
                 id: 1,
@@ -42,27 +41,9 @@ const ProductList = () => {
                 image: 'https://vadisafire.com/image/cache/catalog/vadisafire/Mu%20chua%20chay/mu-bao-ho-linh-cuu-hoa-650x650.jpg',
                 price: 3000000,
             },
-            {
-                id: 3,
-                name: 'Bộ quần áo',
-                image: 'https://vadisafire.com/image/cache/catalog/vadisafire/Mu%20chua%20chay/mu-bao-ho-linh-cuu-hoa-650x650.jpg',
-                price: 3000000,
-            },
-            {
-                id: 3,
-                name: 'Bộ quần áo',
-                image: 'https://vadisafire.com/image/cache/catalog/vadisafire/Mu%20chua%20chay/mu-bao-ho-linh-cuu-hoa-650x650.jpg',
-                price: 3000000,
-            },
-            {
-                id: 3,
-                name: 'Bộ quần áo',
-                image: 'https://vadisafire.com/image/cache/catalog/vadisafire/Mu%20chua%20chay/mu-bao-ho-linh-cuu-hoa-650x650.jpg',
-                price: 3000000,
-            },
         ];
         setProducts(exampleProducts);
-    }, []);
+    }, [groupCategories]);
 
     const handleFilterChange = (filter) => {
         setSelectedFilters((prev) =>
@@ -102,16 +83,21 @@ const ProductList = () => {
                         <hr className="filter-divider" />
                         <div className="filter-options">
                             <h3 className="filter-subtitle">Loại Sản Phẩm</h3>
-                            {categoryFilters.map((filter, index) => (
-                                <label key={index} className="filter-label">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedFilters.includes(filter)}
-                                        onChange={() => handleFilterChange(filter)}
-                                        className="filter-checkbox"
-                                    />
-                                    <span>{filter}</span>
-                                </label>
+                            {groupCategories.map((group, index) => (
+                                <div key={index}>
+                                    <h4>{group.groupName}</h4>
+                                    {group.categories.map((category, catIndex) => (
+                                        <label key={catIndex} className="filter-label">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedFilters.includes(category.categoryName)}
+                                                onChange={() => handleFilterChange(category.categoryName)}
+                                                className="filter-checkbox"
+                                            />
+                                            <span>{category.categoryName}</span>
+                                        </label>
+                                    ))}
+                                </div>
                             ))}
                         </div>
                     </div>
