@@ -10,6 +10,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [isScrolled, setIsScrolled] = useState(false); // State to track scroll position
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
@@ -17,6 +18,23 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     useEffect(() => {
         updateCartCount();
     }, [cartItems]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const header = document.querySelector(".header-gradient");
+            const headerHeight = header.offsetHeight;
+            if (window.scrollY > headerHeight) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -33,7 +51,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
 
     return (
         <>
-            <header className="header-gradient shadow">
+            <header className={`header-gradient shadow ${isScrolled ? "scrolled" : ""}`}>
                 <div className="container mx-auto flex justify-between items-center py-4">
                     <div className="flex items-center">
                         <button onClick={toggleSidebar} className="text-white mr-4">

@@ -1,6 +1,26 @@
 .header-gradient {
     width: 100%;
     background: linear-gradient(to top, #620805, #c7170e);
+    position: relative; /* Initially relative */
+    top: 0;
+    z-index: 1000;
+    transition: background 0.3s ease, padding 0.3s ease, top 0.3s ease; /* Add transition for top */
+}
+
+.header-gradient.scrolled {
+    background: linear-gradient(to top, #4a0403, #a50d0b); /* Darker gradient */
+    padding: 10px 20px; /* Adjust padding for the sticky state */
+    position: fixed; /* Change to fixed when scrolled */
+    top: 0; /* Stick to the top */
+    z-index: 1000; /* Ensure it stays on top of other elements */
+}
+
+.sidebar-overlay {
+    z-index: 2000; /* Ensure the overlay is above other elements */
+}
+
+.sidebar-container {
+    z-index: 2001; /* Ensure the sidebar is above the overlay */
 }
 
 .header-gradient .container {
@@ -36,7 +56,6 @@
 .header-gradient .search-container input {
     width: 100%; /* Make the search bar take the full width */
 }
-
 
 /* Responsive styles for header */
 @media (max-width: 768px) {
@@ -88,4 +107,3 @@
         width: calc(100% - 40px);
     }
 }
-
