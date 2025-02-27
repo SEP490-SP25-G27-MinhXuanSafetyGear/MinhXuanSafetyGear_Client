@@ -1,6 +1,6 @@
 ﻿import React, { useContext, useEffect, useState } from "react";
 import {CustomerProductContext} from "../../contexts/CustomerProductContext";
-import Banner from "../../components/Banner";
+import Banner from "../../components/banner/Banner";
 import DiscountedProducts from "../../components/discountedproducts";
 import Products from "../../components/products";
 import Feedbacks from "../../components/feedbacks";

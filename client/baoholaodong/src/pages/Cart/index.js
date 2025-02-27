@@ -1,4 +1,4 @@
-﻿import React, { useContext, useState } from "react";
+﻿import React, { useContext} from "react";
 import { CartContext } from "../../contexts/CartContext";
 import "./style.css";
 
@@ -95,12 +95,6 @@ const Cart = () => {
                             <div className="cart-summary-section">
                                 <div>Phí vận chuyển</div>
                                 <div className="small-light-text">Được tính tại trang thanh toán</div>
-                            </div>
-                        </div>
-                        <div className="cart-summary-delivery">
-                            <div className="cart-summary-invoice">
-                                <input type="checkbox" id="invoice" />
-                                <label htmlFor="invoice">Xuất hóa đơn công ty</label>
                             </div>
                         </div>
                         <a href="/checkout" className="cart-summary-button">Thanh toán</a>

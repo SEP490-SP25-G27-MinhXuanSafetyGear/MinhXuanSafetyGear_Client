@@ -5,6 +5,11 @@
     top: 0;
     z-index: 1000;
     transition: background 0.3s ease, padding 0.3s ease, top 0.3s ease; /* Add transition for top */
+    padding: 5px 10px;
+}
+
+.siderbar-head{
+    background: linear-gradient(to top, #620805, #c7170e);
 }
 
 .header-gradient.scrolled {

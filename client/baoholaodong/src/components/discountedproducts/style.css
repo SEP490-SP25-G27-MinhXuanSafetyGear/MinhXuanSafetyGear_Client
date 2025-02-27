@@ -1,4 +1,4 @@
-/* General styles for discounted products */
+
 .deal {
     display: flex;
     justify-content: center;
@@ -9,7 +9,8 @@
     background-size: 40%;
     background-repeat: repeat;
     filter: brightness(85%);
-    overflow: hidden; /* Hide overflow to prevent scrollbars */
+    margin-top: 300px; /* Add margin to push it below the banner */
+
 }
 
 .deal .container {

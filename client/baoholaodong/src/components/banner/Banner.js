@@ -15,9 +15,9 @@ const Banner = () => {
     };
 
     const images = [
-        "https://placehold.co/700x150",
-        "https://placehold.co/700x150",
-        "https://placehold.co/700x150",
+        "http://baoholaodongminhxuan.com/images/common/slider1.jpg",
+        "http://baoholaodongminhxuan.com/images/common/slider2.jpg",
+        "http://baoholaodongminhxuan.com/images/common/slider3.jpg",
     ];
 
     return (
