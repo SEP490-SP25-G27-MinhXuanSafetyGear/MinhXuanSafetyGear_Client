@@ -56,7 +56,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                     <div className="flex items-center">
                         <button onClick={toggleSidebar} className="text-white mr-4">
                             {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
-                            <span className="ml-2">Menu</span>
+                            <span className="ml-2">MENU</span>
                         </button>
                         <a href="/">
                             <img alt="Company Logo" className="h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />

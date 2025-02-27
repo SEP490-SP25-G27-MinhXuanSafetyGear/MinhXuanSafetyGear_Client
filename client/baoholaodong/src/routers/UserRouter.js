@@ -36,7 +36,6 @@ const UserRouter = () => {
                         <Route index element={<Home />} />
                         <Route path="/register" element={<Register />} />
                         <Route path={"/login"} element={<Signin />} />
-                        <Route path="/about" element={<About />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/products" element={<ProductList />} />
                         <Route path="/product/:id" element={<ProductDetail />}/>

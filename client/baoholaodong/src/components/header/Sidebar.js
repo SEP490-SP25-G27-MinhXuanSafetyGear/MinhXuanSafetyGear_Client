@@ -60,7 +60,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
             {/* Sidebar container */}
             <div className={`fixed top-0 left-0 h-full w-72 bg-white shadow-lg sidebar-container transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
                 {/* Sidebar header */}
-                <div className="header-gradient text-yellow-500 p-4 flex justify-between items-center">
+                <div className="siderbar-head text-yellow-500 p-4 flex justify-between items-center">
                     <h2 className="text-lg font-bold">DANH MỤC</h2>
                     <button onClick={toggleSidebar}>
                         <FaTimes size={20} />
