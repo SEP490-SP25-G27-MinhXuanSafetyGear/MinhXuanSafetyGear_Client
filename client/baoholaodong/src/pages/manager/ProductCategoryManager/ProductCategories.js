@@ -1,13 +1,13 @@
 ﻿import React, {useContext, useEffect, useState,useCallback} from "react";
 import { ProductContext } from "../../../contexts/AdminProductContext";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { Edit, Plus, Trash2,EyeIcon } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
 import Loading from "../../../components/Loading/Loading";
-
+import {motion} from "framer-motion";
 const ProductCategories = () => {
     const { categories ,createCategory,updateCategory,groupCategories} = useContext(ProductContext);
-    const [isOpenCreate, setIsOpenCreate] = useState(false);
+    const [isOpenCreateCategory, setIsOpenCreateCategory] = useState(false);
     const [isOpenEditCategory, setIsOpenEditCategory] = useState(false);
     const [isOpenEditGroup, setIsOpenEditGroup] = useState(false);
     const [categorySelected, setCategorySelected] = useState(null);
@@ -22,30 +22,33 @@ const ProductCategories = () => {
         setIsOpenEditCategory(true);
     }, []);
 
+    const handleCreateCategory = useCallback(group =>{
+       setIsOpenCreateCategory(true);
+       setGroupSelected(group);
+    });
     useEffect(() => {
         const selectedGroup = groupCategories.find(group => group.groupId === groupSelected?.groupId);
         setGroupSelected(selectedGroup || null);
-    }, [groupCategories]);
+    }, [groupCategories.length, groupSelected]);
 
     return (
         <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-white rounded-lg shadow min-h-[800px]">
                 {/* Header */}
                 <div className="p-6 border-b flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-gray-800">Danh mục sản phẩm</h3>
                     <button
-                        onClick={() => setIsOpenCreate(true)}
                         className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
                     >
                         <Plus size={20} className="mr-2"/>
-                        Thêm danh mục
+                        Thêm nhóm danh mục
                     </button>
                 </div>
                 <div className="grid grid-cols-10 gap-8 p-6">
                     {/* Bảng nhóm danh mục chiếm 3/7 */}
                     <div className="col-span-3">
-                        <TableByGroup groups={groupCategories ? groupCategories : []}
-                                      setGroupSelected={setGroupSelected} onHandleEdit={handleEditGroup}/>
+                        <TableByGroup groups={groupCategories ? groupCategories : []} groupSelected={groupSelected}
+                                      setGroupSelected={setGroupSelected} onHandleEdit={handleEditGroup} onHandleCreateCategory={handleCreateCategory}/>
                     </div>
                     {/* Bảng danh mục chiếm 7/7 */}
                     <div className="col-span-7">
@@ -54,9 +57,9 @@ const ProductCategories = () => {
                     </div>
                 </div>
                 {/* Modal thêm danh mục */}
-                <Modal isOpen={isOpenCreate} onClose={() => setIsOpenCreate(false)} title={"Thêm danh mục"}>
-                    <CreateCategoryForm onCreateCategory={createCategory} groupCategories={groupCategories}
-                                        close={()=>setIsOpenCreate(false)} />
+                <Modal isOpen={isOpenCreateCategory} onClose={() => setIsOpenCreateCategory(false)} title={"Thêm danh mục cho " + (groupSelected ? groupSelected.groupName : "")}>
+                    <CreateCategoryForm onCreateCategory={createCategory} group={groupSelected}
+                                        close={()=>setIsOpenCreateCategory(false)} />
                 </Modal>
                 <Modal isOpen={isOpenEditCategory} onClose={() => setIsOpenEditCategory(false)} title={"Cập nhật danh mục"}>
                     <EditCategoryForm category={categorySelected} updateCategory={updateCategory}
@@ -73,12 +76,12 @@ const ProductCategories = () => {
 };
 
 // Component Form để thêm danh mục
-const CreateCategoryForm = ({onCreateCategory,groupCategories,close}) => {
+const CreateCategoryForm = ({onCreateCategory,group,close}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [newCategory, setNewCategory] = useState({
         categoryName: "",
         description: "",
-        groupId: 0
+        groupId: group.groupId
     });
 
     // Hàm xử lý onChange chung
@@ -124,17 +127,6 @@ const CreateCategoryForm = ({onCreateCategory,groupCategories,close}) => {
                         placeholder="Nhập mô tả danh mục..."
                     />
                 </div>
-                <div>
-                    <label className="block text-gray-700 font-semibold mb-2" htmlFor="groupId">Group</label>
-                    <select name="groupId" value={newCategory.groupId} onChange={handleChange}
-                            className="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300">
-                        <option key={0} value={0}>Chọn nhóm sản phẩm</option>
-                        {groupCategories.map(group => (
-                            <option key={group.groupId} value={group.groupId}>{group.groupName}</option>
-                        ))}
-                    </select>
-                </div>
-
                 <div className="flex justify-end space-x-2">
                     <button
                         className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
@@ -233,80 +225,97 @@ const EditCategoryForm = ({category, updateCategory, groupCategories, close}) =>
     );
 };
 
-const TableByGroup = ({groups, setGroupSelected, onHandleEdit}) => {
+const TableByGroup = ({groups, setGroupSelected,groupSelected,onHandleEdit,onHandleCreateCategory}) => {
     return (
-        <div className="flex flex-wrap gap-8">
-            <table className="w-full border border-gray-300 rounded-lg shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border">
                 <thead>
-                <tr className="bg-blue-500 text-white text-lg font-semibold">
-                    <th className="p-4" colSpan="2">Mã danh mục</th>
-                    <th className="p-4" colSpan="2">Nhóm danh mục</th>
-                    <th className="p-4" colSpan="2">cập nhât</th>
+                <tr className="">
+                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="2">Mã danh mục</th>
+                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="2">Nhóm danh mục</th>
+                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="2">Chức năng</th>
                 </tr>
                 </thead>
                 <tbody>
                 {groups.map((group, index) => (
-                    <tr key={index} className="border-b border-gray-200 hover:bg-gray-100 transition" onClick={() => {
-                        setGroupSelected(group)
-                    }}>
-                        <td className="p-4 font-medium text-gray-700" colSpan="2">
+                    <motion.tr key={index}
+                               variants={{
+                                   hidden: { opacity: 0, y: 0 },
+                                   visible: { opacity: 1, y: 0 },
+                               }}
+                               transition={{ duration: 0.3, delay: index * 0.05 }}
+                        className={`border-b border-gray-200 hover:bg-gray-100 transition ${
+                            ( groupSelected && group.groupId === groupSelected.groupId) ? 'bg-gray-100' : ''
+                        }`}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm" colSpan="2">
                             {group.groupId}
                         </td>
-                        <td className="p-4 font-medium text-gray-700" colSpan="2">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm" colSpan="2">
                             {group.groupName}
                         </td>
-                        <td className="p-4 font-medium text-gray-700" colSpan="2">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm" colSpan="2">
                             <button onClick={() => onHandleEdit(group)}
                                     className="text-blue-500 hover:text-blue-700 mx-2">
                                 <Edit size={18}/>
                             </button>
+                            <button onClick={() => {setGroupSelected(group)}}
+                                    className="text-blue-500 hover:text-blue-700 mx-2">
+                                <EyeIcon size={18}/>
+                            </button>
+                            <button onClick={() => onHandleCreateCategory(group)}
+                                    className="text-blue-500 hover:text-blue-700 mx-2">
+                                <Plus size={18}/>
+                            </button>
                         </td>
-                    </tr>
+                    </motion.tr>
                 ))}
                 </tbody>
             </table>
         </div>
     );
 };
-const TableBycategories = ({categories, onHandleEdit}) => {
+const TableBycategories = ({ categories, onHandleEdit }) => {
     return (
-        <div className="flex flex-wrap gap-8">
-            <table className="w-full border border-gray-300 rounded-lg shadow-md overflow-hidden">
+        <div
+            className="overflow-x-auto"
+        >
+            <table className="min-w-full divide-y divide-gray-200 border">
                 <thead>
-                <tr className="bg-blue-500 text-white text-lg font-semibold">
-                    <th className="p-4" colSpan="2">Mã loại sản phẩm</th>
-                    <th className="p-4" colSpan="2">Tên loại sản phẩm</th>
-                    <th className="p-4" colSpan="2">Mô tả loại sản phẩm</th>
-                    <th className="p-4" colSpan="2">cập nhât</th>
+                <tr >
+                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="2">Mã loại sản phẩm</th>
+                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="2">Tên loại sản phẩm</th>
+                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="2">Mô tả loại sản phẩm</th>
+                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan="2">Cập nhật</th>
                 </tr>
                 </thead>
                 <tbody>
                 {categories.map((cate, index) => (
-                    <tr key={index} className="border-b border-gray-200 hover:bg-gray-100 transition">
-                        <td className="p-4 font-medium text-gray-700" colSpan="2">
-                            {cate.categoryId}
-                        </td>
-                        <td className="p-4 font-medium text-gray-700" colSpan="2">
-                            {cate.categoryName}
-                        </td>
-                        <td className="p-4 font-medium text-gray-700" colSpan="2">{cate.description || "Không có mô tả"}
-                        </td>
-                        <td className="p-4 font-medium text-gray-700" colSpan="2">
+                    <motion.tr
+                        key={index}
+                        className="border-b border-gray-200 hover:bg-gray-100 transition"
+                        initial={{ opacity: 0, y: 0 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.1, delay: index * 0.05 }}
+                    >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm" colSpan="2">{cate.categoryId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm" colSpan="2">{cate.categoryName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm" colSpan="2">{cate.description || "Không có mô tả"}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm" colSpan="2">
                             <button onClick={() => onHandleEdit(cate)}
                                     className="text-blue-500 hover:text-blue-700 mx-2">
                                 <Edit size={18}/>
                             </button>
-                            <button className="text-red-500 hover:text-red-700">
+                            <button
+                                className="text-red-500 hover:text-red-700"
+                            >
                                 <Trash2 size={18}/>
                             </button>
                         </td>
-                    </tr>
+                    </motion.tr>
                 ))}
                 </tbody>
             </table>
         </div>
-
     );
 };
-
 export default ProductCategories;

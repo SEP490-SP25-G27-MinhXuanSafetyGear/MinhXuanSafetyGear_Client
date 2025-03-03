@@ -5,6 +5,7 @@ import DiscountedProducts from "../../components/discountedproducts";
 import Products from "../../components/products";
 import Feedbacks from "../../components/feedbacks";
 import NewBlog from "../../components/newblog";
+import TopSaleProducts from "./TopSaleProducts";
 
 function Index() {
     const { topSaleProducts } = useContext(CustomerProductContext);
@@ -23,7 +24,7 @@ function Index() {
             {showWelcome && <div className="welcome-message">🎉 Welcome back!</div>}
             <Banner />
             <DiscountedProducts />
-            <Products products={topSaleProducts} title="TOP SẢN PHẨM BÁN CHẠY" />
+            <TopSaleProducts products={topSaleProducts} title="TOP SẢN PHẨM BÁN CHẠY" />
             <Feedbacks />
             <NewBlog />
         </div>

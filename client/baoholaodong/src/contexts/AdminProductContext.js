@@ -1,4 +1,4 @@
-﻿import React, { createContext, useState, useEffect } from "react";
+import React, {createContext, useState, useEffect, useCallback} from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 
@@ -11,32 +11,32 @@ export const AdminProductProvider = ({ children }) => {
 	 * @return {products}
 	 * */
 	const [products, setProducts] = useState([]);
-	const [product, setProduct] = useState(null);
-	const [loading, setLoading] = useState(false);
 	const [selectedCategory, setSelectedCategory] = useState(0);
-	const [page, setPage] = useState(1);
+	const [selectedGroup, setSelectGroup] = useState(0);
+	const [currentPage, setCurrentPage] = useState(1);
 	const [size, setSize] = useState(10);
+	const [totalPages,setTotalPages] = useState(0);
 	const [groupCategories, setGroupCategories] = useState([]);
 	const [hubConnection, setHubConnection] = useState(null);
 	const [search, setSearch] = useState("");
 	const [taxes, setTaxes] = useState([]);
 	const [categories, setCategories] = useState([]);
 	/** Lấy danh sách sản phẩm */
-	const fetchProducts = async () => {
+	const fetchProducts = useCallback(async () => {
 		//setLoading(true);
 		try {
 			const response = await axios.get(`${BASE_URL}/api/Product/get-product-page`, {
-				params: { category: selectedCategory, page, pagesize: size },
+				params: {group:selectedGroup, category: selectedCategory, page: currentPage, pagesize: size },
 			});
 			setProducts(response.data.items || []);
+			setTotalPages(response.data.totalPages);
 		} catch (error) {
 			console.error("Lỗi khi lấy sản phẩm:", error.response?.data || error.message);
 		} finally {
 			setTimeout(() => {
-				//setLoading(false);
 			}, 0); //
 		}
-	};
+	},[currentPage, selectedCategory, selectedGroup, size]);
 
 	/** Lấy thông tin chi tiết sản phẩm */
 	const getProductById = async (id) => {
@@ -96,8 +96,10 @@ export const AdminProductProvider = ({ children }) => {
 			const response = await axios.post(`${BASE_URL}/api/product/create-product`, product);
 			return response.data;
 		} catch (error) {
-			console.error("Lỗi khi tạo sản phẩm:", error.response?.data || error.message);
-			throw error;
+			if (error.response && error.response.data) {
+				throw error.response.data;
+			}
+			throw new Error("Không thể kết nối đến server!");
 		}
 	};
 
@@ -125,7 +127,7 @@ export const AdminProductProvider = ({ children }) => {
 	};
 
 	/** Tìm kiếm sản phẩm */
-	const searchProduct = async (value) => {
+	const searchProduct = useCallback(async (value) => {
 		if (!value.trim()) {
 			fetchProducts();
 			return;
@@ -138,7 +140,7 @@ export const AdminProductProvider = ({ children }) => {
 		} catch (error) {
 			console.error("Lỗi khi tìm kiếm sản phẩm:", error.response?.data || error.message);
 		}
-	};
+	},[fetchProducts]);
 
 	/** upload image */
 	const uploadImage = async (image) => {
@@ -220,6 +222,7 @@ export const AdminProductProvider = ({ children }) => {
 			throw error;
 		}
 	}
+
 	/** Kết nối với SignalR */
 	useEffect(() => {
 		const connection = new signalR.HubConnectionBuilder()
@@ -274,7 +277,8 @@ export const AdminProductProvider = ({ children }) => {
 		if (search === "") {
 			fetchProducts();
 		}
-	}, [selectedCategory, page, size]);
+	}, [fetchProducts, search]);
+
 
 	/** Lấy danh mục và thuế ngay khi khởi động */
 	useEffect(() => {
@@ -302,18 +306,17 @@ export const AdminProductProvider = ({ children }) => {
 		}, 500);
 
 		return () => clearTimeout(delaySearch);
-	}, [search]);
+	}, [searchProduct,fetchProducts,search]);
 
 	return (
 		<ProductContext.Provider
 			value={{
 				products,
 				setProducts,
-				loading,
 				selectedCategory,
 				setSelectedCategory,
-				page,
-				setPage,
+				currentPage,
+				setCurrentPage,
 				size,
 				setSize,
 				groupCategories,
@@ -335,6 +338,9 @@ export const AdminProductProvider = ({ children }) => {
 				addProductTax,
 				deleteProductTax,
 				categories,
+				setSelectGroup,
+				selectedGroup,
+				totalPages,
 			}}
 		>
 			{children}
