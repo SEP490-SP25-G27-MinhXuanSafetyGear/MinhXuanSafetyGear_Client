@@ -52,11 +52,13 @@
 }
 
 .header-gradient .search-container {
-    flex-grow: 3; /* Allow the search bar to grow more */
+    flex-grow: 3;
     display: flex;
     align-items: center;
-    margin: 0 10px; /* Reduce margin to create more space for other elements */
+    margin: 0 10px;
+    max-width: 400px; /* Điều chỉnh theo thiết kế mong muốn */
 }
+
 
 .header-gradient .search-container input {
     width: 100%; /* Make the search bar take the full width */
