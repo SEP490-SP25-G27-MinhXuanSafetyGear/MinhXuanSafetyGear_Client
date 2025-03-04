@@ -5,6 +5,8 @@ import Sidebar from "./Sidebar";
 import CartDropdown from "../Cartdropdown/CartDropdown";
 import "./style.css";
 import { AuthContext } from "../../contexts/AuthContext";
+import {ProductContext} from "../../contexts/AdminProductContext";
+import {CustomerProductContext} from "../../contexts/CustomerProductContext";
 
 function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,7 +16,13 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
-
+    const [search, setSearch] = useState("");
+    const handleSearch = (e)=>{
+        e.preventDefault();
+        if(search !== ""){
+            navigate("/products?search="+search);
+        }
+    }
     useEffect(() => {
         updateCartCount();
     }, [cartItems]);
@@ -72,11 +80,15 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                     </div>
                     <div className="search-container mx-8 flex items-center mt-4">
                         <FaSearch className="text-white h-5 w-5 mr-2" />
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm..."
-                            className="w-3/4 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-white"
-                        />
+                        <form className="w-full" onSubmit={(e)=>handleSearch(e)}>
+                            <input
+                                value={search}
+                                onChange={(e)=>{setSearch(e.target.value)}}
+                                type="text"
+                                placeholder="Tìm kiếm..."
+                                className="w-full max-w-[300px] px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-white"
+                            />
+                        </form>
                     </div>
                     <div className="flex items-center space-x-6">
                         <div className="relative group contact-info">

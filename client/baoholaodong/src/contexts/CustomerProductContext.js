@@ -1,4 +1,4 @@
-﻿import React, { createContext, useState, useEffect } from "react";
+﻿import React, {createContext, useState, useEffect, useCallback} from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 
@@ -8,6 +8,17 @@ export const CustomerProductProvider =({ children }) => {
     const [topSaleProducts,setTopSaleProducts] = useState([]);
     const [hubConnection, setHubConnection] = useState(null);
     const [groupCategories, setGroupCategories] = useState([]);
+
+    const searchProduct = async (value) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/Product/search-product`, {
+                params: { title: value },
+            });
+            return response.data;
+        } catch (error) {
+            return [];
+        }
+    };
     /** Lấy thông tin chi tiết sản phẩm */
     const getProductById = async (id) => {
         try {
@@ -105,6 +116,7 @@ export const CustomerProductProvider =({ children }) => {
                 getProductById,
                 groupCategories,
                 fetchProductCategories,
+                searchProduct,
             }}
         >
             {children}
