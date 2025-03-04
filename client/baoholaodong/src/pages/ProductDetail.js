@@ -3,9 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../contexts/AdminProductContext";
 import Loading from "../components/Loading/Loading";
 import * as signalR from "@microsoft/signalr";
-import {CustomerProductContext} from "../contexts/CustomerProductContext";
+import { CustomerProductContext } from "../contexts/CustomerProductContext";
 import noimage from "../images/no-image-product.jpg"
+
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+
 const ProductDetail = () => {
     const { id } = useParams();
     const { getProductById } = useContext(CustomerProductContext);
@@ -20,13 +22,13 @@ const ProductDetail = () => {
         quantity: 0,
         price: 0,
         priceDiscount: 0,
-        image :null,
+        image: null,
         discount: 0,
         createdAt: "2025-02-11T18:30:25.43",
         updatedAt: "2025-02-14T22:16:08.1",
         status: true,
         averageRating: 0,
-        qualityCertificate:"",
+        qualityCertificate: "",
         productImages: [
             {
                 id: 0,
@@ -51,7 +53,7 @@ const ProductDetail = () => {
     });
     const [isLoading, setIsLoading] = useState(true);
     const [hubConnection, setHubConnection] = useState(null);
-    // Fetch product data
+
     const fetchProduct = async () => {
         setIsLoading(true);
         try {
@@ -64,7 +66,6 @@ const ProductDetail = () => {
         }
     };
 
-    // Kết nối SignalR
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -85,7 +86,6 @@ const ProductDetail = () => {
         };
     }, []);
 
-    // Xử lý sự kiện khi sản phẩm được cập nhật
     useEffect(() => {
         if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
 
@@ -105,112 +105,138 @@ const ProductDetail = () => {
         };
     }, [hubConnection, id]);
 
-    // Gọi API để lấy sản phẩm khi `id` thay đổi
     useEffect(() => {
         const fetchData = async () => {
             await fetchProduct();
         };
         fetchData();
     }, [id]);
-    return (
-        <div className="max-w-5xl mx-auto p-4">
-            <Loading isLoading={isLoading} />
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-                <div className="flex flex-col md:flex-row">
-                    <div className="md:w-1/2">
-                        <img// Thêm key để React nhận biết thay đổi
-                            alt="Protective workwear displayed in an industrial setting"
-                            className="rounded-lg"
-                            height="500"
-                            src={product.image || noimage}
-                            width="500"
-                        />
 
+    return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Loading isLoading={isLoading} />
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="flex flex-col md:flex-row">
+                    {/* Image Section */}
+                    <div className="md:w-1/2 p-6">
+                        <div className="relative aspect-square overflow-hidden rounded-xl">
+                            <img
+                                alt={product.name}
+                                className="object-cover w-full h-full transform transition-transform duration-500 hover:scale-105"
+                                src={product.image || noimage}
+                            />
+                        </div>
                     </div>
-                    <div className="md:w-1/2 md:pl-6 mt-4 md:mt-0">
-                        <h1 className="text-2xl font-bold">{product.name}</h1>
-                        <div className="flex items-center mt-2">
-                            <div className="text-yellow-500">
+
+                    {/* Product Details Section */}
+                    <div className="md:w-1/2 p-8">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
+
+                        {/* Rating */}
+                        <div className="flex items-center mb-6">
+                            <div className="flex text-yellow-400">
                                 {[...Array(product.averageRating === 0 ? 5 : product.averageRating)].map((_, i) => (
                                     <i key={i} className="fas fa-star"></i>
                                 ))}
                             </div>
-                            <span className="ml-2 text-gray-600">(45 đánh giá)</span>
+                            <span className="ml-2 text-gray-600 text-sm">(45 đánh giá)</span>
                         </div>
-                        <div className="mt-4">
-                            <span className="text-2xl font-bold text-red-500">
-                                {product.priceDiscount.toLocaleString()}₫
-                            </span>
-                            <span className="text-gray-500 line-through ml-2">
-                                {product.price.toLocaleString()}₫
-                            </span>
-                            <span className="bg-red-100 text-red-500 text-sm font-semibold ml-2 px-2 py-1 rounded">
-                                Giảm {product.discount}%
-                            </span>
+
+                        {/* Price */}
+                        <div className="mb-6">
+                            <div className="flex items-center">
+                                <span className="text-3xl font-bold text-red-600">
+                                    {product.priceDiscount.toLocaleString()}₫
+                                </span>
+                                <span className="ml-3 text-lg text-gray-400 line-through">
+                                    {product.price.toLocaleString()}₫
+                                </span>
+                                <span className="ml-3 px-3 py-1 bg-red-100 text-red-600 text-sm font-semibold rounded-full">
+                                    -{product.discount}%
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex items-center mt-4">
-                            <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-l">-</button>
-                            <input
-                                className="w-12 text-center border-t border-b border-gray-200"
-                                type="text"
-                                value="1"
-                            />
-                            <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-r">+</button>
-                            <button className="bg-blue-500 text-white px-6 py-2 rounded ml-4">
+
+                        {/* Quantity Selector and Add to Cart */}
+                        <div className="flex items-center space-x-4 mb-8">
+                            <div className="flex items-center border border-gray-300 rounded-lg">
+                                <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-l-lg">
+                                    -
+                                </button>
+                                <input
+                                    type="text"
+                                    className="w-16 text-center border-x border-gray-300 py-2 focus:outline-none"
+                                    value="1"
+                                />
+                                <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors rounded-r-lg">
+                                    +
+                                </button>
+                            </div>
+                            <button className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold">
                                 Thêm vào giỏ hàng
                             </button>
                         </div>
-                        <div className="mt-6">
-                            <h2 className="text-lg font-semibold">Đặc điểm nổi bật</h2>
-                            <span className="text-gray-500 ml-2">
+
+                        {/* Description */}
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold mb-3">Đặc điểm nổi bật</h2>
+                            <div className="text-gray-600 space-y-2">
                                 {product.description.split('\n').map((line, index) => (
-                                    <React.Fragment key={index}>
-                                        {line}
-                                        <br />
-                                    </React.Fragment>
+                                    <p key={index}>{line}</p>
                                 ))}
-                            </span>
-                        </div>
-                        <div className="mt-6">
-                            <h2 className="text-lg font-semibold">Chọn hình thức vận chuyển</h2>
-                            <div className="flex items-center mt-2">
-                                <input className="mr-2" id="standard" name="shipping" type="radio" />
-                                <label className="text-gray-700" htmlFor="standard">
-                                    Giao hàng tiêu chuẩn
-                                </label>
                             </div>
-                            <div className="flex items-center mt-2">
-                                <input className="mr-2" id="express" name="shipping" type="radio" />
-                                <label className="text-gray-700" htmlFor="express">
-                                    Giao hàng nhanh
+                        </div>
+
+                        {/* Shipping Options */}
+                        <div className="border-t border-gray-200 pt-6">
+                            <h2 className="text-xl font-semibold mb-4">Chọn hình thức vận chuyển</h2>
+                            <div className="space-y-3">
+                                <label className="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="shipping" className="w-4 h-4 text-blue-600" />
+                                    <span className="text-gray-700">Giao hàng tiêu chuẩn</span>
+                                </label>
+                                <label className="flex items-center space-x-3 cursor-pointer">
+                                    <input type="radio" name="shipping" className="w-4 h-4 text-blue-600" />
+                                    <span className="text-gray-700">Giao hàng nhanh</span>
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
-                <h2 className="text-xl font-bold">Thông số kỹ thuật</h2>
-                <div className="flex flex-col md:flex-row mt-4">
-                    <div className="md:w-1/2">
-                        <h3 className="text-lg font-semibold">Chi tiết sản phẩm</h3>
-                        <ul className="list-disc list-inside mt-2 text-gray-700">
-                            <li>Chất liệu: {product.material}</li>
-                            <li>Màu sắc: {[...new Set(product.productVariants.map(v => v.color))].join(" - ")}</li>
-                            <li>Kích thước: {[...new Set(product.productVariants.map(v => v.size))].join(" , ")}</li>
-                            <li>Xuất xứ: {product.origin}</li>
+
+            {/* Technical Specifications */}
+            <div className="bg-white rounded-2xl shadow-xl mt-8 p-8">
+                <h2 className="text-2xl font-bold mb-6">Thông số kỹ thuật</h2>
+                <div className="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 className="text-xl font-semibold mb-4">Chi tiết sản phẩm</h3>
+                        <ul className="space-y-3 text-gray-600">
+                            <li className="flex items-center">
+                                <span className="font-medium w-24">Chất liệu:</span>
+                                <span>{product.material}</span>
+                            </li>
+                            <li className="flex items-center">
+                                <span className="font-medium w-24">Màu sắc:</span>
+                                <span>{[...new Set(product.productVariants.map(v => v.color))].join(" - ")}</span>
+                            </li>
+                            <li className="flex items-center">
+                                <span className="font-medium w-24">Kích thước:</span>
+                                <span>{[...new Set(product.productVariants.map(v => v.size))].join(" , ")}</span>
+                            </li>
+                            <li className="flex items-center">
+                                <span className="font-medium w-24">Xuất xứ:</span>
+                                <span>{product.origin}</span>
+                            </li>
                         </ul>
                     </div>
-                    <div className="md:w-1/2 mt-4 md:mt-0 md:pl-6">
-                        <h3 className="text-lg font-semibold">Chứng nhận chất lượng</h3>
-                        <span className="text-gray-500 ml-2">
-                                {product.qualityCertificate.split('\n').map((line, index) => (
-                                    <React.Fragment key={index}>
-                                        {line}
-                                        <br/>
-                                    </React.Fragment>
-                                ))}
-                            </span>
+                    <div>
+                        <h3 className="text-xl font-semibold mb-4">Chứng nhận chất lượng</h3>
+                        <div className="text-gray-600 space-y-2">
+                            {product.qualityCertificate.split('\n').map((line, index) => (
+                                <p key={index}>{line}</p>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

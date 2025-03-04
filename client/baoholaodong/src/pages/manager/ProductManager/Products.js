@@ -43,7 +43,7 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 						hidden: { opacity: 0 },
 						visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
 					}}>
-					{products.map(({ id, name, price,quantity,priceDiscount,discount,image }, index) => (
+					{products.map(({ id, name, price,quantity,priceDiscount,discount,image,isNew }, index) => (
 						<motion.tr
 							key={id}
 							variants={{
@@ -52,11 +52,16 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 							}}
 							transition={{ duration: 0.3, delay: index * 0.05 }}
 							className="border-b bg-white divide-y divide-gray-200 hover:bg-gray-100">
-							<td className="px-6 py-4 whitespace-nowrap text-sm">{id}</td>
+							<td className="px-6 py-4 whitespace-nowrap text-sm">
+								{id} {isNew && <span className="ml-2 px-2 py-1 text-xs text-white bg-green-500 rounded">Mới</span>}
+							</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">
 								<img onClick={()=>handelClickImage(image)} src={image || noImage} alt={name} className="w-16 h-16 object-cover rounded-md"/>
 							</td>
-							<td className="px-6 py-4 text-sm truncate max-w-[150px]">{name}</td>
+							<td className="px-6 py-4 text-sm truncate max-w-[150px]">
+								{name}
+							</td>
+
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{price.toLocaleString("vi-VN")} đ</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{priceDiscount.toLocaleString("vi-VN")} đ</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{discount}%</td>

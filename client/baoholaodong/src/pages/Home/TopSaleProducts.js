@@ -33,8 +33,8 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
         currentPage * productsPerPage
     );
 
-    const handleDetailProduct = (id) => {
-        navigate("/product/" + id);
+    const handleDetailProduct = (product) => {
+        window.location.href = `/product/${product.id}?${product.name}`;
     };
 
     return (
@@ -63,7 +63,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: index * 0.1 }}
                     >
-                        <img onClick={() => { handleDetailProduct(product.id) }}
+                        <img onClick={() => { handleDetailProduct(product) }}
                              className="product-image"
                              src={product.image || noImage}
                              alt={product.name}

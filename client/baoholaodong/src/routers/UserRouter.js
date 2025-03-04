@@ -27,6 +27,7 @@ import VerificationPage from "../pages/register/Verification";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 import Logout from "../pages/Logout";
 import {AdminUserContextProvider} from "../contexts/AdminUserContext";
+import Dashboard from "../pages/manager/Dashboard";
 
 const UserRouter = () => {
     return (
@@ -66,6 +67,8 @@ const UserRouter = () => {
                         </AdminProductProvider>
                     }
                 >
+                    <Route path="dashboard" element={<Dashboard/>}/>
+                    <Route index element={<Dashboard/>}/>
                     <Route path="users" element={<Users />} />
                     <Route path="orders" element={<Orders />} />
                     <Route path="products" element={<Products />} />

@@ -1,17 +1,18 @@
 ﻿import React, {useContext, useEffect, useState,useCallback} from "react";
 import { ProductContext } from "../../../contexts/AdminProductContext";
 import { Edit, Plus, Trash2,EyeIcon } from "lucide-react";
-import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
 import Loading from "../../../components/Loading/Loading";
 import {motion} from "framer-motion";
 const ProductCategories = () => {
-    const { categories ,createCategory,updateCategory,groupCategories} = useContext(ProductContext);
+    const {createCategory,updateCategory,groupCategories,createGroup,updateGroupCategory} = useContext(ProductContext);
     const [isOpenCreateCategory, setIsOpenCreateCategory] = useState(false);
     const [isOpenEditCategory, setIsOpenEditCategory] = useState(false);
     const [isOpenEditGroup, setIsOpenEditGroup] = useState(false);
     const [categorySelected, setCategorySelected] = useState(null);
     const [groupSelected, setGroupSelected] = useState(null);
+    const [isOpenCreateGroup, setIsOpenCreateGroup] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const handleEditGroup = useCallback((group) => {
         setGroupSelected(group);
         setIsOpenEditGroup(true);
@@ -26,10 +27,11 @@ const ProductCategories = () => {
        setIsOpenCreateCategory(true);
        setGroupSelected(group);
     });
+
     useEffect(() => {
         const selectedGroup = groupCategories.find(group => group.groupId === groupSelected?.groupId);
         setGroupSelected(selectedGroup || null);
-    }, [groupCategories.length, groupSelected]);
+    }, [groupCategories, groupSelected]);
 
     return (
         <div className="space-y-6">
@@ -38,6 +40,7 @@ const ProductCategories = () => {
                 <div className="p-6 border-b flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-gray-800">Danh mục sản phẩm</h3>
                     <button
+                        onClick={() => setIsOpenCreateGroup(!isOpenCreateGroup)}
                         className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
                     >
                         <Plus size={20} className="mr-2"/>
@@ -58,17 +61,21 @@ const ProductCategories = () => {
                 </div>
                 {/* Modal thêm danh mục */}
                 <Modal isOpen={isOpenCreateCategory} onClose={() => setIsOpenCreateCategory(false)} title={"Thêm danh mục cho " + (groupSelected ? groupSelected.groupName : "")}>
-                    <CreateCategoryForm onCreateCategory={createCategory} group={groupSelected}
+                    <CreateCategoryForm onCreateCategory={createCategory} group={groupSelected} setIsLoading={setIsLoading}
                                         close={()=>setIsOpenCreateCategory(false)} />
                 </Modal>
                 <Modal isOpen={isOpenEditCategory} onClose={() => setIsOpenEditCategory(false)} title={"Cập nhật danh mục"}>
-                    <EditCategoryForm category={categorySelected} updateCategory={updateCategory}
+                    <EditCategoryForm category={categorySelected} updateCategory={updateCategory} setIsLoading={setIsLoading}
                                       groupCategories={groupCategories} close={() => setIsOpenEditCategory(false)}/>
                 </Modal>
                 {/* Model updat group*/}
                 <Modal isOpen={isOpenEditGroup} onClose={() => setIsOpenEditGroup(false)} title={"Cập nhật nhóm danh mục"}>
-
+                    <UpdateGroupForm close={()=>setIsOpenEditGroup(false)} setLoading={setIsLoading} groupSelected={groupSelected} onUpdateGroup={updateGroupCategory}/>
                 </Modal>
+                <Modal isOpen={isOpenCreateGroup} onClose={()=>setIsOpenCreateGroup(false)} title={"Tạo nhóm danh mục"}>
+                    <CreateGroupForm close={()=>setIsOpenCreateGroup(false)} setLoading={setIsLoading} onCreateGroup={createGroup}/>
+                </Modal>
+                <Loading isLoading={isLoading}/>
             </div>
         </div>
     );
@@ -76,8 +83,7 @@ const ProductCategories = () => {
 };
 
 // Component Form để thêm danh mục
-const CreateCategoryForm = ({onCreateCategory,group,close}) => {
-    const [isLoading, setIsLoading] = useState(false);
+const CreateCategoryForm = ({onCreateCategory,group,close,setIsLoading}) => {
     const [newCategory, setNewCategory] = useState({
         categoryName: "",
         description: "",
@@ -94,7 +100,7 @@ const CreateCategoryForm = ({onCreateCategory,group,close}) => {
         try {
             setIsLoading(true);
             const result = await onCreateCategory(newCategory);
-            console.log(result);
+            close();
         } catch (e) {
             console.log(e);
         } finally {
@@ -141,13 +147,11 @@ const CreateCategoryForm = ({onCreateCategory,group,close}) => {
                     </button>
                 </div>
             </div>
-            <Loading isLoading={isLoading}/>
         </div>
     );
 };
 
-const EditCategoryForm = ({category, updateCategory, groupCategories, close}) => {
-    const [isLoading, setIsLoading] = useState(false);
+const EditCategoryForm = ({category, updateCategory, groupCategories, close,setIsLoading}) => {
     const [categoryUpdate, setCategory] = useState({
         categoryId: category.categoryId,
         categoryName: category.categoryName,
@@ -220,11 +224,144 @@ const EditCategoryForm = ({category, updateCategory, groupCategories, close}) =>
                     </button>
                 </div>
             </div>
-            <Loading isLoading={isLoading}/>
         </div>
     );
 };
+// component form nhóm danh muc
+const CreateGroupForm = ({onCreateGroup,close,setLoading}) => {
+    const [newGroup, setNewGroup] = useState({
+        name: "",
+        description: ""
+    });
 
+    // Hàm xử lý onChange chung
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setNewGroup((prev) => ({...prev, [name]: value}));
+    };
+
+    const handleCreateGroup = async () => {
+        setLoading(true);
+        try {
+            const result = await onCreateGroup(newGroup);
+            close();
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="p-6 bg-white rounded-lg shadow">
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-gray-700 font-medium">Tên nhóm danh mục</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={newGroup.name}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Nhập tên danh mục..."
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-medium">Mô tả</label>
+                    <textarea
+                        name="description"
+                        value={newGroup.description}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Nhập mô tả danh mục..."
+                    />
+                </div>
+                <div className="flex justify-end space-x-2">
+                    <button
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        onClick={handleCreateGroup}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                        Thêm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+const UpdateGroupForm = ({onUpdateGroup,close,setLoading,groupSelected}) => {
+    const [updateGroup, setUpdateGroup] = useState(
+        {
+            id: groupSelected.groupId,
+            name: groupSelected.groupName,
+            description: groupSelected.description,
+        }
+    );
+    // Hàm xử lý onChange chung
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setUpdateGroup((prev) => ({...prev, [name]: value}));
+    };
+
+    const handleUpdateGroup = async () => {
+        setLoading(true);
+        try {
+            const result = await onUpdateGroup(updateGroup);
+            close();
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="p-6 bg-white rounded-lg shadow">
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-gray-700 font-medium">Tên nhóm danh mục</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={updateGroup.name}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Nhập tên danh mục..."
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-medium">Mô tả</label>
+                    <textarea
+                        name="description"
+                        value={updateGroup.description}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Nhập mô tả danh mục..."
+                    />
+                </div>
+                <div className="flex justify-end space-x-2">
+                    <button
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        onClick={handleUpdateGroup}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                        Thêm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 const TableByGroup = ({groups, setGroupSelected,groupSelected,onHandleEdit,onHandleCreateCategory}) => {
     return (
         <div className="overflow-x-auto">
