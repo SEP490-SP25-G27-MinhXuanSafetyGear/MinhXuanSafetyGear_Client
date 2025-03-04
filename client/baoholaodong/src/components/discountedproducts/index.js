@@ -1,21 +1,17 @@
-import React, { useRef } from "react";
+// src/components/discountedproducts/index.js
+import React, { useRef, useState } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import './style.css';
+import ProductPopup from "../productpopup";
 
 const index = [
-    { id: 1, name: "Product 1", price: "100,000 VND", discountPrice: "80,000 VND", discountPercentage: " Giảm 20%", image: "path/to/image1.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
-    { id: 2, name: "Product 2", price: "200,000 VND", discountPrice: "150,000 VND", discountPercentage: "Giảm 25%", image: "path/to/image2.jpg" },
-
+    { id: 1, name: "Product 1", price: "100,000 VND", discountPrice: "80,000 VND", discountPercentage: " Giảm 20%", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTx3CKgGxeoMbIBXV4HWzxHrq--kMALDEiCw&s" },
+    // ... other products
 ];
 
 export default function DiscountedProducts() {
     const scrollRef = useRef(null);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     const scrollLeft = () => {
         scrollRef.current.scrollBy({ left: -200, behavior: "smooth" });
@@ -23,6 +19,14 @@ export default function DiscountedProducts() {
 
     const scrollRight = () => {
         scrollRef.current.scrollBy({ left: 200, behavior: "smooth" });
+    };
+
+    const handleProductClick = (product) => {
+        setSelectedProduct(product);
+    };
+
+    const handleClosePopup = () => {
+        setSelectedProduct(null);
     };
 
     return (
@@ -42,20 +46,22 @@ export default function DiscountedProducts() {
                 </div>
                 <div ref={scrollRef} className="flex overflow-x-auto space-x-4 product-container">
                     {index.map((product) => (
-                        <div key={product.id} className="w-64 flex-shrink-0 bg-white shadow-lg rounded-lg p-4">
-                            <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-t-lg" />
-                            <div className="mt-4">
-                                <h3 className="product-name">{product.name}</h3>
-                                <div className="flex items-center">
-                                    <p className="text-red-600 font-bold">{product.discountPrice}</p>
-                                    <p className="text-gray-500 line-through text-sm ml-2">{product.price}</p>
+                        <div key={product.id} className="product-discounted-card">
+                            <img src={product.image} alt={product.name} className="product-discounted-image" />
+                            <div className="product-discounted-details">
+                                <h3 className="product-discounted-name">{product.name}</h3>
+                                <div className="product-discounted-prices">
+                                    <p className="product-discount-price">{product.discountPrice}</p>
+                                    <p className="product-original-price">{product.price}</p>
                                 </div>
-                                <p className="text-gold font-bold">{product.discountPercentage}</p>
+                                <p className="product-discount-percentage">{product.discountPercentage}</p>
+                                <button className="option-button" onClick={() => handleProductClick(product)}>Tùy chọn</button>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
+            {selectedProduct && <ProductPopup product={selectedProduct} onClose={handleClosePopup} />}
         </div>
     );
 }

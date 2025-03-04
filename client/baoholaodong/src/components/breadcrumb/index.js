@@ -14,6 +14,7 @@ const Breadcrumb = () => {
         'blog': 'Kiến thức an toàn lao động',
         'login': 'Đăng nhập',
         'register': 'Đăng ký',
+        'product': 'Chi tiết sản phẩm'
     };
 
     return (

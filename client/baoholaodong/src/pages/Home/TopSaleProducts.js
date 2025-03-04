@@ -1,17 +1,21 @@
-﻿import React, { useState } from "react";
-import { FaArrowRight, FaCheck, FaShoppingCart, FaStar } from "react-icons/fa";
+﻿import React, { useState, useContext } from "react";
+import { FaArrowRight, FaCheck, FaStar, FaCog, FaCartPlus } from "react-icons/fa";
 import "./TopSaleProductsStyle.css";
-import noImage from "../../images/no-image-product.jpg"
-import { useNavigate, useOutletContext } from "react-router-dom";
-import {motion} from "framer-motion";
+import noImage from "../../images/no-image-product.jpg";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import ProductPopup from "../../components/productpopup";
+import { CartContext } from "../../contexts/CartContext";
+
 const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const productsPerPage = 10;
     const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
     const totalPages = Math.ceil(products.length / productsPerPage);
     const navigate = useNavigate();
-    const { addToCart } = useOutletContext();
+    const { addToCart } = useContext(CartContext);
 
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
@@ -35,6 +39,18 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
 
     const handleDetailProduct = (id) => {
         navigate("/product/" + id);
+    };
+
+    const handleProductClick = (product) => {
+        if (product.productVariants.length > 0) {
+            setSelectedProduct(product);
+        } else {
+            addToCart(product);
+        }
+    };
+
+    const handleClosePopup = () => {
+        setSelectedProduct(null);
     };
 
     return (
@@ -69,20 +85,25 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                              alt={product.name}
                         />
                         <div className="product-info">
-                            <div className="product-rating-price">
-                                <div className="product-rating">
-                                    {Array.from({ length: product.averageRating }, (_, i) => (
-                                        <FaStar key={i} />
-                                    ))}
-                                </div>
-                                <div className="product-price">{product.price}</div>
+                            <div className="product-rating">
+                                {Array.from({ length: product.averageRating }, (_, i) => (
+                                    <FaStar key={i} />
+                                ))}
                             </div>
                             <div className="product-name">{product.name}</div>
-                            <div className="product-stock">{product.stock}</div>
+                            <div className="product-price">
+                                {product.discount > 0 ? (
+                                    <>
+                                        <span className="text-red-500">{product.price - product.discount}</span>
+                                        <span className="text-gray-400 line-through ml-2">{product.price}</span>
+                                    </>
+                                ) : (
+                                    <span>{product.price}</span>
+                                )}
+                            </div>
                             <div className="product-actions">
-                                <input type="number" className="quantity-input" min="1" defaultValue="1" />
-                                <button className="add-to-cart-button" onClick={() => addToCart(product)}>
-                                    <FaShoppingCart className="icon" /> <span>Thêm vào giỏ</span>
+                                <button className="option-button" onClick={() => handleProductClick(product)}>
+                                    {product.productVariants.length > 0 ? <><FaCog className="icon" />Tùy chọn</> : <><FaCartPlus className="icon" />Thêm vào giỏ hàng</>}
                                 </button>
                             </div>
                         </div>
@@ -102,6 +123,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                     </button>
                 </div>
             </div>
+            {selectedProduct && <ProductPopup product={selectedProduct} onClose={handleClosePopup} />}
         </main>
     );
 };

@@ -31,7 +31,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
         const handleScroll = () => {
             const header = document.querySelector(".header-gradient");
             const headerHeight = header.offsetHeight;
-            if (window.scrollY > headerHeight) {
+            if (window.scrollY > headerHeight * 2) { // Adjust the threshold as needed
                 setIsScrolled(true);
             } else {
                 setIsScrolled(false);
@@ -86,7 +86,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                                 onChange={(e)=>{setSearch(e.target.value)}}
                                 type="text"
                                 placeholder="Tìm kiếm..."
-                                className="w-full max-w-[300px] px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-white"
+                                className="w-full  px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-white"
                             />
                         </form>
                     </div>

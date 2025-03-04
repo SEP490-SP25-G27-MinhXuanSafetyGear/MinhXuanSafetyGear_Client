@@ -1,4 +1,4 @@
-﻿import React, { useContext} from "react";
+﻿import React, { useContext } from "react";
 import { CartContext } from "../../contexts/CartContext";
 import "./style.css";
 
@@ -23,16 +23,17 @@ const Cart = () => {
         <div className="cart-page">
             <div className="cart-page-content">
                 <div className="cart-page-left">
-
                     <div className="max-w-6xl mx-auto p-4">
                         <h2 className="cart-page-title">Giỏ hàng của bạn</h2>
                         <table className="w-full text-left border-collapse custom-table">
+                            <thead>
                             <tr className="cart-header">
                                 <th className="p-2">THÔNG TIN SẢN PHẨM</th>
                                 <th className="p-2 price-column">ĐƠN GIÁ</th>
                                 <th className="p-2 quantity-column">SỐ LƯỢNG</th>
-                                <th className="p-2 ">THÀNH TIỀN</th>
+                                <th className="p-2">THÀNH TIỀN</th>
                             </tr>
+                            </thead>
                             <tbody>
                             {cartItems.map((item) => (
                                 <tr key={item.id} className="border-b">
@@ -69,7 +70,7 @@ const Cart = () => {
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="p-2 text-red-500 font-bold ">
+                                    <td className="p-2 text-red-500 font-bold">
                                         {(item.price * item.quantity).toLocaleString()}đ
                                     </td>
                                 </tr>
