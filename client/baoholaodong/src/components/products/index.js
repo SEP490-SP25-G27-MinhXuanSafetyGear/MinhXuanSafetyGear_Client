@@ -1,6 +1,7 @@
 ﻿import React, { useState } from "react";
 import { FaArrowRight, FaCheck, FaShoppingCart, FaStar } from "react-icons/fa";
 import "./style.css";
+import noimage from "../../images/no-image-product.jpg"
 import { useNavigate, useOutletContext } from "react-router-dom";
 
 const Products = ({ products = [], title = "" }) => {
@@ -58,7 +59,7 @@ const Products = ({ products = [], title = "" }) => {
 					<div key={index} className="product-card">
 						<img onClick={() => { handleDetailProduct(product.id) }}
 							 className="product-image"
-							 src={product.productImages?.[0]?.image || "/images/default.png"}
+							 src={product.image || noimage}
 							 alt={product.name}
 						/>
 						<div className="product-info">

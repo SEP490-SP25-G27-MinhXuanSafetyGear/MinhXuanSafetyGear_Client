@@ -93,6 +93,7 @@ export const CustomerProductProvider =({ children }) => {
             if (groupCategories.length === 0) {
                 await fetchProductCategories();
             }
+
         };
         loadData();
     }, [topSaleProducts.length, groupCategories.length]);

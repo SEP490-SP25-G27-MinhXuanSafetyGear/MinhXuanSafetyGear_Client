@@ -4,6 +4,7 @@ import { ProductContext } from "../contexts/AdminProductContext";
 import Loading from "../components/Loading/Loading";
 import * as signalR from "@microsoft/signalr";
 import {CustomerProductContext} from "../contexts/CustomerProductContext";
+import noimage from "../images/no-image-product.jpg"
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 const ProductDetail = () => {
     const { id } = useParams();
@@ -19,6 +20,7 @@ const ProductDetail = () => {
         quantity: 0,
         price: 0,
         priceDiscount: 0,
+        image :null,
         discount: 0,
         createdAt: "2025-02-11T18:30:25.43",
         updatedAt: "2025-02-14T22:16:08.1",
@@ -116,12 +118,11 @@ const ProductDetail = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg">
                 <div className="flex flex-col md:flex-row">
                     <div className="md:w-1/2">
-                        <img
-                            key={(product.productImages.length!==0)?product.productImages[0].image:0} // Thêm key để React nhận biết thay đổi
+                        <img// Thêm key để React nhận biết thay đổi
                             alt="Protective workwear displayed in an industrial setting"
                             className="rounded-lg"
                             height="500"
-                            src={(product.productImages.length!==0)?product.productImages[0].image:""}
+                            src={product.image || noimage}
                             width="500"
                         />
 
