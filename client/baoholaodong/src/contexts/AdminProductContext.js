@@ -6,10 +6,6 @@ const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const ProductContext = createContext();
 
 export const AdminProductProvider = ({ children }) => {
-	/**
-	 * danh sach sản phẩm
-	 * @return {products}
-	 * */
 	const [products, setProducts] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState(0);
 	const [selectedGroup, setSelectGroup] = useState(0);
@@ -74,6 +70,7 @@ export const AdminProductProvider = ({ children }) => {
 	const createCategory = async (category) => {
 		try{
 			const response = await axios.post(`${BASE_URL}/api/Product/create-category`, category);
+			setGroupCategories(response.data);
 			return response.data;
 		}catch (error){
 			throw error;
@@ -84,6 +81,7 @@ export const AdminProductProvider = ({ children }) => {
 	const updateCategory = async (category) => {
 		try{
 			const response = await axios.put(`${BASE_URL}/api/Product/update-category`, category);
+			setGroupCategories(response.data);
 			return response.data;
 		}catch (error){
 			throw error;
@@ -94,6 +92,8 @@ export const AdminProductProvider = ({ children }) => {
 	const createProduct = async (product) => {
 		try {
 			const response = await axios.post(`${BASE_URL}/api/product/create-product`, product);
+			const newProduct = {...await response.data,isNew: true};
+			setProducts((prevProducts)=>[newProduct,...prevProducts]);
 			return response.data;
 		} catch (error) {
 			if (error.response && error.response.data) {
@@ -120,7 +120,13 @@ export const AdminProductProvider = ({ children }) => {
 	const updateProduct = async (product) => {
 		try{
 			const response = await axios.put(`${BASE_URL}/api/product/update-product`, product);
-			return response.data;
+			const updatedProduct = response.data;
+			// Cập nhật danh sách sản phẩm
+			setProducts((prevProducts) =>
+				prevProducts.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+			);
+			return updatedProduct;
+
 		}catch(error){
 			throw error;
 		}
@@ -156,7 +162,12 @@ export const AdminProductProvider = ({ children }) => {
 	const updateImage = async (image) => {
 		try{
 			const response = await axios.put(`${BASE_URL}/api/Product/update-image`, image);
-			return response.data;
+			const updatedProduct = response.data;
+			// Cập nhật danh sách sản phẩm
+			setProducts((prevProducts) =>
+				prevProducts.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+			);
+			return updatedProduct;
 		}catch (error){
 			throw error;
 		}
@@ -223,54 +234,29 @@ export const AdminProductProvider = ({ children }) => {
 		}
 	}
 
-	/** Kết nối với SignalR */
-	useEffect(() => {
-		const connection = new signalR.HubConnectionBuilder()
-			.withUrl(`${BASE_URL}/productHub`)
-			.withAutomaticReconnect()
-			.build();
-
-		connection.start()
-			.then(() => setHubConnection(connection))
-			.catch(err => console.error("Lỗi khi kết nối SignalR:", err));
-
-		return () => {
-			if (connection.state === signalR.HubConnectionState.Connected) {
-				connection.stop();
-			}
-		};
-	}, []);
-
-	/** Lắng nghe sự kiện từ SignalR */
-	useEffect(() => {
-		if (!hubConnection) return;
-
-		const handleProductChange = (productUpdated) => {
-			setProducts((prevProducts) =>
-				prevProducts.map((product) =>
-					product.id === productUpdated.id ? productUpdated : product
-				)
-			);
-
-		};
-		const handleCategoriesChange = (groups) => {
-			setGroupCategories(groups);
+	const createGroup = async (group)=>{
+		try{
+			const response = await axios.post(`${BASE_URL}/api/Product/create-group-category`, group);
+			setGroupCategories((prevGroups) =>[...prevGroups,response.data])
+			return response.data;
+		}catch (error){
+			throw error;
 		}
-		hubConnection.on("ProductUpdated", handleProductChange);
-		hubConnection.on("ProductAdded", handleProductChange);
-		hubConnection.on("ProductDeleted", handleProductChange);
-		hubConnection.on("ProductCategoryAdded",handleCategoriesChange);
-		hubConnection.on("ProductCategoryUpdated",handleCategoriesChange);
-		return () => {
-			hubConnection.off("ProductUpdated", handleProductChange);
-			hubConnection.off("ProductAdded", handleProductChange);
-			hubConnection.off("ProductDeleted", handleProductChange);
-			hubConnection.off("ProductCategoryAdded",handleCategoriesChange);
-			hubConnection.off("ProductCategoryUpdated",handleCategoriesChange);
-		};
-	}, [hubConnection]);
-	// lắng nghe sư kiện update của product
-
+	}
+	const updateGroupCategory = async (group)=>{
+		try{
+			const response = await axios.put(`${BASE_URL}/api/Product/update-group-category`, group);
+			const updatedGroup = await response.data;
+			setGroupCategories((prevGroups) => {
+				return prevGroups.map((g) =>
+					g.groupId === updatedGroup.groupId ? updatedGroup : g
+				);
+			});
+			return response.data;
+		}catch(error){
+			throw error;
+		}
+	}
 
 	/** Gọi API khi thay đổi danh mục, trang hoặc kích thước trang */
 	useEffect(() => {
@@ -304,7 +290,6 @@ export const AdminProductProvider = ({ children }) => {
 				fetchProducts();
 			}
 		}, 500);
-
 		return () => clearTimeout(delaySearch);
 	}, [searchProduct,fetchProducts,search]);
 
@@ -334,6 +319,7 @@ export const AdminProductProvider = ({ children }) => {
 				deleteImage,
 				createCategory,
 				updateCategory,
+				createGroup,
 				taxes,
 				addProductTax,
 				deleteProductTax,
@@ -341,6 +327,7 @@ export const AdminProductProvider = ({ children }) => {
 				setSelectGroup,
 				selectedGroup,
 				totalPages,
+				updateGroupCategory,
 			}}
 		>
 			{children}

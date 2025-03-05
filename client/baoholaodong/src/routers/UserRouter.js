@@ -1,4 +1,4 @@
-﻿import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Register from "../pages/register";
 import Signin from "../pages/signin";
 import Home from "../pages/Home";
@@ -27,6 +27,7 @@ import VerificationPage from "../pages/register/Verification";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 import Logout from "../pages/Logout";
 import { AdminUserContextProvider } from "../contexts/AdminUserContext";
+import Dashboard from "../pages/manager/Dashboard";
 import CartProvider from "../contexts/CartContext";
 import ScrollToTop from "../components/ScrollToTop";
 
@@ -36,11 +37,14 @@ const UserRouter = () => {
             <Router>
                 <ScrollToTop />
                 <Routes>
-                    <Route path="/" element={
-                        <CustomerProductProvider>
-                            <CustomerLayout />
-                        </CustomerProductProvider>
-                    }>
+                    <Route
+                        path="/"
+                        element={
+                            <CustomerProductProvider>
+                                <CustomerLayout />
+                            </CustomerProductProvider>
+                        }
+                    >
                         <Route index element={<Home />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/login" element={<Signin />} />
@@ -53,9 +57,8 @@ const UserRouter = () => {
                         <Route path="/unauthorized" element={<UnauthorizedPage />} />
                         <Route path="/logout" element={<Logout />} />
                     </Route>
-                </Routes>
 
-                <Routes>
+                    {/* Admin Routes */}
                     <Route
                         path="/manager/*"
                         element={
@@ -68,6 +71,8 @@ const UserRouter = () => {
                             </AdminProductProvider>
                         }
                     >
+                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route index element={<Dashboard />} />
                         <Route path="users" element={<Users />} />
                         <Route path="orders" element={<Orders />} />
                         <Route path="products" element={<Products />} />
