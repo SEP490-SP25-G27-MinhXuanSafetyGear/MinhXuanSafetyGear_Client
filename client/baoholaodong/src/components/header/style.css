@@ -4,12 +4,9 @@
     position: relative; /* Initially relative */
     top: 0;
     z-index: 1000;
-    transition: background 0.3s ease, padding 0.3s ease, top 0.3s ease; /* Add transition for top */
+    transition: background 2s ease-in-out, padding 0.5s ease-in-out, top 50s ease-in-out; /* Use ease-in-out for smoother transition */
+    transition-delay: 2s, 0s, 30s;
     padding: 5px 10px;
-}
-
-.siderbar-head{
-    background: linear-gradient(to top, #620805, #c7170e);
 }
 
 .header-gradient.scrolled {
@@ -19,6 +16,12 @@
     top: 0; /* Stick to the top */
     z-index: 1000; /* Ensure it stays on top of other elements */
 }
+
+.siderbar-head{
+    background: linear-gradient(to top, #620805, #c7170e);
+}
+
+
 
 .sidebar-overlay {
     z-index: 2000; /* Ensure the overlay is above other elements */
@@ -56,7 +59,7 @@
     display: flex;
     align-items: center;
     margin: 0 10px;
-    max-width: 400px; /* Điều chỉnh theo thiết kế mong muốn */
+
 }
 
 

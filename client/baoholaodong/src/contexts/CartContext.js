@@ -8,15 +8,26 @@ const CartProvider = ({ children }) => {
     const [toast, setToast] = useState(null);
 
     useEffect(() => {
-        const savedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-        console.log(savedCartItems);
-        setCartItems(savedCartItems);
-        updateTotalPrice(savedCartItems);
+        console.log("useEffect for loading cart items from localStorage triggered");
+        try {
+            const savedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+            setCartItems(savedCartItems);
+            updateTotalPrice(savedCartItems); // Update total price based on loaded items
+            console.log("Loaded cart items from localStorage:", savedCartItems);
+        } catch (error) {
+            console.error("Failed to load cart items from localStorage:", error);
+        }
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("cartItems", JSON.stringify(cartItems));
-        updateTotalPrice(cartItems);
+        console.log("useEffect for saving cart items to localStorage triggered");
+        try {
+            localStorage.setItem("cartItems", JSON.stringify(cartItems));
+            console.log("Saved cart items to localStorage:", cartItems);
+        } catch (error) {
+            console.error("Failed to save cart items to localStorage:", error);
+        }
+        updateTotalPrice(cartItems); // Update total price based on current items
     }, [cartItems]);
 
     const updateTotalPrice = (items) => {
@@ -25,15 +36,20 @@ const CartProvider = ({ children }) => {
     };
 
     const addToCart = (product) => {
+        const price = product.discount > 0 ? product.price - product.discount : product.price;
+        const quantity = product.selectedVariant ? product.quantity : 1;
         setCartItems((prevItems) => {
             const existingItem = prevItems.find(item => item.id === product.id);
+            let updatedItems;
             if (existingItem) {
-                return prevItems.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                updatedItems = prevItems.map(item =>
+                    item.id === product.id ? { ...item, quantity: item.quantity + quantity, price } : item
                 );
             } else {
-                return [...prevItems, { ...product, quantity: 1 }];
+                updatedItems = [...prevItems, { ...product, quantity, price }];
             }
+            console.log("Updated cart items:", updatedItems);
+            return updatedItems;
         });
         showToast("Sản phẩm đã được thêm vào giỏ hàng");
     };
@@ -52,7 +68,7 @@ const CartProvider = ({ children }) => {
 
     const showToast = (message) => {
         setToast(message);
-        setTimeout(() => setToast(null), 3000); // Hide toast after 3 seconds
+        setTimeout(() => setToast(null), 3000);
     };
 
     return (

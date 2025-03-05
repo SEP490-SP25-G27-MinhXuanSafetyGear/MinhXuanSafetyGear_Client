@@ -1,3 +1,15 @@
+/* Ensure no elements cause horizontal overflow */
+html, body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 /* General styles for larger screens */
 /* Ensure the main container takes at least the full height of the viewport */
 .main-container {
@@ -26,4 +38,3 @@ body {
     padding: 10px;
   }
 }
-

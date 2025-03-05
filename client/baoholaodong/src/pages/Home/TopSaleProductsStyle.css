@@ -106,6 +106,22 @@
     margin-right: 8px;
 }
 
+.option-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background-color: #b50a00;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.option-button .icon {
+    margin-right: 8px;
+}
+
 .filter-button {
     display: inline-block;
     position: relative;

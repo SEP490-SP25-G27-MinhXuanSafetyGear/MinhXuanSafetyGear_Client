@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import Toast from "../components/toast";
-import Breadcrumb from "../components/breadcrumb"; // Import Breadcrumb
+import Breadcrumb from "../components/breadcrumb";
 import { CartContext } from "../contexts/CartContext";
 
 const CustomerLayout = () => {
@@ -14,11 +14,11 @@ const CustomerLayout = () => {
     useEffect(() => {
         const savedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
         setCartItems(savedCartItems);
-        setCartCount(savedCartItems.length);
     }, [setCartItems]);
 
     useEffect(() => {
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        setCartCount(cartItems.length);
     }, [cartItems]);
 
     const handleToastClose = () => {
