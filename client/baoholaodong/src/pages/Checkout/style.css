@@ -42,6 +42,7 @@
     margin-bottom: 10px;
     border-bottom: 1px solid black; /* Add bottom border */
     padding-bottom: 10px; /* Add padding to the bottom */
+    font-weight: bold;
 }
 
 .total-quantity {

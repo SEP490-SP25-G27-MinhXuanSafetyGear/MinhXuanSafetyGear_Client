@@ -1,6 +1,7 @@
-﻿import React, { useContext, useState } from 'react';
+﻿import React, { useContext, useState, useEffect } from 'react';
 import { CartContext } from '../../contexts/CartContext';
 import './style.css';
+import logo from '../../images/logo.gif';
 
 const Checkout = () => {
     const { cartItems, totalPrice } = useContext(CartContext);
@@ -14,6 +15,16 @@ const Checkout = () => {
         ward: '',
     });
     const [paymentMethod, setPaymentMethod] = useState('');
+
+    useEffect(() => {
+        sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
+        sessionStorage.setItem('totalPrice', totalPrice);
+    }, [cartItems, totalPrice]);
+
+    useEffect(() => {
+        const savedCartItems = JSON.parse(sessionStorage.getItem('cartItems')) || [];
+        const savedTotalPrice = sessionStorage.getItem('totalPrice') || 0;
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -34,7 +45,7 @@ const Checkout = () => {
             <div className="checkout-content">
                 <div className="checkout-left">
                     <div className="logo-container">
-                        <img src="http://baoholaodongminhxuan.com/images/common/logo1.gif" alt="Company Logo" className="company-logo" />
+                        <img src={logo} alt="Company Logo" className="company-logo" />
                     </div>
                     <div className="checkout-left-content">
                         <form className="shipping-form" onSubmit={handleSubmit}>
@@ -106,8 +117,13 @@ const Checkout = () => {
                     </div>
                     <ul>
                         {cartItems.map((item) => (
-                            <li key={item.id}>
-                                {item.name} - {item.quantity} x {item.price.toLocaleString()}đ
+                            <li key={item.id} className="flex items-center mb-4">
+                                <img src={item.image} alt={item.name} className="w-16 h-16 object-cover mr-4" />
+                                <div>
+                                    <p>{item.name}</p>
+                                    <p>Số lượng: {item.quantity}</p>
+                                    <p>{item.price.toLocaleString()}đ</p>
+                                </div>
                             </li>
                         ))}
                     </ul>
