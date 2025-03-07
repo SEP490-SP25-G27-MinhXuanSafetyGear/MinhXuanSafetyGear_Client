@@ -86,7 +86,6 @@ const UserRouter = () => {
                         <Route path="updateproduct/:id" element={<UpdateProduct />} />
                         <Route path="product_categories" element={<ProductCategories />} />
                         <Route path="taxes" element={<Taxes />} />
-                        <Route path="contact" element={<Contact />} />
                     </Route>
                 </Routes>
             </Router>
