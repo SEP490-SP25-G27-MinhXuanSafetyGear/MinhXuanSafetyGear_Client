@@ -31,6 +31,7 @@ import Dashboard from "../pages/manager/Dashboard";
 import CartProvider from "../contexts/CartContext";
 import ScrollToTop from "../components/ScrollToTop";
 import Contact from "../pages/Contact";
+import CustomerInfo from "../pages/CustomerInfo";
 
 const UserRouter = () => {
     return (
@@ -58,6 +59,7 @@ const UserRouter = () => {
                         <Route path="/unauthorized" element={<UnauthorizedPage />} />
                         <Route path="/logout" element={<Logout />} />
                         <Route path="/contact" element={<Contact />} />
+                        <Route path="/customer-info" element={<CustomerInfo />} />
                     </Route>
 
                     {/* Admin Routes */}
