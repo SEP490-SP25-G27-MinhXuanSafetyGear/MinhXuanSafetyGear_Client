@@ -30,6 +30,7 @@ import { AdminUserContextProvider } from "../contexts/AdminUserContext";
 import Dashboard from "../pages/manager/Dashboard";
 import CartProvider from "../contexts/CartContext";
 import ScrollToTop from "../components/ScrollToTop";
+import Contact from "../pages/Contact";
 
 const UserRouter = () => {
     return (
@@ -56,6 +57,7 @@ const UserRouter = () => {
                         <Route path="/verification" element={<VerificationPage />} />
                         <Route path="/unauthorized" element={<UnauthorizedPage />} />
                         <Route path="/logout" element={<Logout />} />
+                        <Route path="/contact" element={<Contact />} />
                     </Route>
 
                     {/* Admin Routes */}
@@ -84,6 +86,7 @@ const UserRouter = () => {
                         <Route path="updateproduct/:id" element={<UpdateProduct />} />
                         <Route path="product_categories" element={<ProductCategories />} />
                         <Route path="taxes" element={<Taxes />} />
+                        <Route path="contact" element={<Contact />} />
                     </Route>
                 </Routes>
             </Router>
