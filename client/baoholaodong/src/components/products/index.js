@@ -1,23 +1,15 @@
 ﻿import React, { useState } from "react";
 import { FaArrowRight, FaCheck, FaShoppingCart, FaStar } from "react-icons/fa";
 import "./style.css";
-import noimage from "../../images/no-image-product.jpg"
+import noimage from "../../images/no-image-product.jpg";
 import { useNavigate, useOutletContext } from "react-router-dom";
 
 const Products = ({ products = [], title = "" }) => {
 	const [selectedFilter, setSelectedFilter] = useState(null);
-	const [currentPage, setCurrentPage] = useState(1);
-	const productsPerPage = 10;
-	const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
-	const totalPages = Math.ceil(products.length / productsPerPage);
 	const navigate = useNavigate();
 	const { addToCart } = useOutletContext();
 
-	const handlePageChange = (page) => {
-		if (page > 0 && page <= totalPages) {
-			setCurrentPage(page);
-		}
-	};
+	const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
 
 	const sortedProducts = [...products];
 	if (selectedFilter === "Giá tăng dần") {
@@ -27,11 +19,6 @@ const Products = ({ products = [], title = "" }) => {
 	} else if (selectedFilter === "Rating") {
 		sortedProducts.sort((a, b) => b.averageRating - a.averageRating);
 	}
-
-	const currentProducts = sortedProducts.slice(
-		(currentPage - 1) * productsPerPage,
-		currentPage * productsPerPage
-	);
 
 	const handleDetailProduct = (id) => {
 		navigate("/product/" + id);
@@ -55,7 +42,7 @@ const Products = ({ products = [], title = "" }) => {
 				</div>
 			</div>
 			<div className="product-container-best-products">
-				{currentProducts.map((product, index) => (
+				{sortedProducts.map((product, index) => (
 					<div key={index} className="product-card">
 						<img onClick={() => { handleDetailProduct(product.id) }}
 							 className="product-image"
@@ -82,11 +69,6 @@ const Products = ({ products = [], title = "" }) => {
 						</div>
 					</div>
 				))}
-			</div>
-			<div className="flex justify-center mt-4">
-				<button className="pagination-button" onClick={() => handlePageChange(currentPage - 1)}>Trước</button>
-				<span className="pagination-info">Trang {currentPage} / {totalPages}</span>
-				<button className="pagination-button" onClick={() => handlePageChange(currentPage + 1)}>Sau</button>
 			</div>
 			<div className="flex justify-center mt-4">
 				<div className="new-blog-read-more">
