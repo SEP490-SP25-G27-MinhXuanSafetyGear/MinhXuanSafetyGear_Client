@@ -1,81 +1,82 @@
-.contact-container {
+/* Thêm lớp cha cụ thể để giới hạn phạm vi style */
+.contact-page .contact-container {
     max-width: 80rem;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
 
-.breadcrumbs {
+.contact-page .breadcrumbs {
     font-size: 0.875rem;
     margin-bottom: 1rem;
 }
 
-.contact-grid {
+.contact-page .contact-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
 }
 
 @media (min-width: 768px) {
-    .contact-grid {
+    .contact-page .contact-grid {
         grid-template-columns: 1fr 1fr;
     }
 }
 
-.contact-info {
+.contact-page .contact-info {
     background-color: white;
     padding: 1.5rem;
     border-radius: 0.5rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.company-title {
+.contact-page .company-title {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
 }
 
-.company-description {
+.contact-page .company-description {
     color: #4B5563;
     margin-bottom: 1rem;
 }
 
-.contact-details {
+.contact-page .contact-details {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 2rem;
 }
 
-.contact-item {
+.contact-page .contact-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.contact-icon {
+.contact-page .contact-icon {
     color: #DC2626;
 }
 
-.contact-form-container {
+.contact-page .contact-form-container {
     background-color: #F9FAFB;
     padding: 1.5rem;
     border-radius: 0.5rem;
 }
 
-.form-title {
+.contact-page .form-title {
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 1rem;
 }
 
-.contact-form {
+.contact-page .contact-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.form-input,
-.form-textarea {
+.contact-page .form-input,
+.contact-page .form-textarea {
     width: 100%;
     padding: 0.5rem 1rem;
     border: 1px solid #D1D5DB;
@@ -83,15 +84,15 @@
     transition: all 0.2s;
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.contact-page .form-input:focus,
+.contact-page .form-textarea:focus {
     outline: none;
     ring: 2px;
     ring-color: #DC2626;
     border-color: #DC2626;
 }
 
-.submit-button {
+.contact-page .submit-button {
     background-color: #DC2626;
     color: white;
     padding: 0.5rem 1.5rem;
@@ -100,17 +101,17 @@
     transition: background-color 0.2s;
 }
 
-.submit-button:hover {
+.contact-page .submit-button:hover {
     background-color: #B91C1C;
 }
 
-.map-container {
+.contact-page .map-container {
     height: 600px;
     border-radius: 0.5rem;
     overflow: hidden;
 }
 
-.google-map {
+.contact-page .google-map {
     width: 100%;
     height: 100%;
     border: 0;

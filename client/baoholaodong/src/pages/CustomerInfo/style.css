@@ -1,12 +1,5 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
-
-.customer-info {
+/* Thêm lớp cha cụ thể để giới hạn phạm vi style */
+.customer-info-page .customer-info {
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
@@ -14,29 +7,25 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-
-h1 {
+.customer-info-page h1 {
     text-align: center;
     color: #333;
 }
 
-
-.form-group {
+.customer-info-page .form-group {
     margin-bottom: 15px;
 }
 
-
-label {
+.customer-info-page label {
     display: block;
     margin-bottom: 5px;
     color: #333;
 }
 
-
-input[type="text"],
-input[type="tel"],
-input[type="email"],
-select {
+.customer-info-page input[type="text"],
+.customer-info-page input[type="tel"],
+.customer-info-page input[type="email"],
+.customer-info-page select {
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
@@ -44,8 +33,7 @@ select {
     border-radius: 4px;
 }
 
-
-button {
+.customer-info-page button {
     width: 100%;
     padding: 10px;
     background-color: #28a745;
@@ -55,7 +43,6 @@ button {
     cursor: pointer;
 }
 
-
-button:hover {
+.customer-info-page button:hover {
     background-color: #218838;
 }
