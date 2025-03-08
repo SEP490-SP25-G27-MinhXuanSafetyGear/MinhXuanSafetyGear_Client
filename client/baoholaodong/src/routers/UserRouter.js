@@ -24,12 +24,12 @@ import { BlogPostProvider } from "../contexts/BlogPostContext";
 import { AdminProductProvider } from "../contexts/AdminProductContext";
 import { Taxes } from "../pages/manager/TaxManager";
 import VerificationPage from "../pages/register/Verification";
-import UnauthorizedPage from "../pages/UnauthorizedPage";
 import Logout from "../pages/Logout";
 import { AdminUserContextProvider } from "../contexts/AdminUserContext";
 import Dashboard from "../pages/manager/Dashboard";
 import CartProvider from "../contexts/CartContext";
 import ScrollToTop from "../components/ScrollToTop";
+import {Error403, Error404, Error503} from "../pages/Errors";
 import Contact from "../pages/Contact";
 import CustomerInfo from "../pages/CustomerInfo";
 import Checkout from "../pages/Checkout";
@@ -40,6 +40,10 @@ const UserRouter = () => {
             <Router>
                 <ScrollToTop />
                 <Routes>
+                    <Route path="/403" element={<Error403 />} />
+                    <Route path="/503" element={<Error503 />} />
+                    <Route path="/404" element={<Error404 />} />
+                    <Route path="*" element={<Error404 />} />
                     <Route
                         path="/"
                         element={
@@ -53,12 +57,11 @@ const UserRouter = () => {
                         <Route path="/login" element={<Signin />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/products" element={<ProductList />} />
-                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/product/:id/:slug" element={<ProductDetail />} />
                         <Route path="/blog" element={<BlogList />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/verification" element={<VerificationPage />} />
-                        <Route path="/unauthorized" element={<UnauthorizedPage />} />
                         <Route path="/logout" element={<Logout />} />
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/customer-info" element={<CustomerInfo />} />
@@ -66,7 +69,7 @@ const UserRouter = () => {
 
                     {/* Admin Routes */}
                     <Route
-                        path="/manager/*"
+                        path="/manager"
                         element={
                             <AdminProductProvider>
                                 <BlogPostProvider>
@@ -87,7 +90,7 @@ const UserRouter = () => {
                         <Route path="notifications" element={<Notifications />} />
                         <Route path="settings" element={<Settings />} />
                         <Route path="createproduct" element={<CreateProduct />} />
-                        <Route path="updateproduct/:id" element={<UpdateProduct />} />
+                        <Route path="update-product/:id/:slug" element={<UpdateProduct />} />
                         <Route path="product_categories" element={<ProductCategories />} />
                         <Route path="taxes" element={<Taxes />} />
                     </Route>

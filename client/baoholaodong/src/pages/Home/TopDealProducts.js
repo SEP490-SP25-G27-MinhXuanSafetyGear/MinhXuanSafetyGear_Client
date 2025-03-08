@@ -1,10 +1,9 @@
-// src/components/discountedproducts/index.js
-import React, { useRef, useState } from "react";
+﻿import React, { useRef, useState } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import './style.css';
-import ProductPopup from "../productpopup";
+import './TopDealProductsStyle.css';
+import ProductPopup from "../../components/productpopup";
 
-export default function DiscountedProducts({products=[]}) {
+export default function TopDealProducts({products=[]}) {
     const scrollRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
 

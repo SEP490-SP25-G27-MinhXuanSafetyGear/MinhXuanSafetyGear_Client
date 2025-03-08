@@ -355,7 +355,7 @@ const UpdateGroupForm = ({onUpdateGroup,close,setLoading,groupSelected}) => {
                         onClick={handleUpdateGroup}
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                     >
-                        Thêm
+                        Save
                     </button>
                 </div>
             </div>

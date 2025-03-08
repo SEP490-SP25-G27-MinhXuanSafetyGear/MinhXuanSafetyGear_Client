@@ -1,15 +1,16 @@
-﻿import { useParams } from "react-router-dom";
+﻿import {useNavigate, useParams} from "react-router-dom";
 import React, { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../contexts/AdminProductContext";
 import Loading from "../components/Loading/Loading";
 import * as signalR from "@microsoft/signalr";
 import { CustomerProductContext } from "../contexts/CustomerProductContext";
 import noimage from "../images/no-image-product.jpg"
-
+import slugify from "slugify";
+import {toSlug} from "../utils/SlugUtils";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const ProductDetail = () => {
-    const { id } = useParams();
+    const { slug,id } = useParams();
     const { getProductById } = useContext(CustomerProductContext);
     const [product, setProduct] = useState({
         id: parseInt(id),
@@ -53,18 +54,7 @@ const ProductDetail = () => {
     });
     const [isLoading, setIsLoading] = useState(true);
     const [hubConnection, setHubConnection] = useState(null);
-
-    const fetchProduct = async () => {
-        setIsLoading(true);
-        try {
-            const data = await getProductById(id);
-            setProduct(data);
-        } catch (error) {
-            console.error("Error fetching product:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const navigate = useNavigate();
 
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
@@ -107,10 +97,38 @@ const ProductDetail = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            await fetchProduct();
+            setIsLoading(true);
+            try {
+                const data = await getProductById(id);
+                setProduct(data);
+            } catch (error) {
+                console.error("Error fetching product:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchData();
     }, [id]);
+
+    useEffect(() => {
+        if (!isLoading && product?.name) {
+            const correctSlug = toSlug(product.name);
+            // Điều hướng nếu slug không khớp
+            if (slug !== correctSlug) {
+                navigate(`/product/${id}/${correctSlug}`, { replace: true });
+            }
+
+            // Cập nhật title của trang
+            document.title = `${product.name} | Chi tiết sản phẩm`;
+        }
+
+        // Cleanup: đặt lại title khi rời trang
+        return () => {
+            document.title = "BaoHoLaoDongMinhXuan";
+        };
+    }, [isLoading, product, slug, id, navigate]);
+
+
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
