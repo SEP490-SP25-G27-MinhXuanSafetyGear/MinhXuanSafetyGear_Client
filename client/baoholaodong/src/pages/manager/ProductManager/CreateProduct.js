@@ -3,9 +3,11 @@ import { ProductContext } from "../../../contexts/AdminProductContext";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../../components/Loading/Loading";
 import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imageUtils";
+import Modal from "../../../components/Modal/Modal";
+import ErrorList from "../../../components/ErrorList/ErrorList";
 
-const MAX_IMAGE_SIZE_MB = 0.3; // 300KB
-const TARGET_IMAGE_SIZE_KB = 300; // 300KB
+const MAX_IMAGE_SIZE_MB = 0.2;
+const TARGET_IMAGE_SIZE_KB = 0.1*1024;
 
 const CreateProduct = () => {
 	const navigate = useNavigate();
@@ -17,7 +19,7 @@ const CreateProduct = () => {
 		material: "",
 		origin: "",
 		quantity: 1,
-		price: 0.01,
+		price: 0,
 		discount: 0,
 		status: true,
 		qualityCertificate: "",
@@ -28,11 +30,16 @@ const CreateProduct = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentStep, setCurrentStep] = useState(1);
 	const totalSteps = 4;
-
+	const [isShowMessage, setIsShowMessage] = useState(false);
+	const [errors, setErrors] = useState([]);
 	// Xử lý khi nhập thông tin sản phẩm
 	const handleChange = (e) => {
 		const { id, value } = e.target;
-		setProduct(prev => ({ ...prev, [id]: value }));
+		setProduct(prev => ({
+			...prev,
+			[id]: id === "price" ? parseInt(value.replace(/\D/g, ""), 10) || 0 : value
+		}));
+		console.log(product)
 	};
 
 	// Thêm biến thể sản phẩm
@@ -74,11 +81,11 @@ const CreateProduct = () => {
 		const selectedFiles = Array.from(e.target.files);
 		const validImages = await Promise.all(
 			selectedFiles.map(async (file) => {
-				if (!isImageSizeValid(file, MAX_IMAGE_SIZE_MB)) { // Kiểm tra giới hạn 5MB
-					alert("File quá lớn! Chỉ chấp nhận ảnh dưới 5MB.");
+				if (!isImageSizeValid(file, MAX_IMAGE_SIZE_MB)) {
+					alert("File quá lớn! Chỉ chấp nhận ảnh dưới "+MAX_IMAGE_SIZE_MB+"MB");
 					return null;
 				}
-				return await compressImageToTargetSize(file, TARGET_IMAGE_SIZE_KB); // Nén ảnh nếu quá lớn
+				return await compressImageToTargetSize(file, TARGET_IMAGE_SIZE_KB);
 			})
 		);
 
@@ -119,20 +126,20 @@ const CreateProduct = () => {
 			images.forEach((image) => {
 				formData.append("files", image);
 			});
-			var result = await createProduct(formData);
+		    var result=	await createProduct(formData);
 			navigate("/manager/products");
 			setIsLoading(false);
 		} catch (err) {
 			if (err.errors) {
 				let errorMessages = [];
 				for (let field in err.errors) {
-					err.errors[field].forEach(message => {
-						errorMessages.push(`${field}: ${message}`);
-					});
+					if (Array.isArray(err.errors[field])) {
+						err.errors[field].forEach((message) => {
+							errorMessages.push(`${field}: ${message}`);
+						});
+					}
 				}
-				alert(errorMessages.join("\n"));
-			} else {
-				alert(err.message);
+				setErrors(errorMessages);
 			}
 		}
 		finally {
@@ -149,7 +156,9 @@ const CreateProduct = () => {
 	const prevStep = () => {
 		setCurrentStep(prev => Math.max(prev - 1, 1));
 	};
-
+	const formatPrice = (value) => {
+		return new Intl.NumberFormat("vi-VN").format(value);
+	};
 	// Kiểm tra xem có thể chuyển đến bước tiếp theo không
 	const canProceedToNextStep = () => {
 		switch (currentStep) {
@@ -170,6 +179,7 @@ const CreateProduct = () => {
 	return (
 		<div className=" min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
 			<Loading isLoading={isLoading} />
+			<ErrorList errors={errors}/>
 			<div className="max-w-6xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
 				<div className="bg-gradient-to-r from-blue-600 to-indigo-700 py-6 px-8">
 					<h2 className="text-3xl font-extrabold text-white">Create New Product</h2>
@@ -208,7 +218,7 @@ const CreateProduct = () => {
 										)}
 									</div>
 									<span className="text-xs font-medium">
-										{step === 1 && "Basic Info"}
+										{step === 1 && "Basic Info" }
 										{step === 2 && "Pricing"}
 										{step === 3 && "Images"}
 										{step === 4 && "Variants"}
@@ -230,7 +240,7 @@ const CreateProduct = () => {
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">
-										Product Name <span className="text-red-500">*</span>
+										Tên Sản Phẩm<span className="text-red-500">*</span>
 									</label>
 									<input
 										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -245,7 +255,7 @@ const CreateProduct = () => {
 
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="category">
-										Category <span className="text-red-500">*</span>
+										Danh mục sản phẩm <span className="text-red-500">*</span>
 									</label>
 									<select
 										id="category"
@@ -254,7 +264,7 @@ const CreateProduct = () => {
 										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
 										required
 									>
-										<option value="">Select a category</option>
+										<option value="">Chọn danh mục</option>
 										{categories.map(cat => (
 											<option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
 										))}
@@ -263,7 +273,7 @@ const CreateProduct = () => {
 
 								<div className="md:col-span-2">
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="description">
-										Description <span className="text-red-500">*</span>
+										Mô Tả sản phẩm <span className="text-red-500">*</span>
 									</label>
 									<textarea
 										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -277,7 +287,7 @@ const CreateProduct = () => {
 								</div>
 								<div className="md:col-span-2">
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="qualityCertificate">
-										Quality Certificate <span className="text-red-500">*</span>
+										Chứng nhận sản phẩm(CO,CQ) <span className="text-red-500">*</span>
 									</label>
 									<textarea
 										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -291,7 +301,7 @@ const CreateProduct = () => {
 								</div>
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="material">
-										Material <span className="text-red-500">*</span>
+										Chất liệu sản phẩm <span className="text-red-500">*</span>
 									</label>
 									<input
 										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -306,7 +316,7 @@ const CreateProduct = () => {
 
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="origin">
-										Origin <span className="text-red-500">*</span>
+										Xuất xứ <span className="text-red-500">*</span>
 									</label>
 									<input
 										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -318,8 +328,6 @@ const CreateProduct = () => {
 										required
 									/>
 								</div>
-
-
 							</div>
 						</div>
 					)}
@@ -334,7 +342,7 @@ const CreateProduct = () => {
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="price">
-										Base Price (đ) <span className="text-red-500">*</span>
+										Giá (đ) <span className="text-red-500">*</span>
 									</label>
 									<div className="relative">
 										<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -343,11 +351,11 @@ const CreateProduct = () => {
 										<input
 											className="w-full pl-8 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
 											id="price"
-											type="number"
+											type="text"
 											step="1000"
 											min="1"
 											placeholder="1000"
-											value={product.price}
+											value={formatPrice(product.price)}
 											onChange={handleChange}
 											required
 										/>
@@ -356,7 +364,7 @@ const CreateProduct = () => {
 
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="discount">
-										Discount (%) <span className="text-red-500">*</span>
+										Giảm giá (%) <span className="text-red-500">*</span>
 									</label>
 									<div className="relative">
 										<input
@@ -378,7 +386,7 @@ const CreateProduct = () => {
 
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="quantity">
-										Base Quantity <span className="text-red-500">*</span>
+										Số lượng <span className="text-red-500">*</span>
 									</label>
 									<input
 										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -426,7 +434,7 @@ const CreateProduct = () => {
 												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
 											</svg>
 											<p className="mb-2 text-sm text-blue-600"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-											<p className="text-xs text-blue-500">PNG, JPG, GIF up to 300KB</p>
+											<p className="text-xs text-blue-500">PNG, JPG, GIF up to {MAX_IMAGE_SIZE_MB*1024}MB</p>
 										</div>
 										<input
 											type="file"

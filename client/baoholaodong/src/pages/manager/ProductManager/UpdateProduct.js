@@ -1,17 +1,19 @@
 ﻿import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { ProductContext } from "../../../contexts/AdminProductContext";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { Edit, Plus, Trash2, Image, Package, Tag, CheckCircle } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
 import Loading from "../../../components/Loading/Loading";
 import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imageUtils";
+import {toSlug} from "../../../utils/SlugUtils";
+import ErrorList from "../../../components/ErrorList/ErrorList";
 
 const MAX_IMAGE_SIZE_MB = 0.5; // 2MB
 const TARGET_IMAGE_SIZE_KB = 10; // 100KB
 
 const UpdateProduct = () => {
-	const { id } = useParams();
+	const { id,slug } = useParams();
 	const { getProductById, categories, updateProduct, uploadImage, updateImage, deleteImage, updateVariant, createVariant, addProductTax, taxes, deleteProductTax } = useContext(ProductContext);
 	const [product, setProduct] = useState({
 		id: parseInt(id),
@@ -70,11 +72,30 @@ const UpdateProduct = () => {
 	const [variantSelected, setVariantSelected] = useState(null);
 	const [isLoading, setLoading] = useState(false);
 	const [isOpenAddTax, setIsOpenAddTax] = useState(false);
-
+	const navigate = useNavigate();
+	const [errors, setErrors] = useState([]);
 	useEffect(() => {
+		const fetchProduct =async ()=>{
+			setLoading(true);
+			try {
+				const data = await getProductById(id);
+				setProduct(data);
+			} catch (error) {
+				console.error("Error fetching product:", error);
+			}finally {
+				setLoading(false);
+			}
+		}
 		fetchProduct();
 	}, [id]);
-
+	useEffect(() => {
+		if (!isLoading && product.name) {
+			const correctSlug = toSlug(product.name);
+			if (slug !== correctSlug) {
+				navigate(`/manager/update-product/${id}/${correctSlug}`, { replace: true });
+			}
+		}
+	}, [isLoading, product, slug, id, navigate]);
 	// click open form update image
 	const handleClickUpdateImage = (image) => {
 		setImageSelected(image);
@@ -86,23 +107,15 @@ const UpdateProduct = () => {
 		setVariantSelected(variant);
 		setIsOpenUpdateVariant(true);
 	}
-
 	// get product by id
-	const fetchProduct = async () => {
-		try {
-			const data = await getProductById(id);
-			setProduct(data);
-		} catch (error) {
-			console.error("Error fetching product:", error);
-		}
-	};
 
 	if (!product) return <div className="text-center mt-10">Loading...</div>;
 
 	return (
 		<div className="space-y-6">
-			<Loading isLoading={isLoading} />
 			<div className="bg-white rounded-lg shadow-lg overflow-hidden ">
+				<Loading isLoading={isLoading} />
+				<ErrorList errors={errors}/>
 				{/* Header */}
 				<div className="bg-gradient-to-r  from-blue-600 to-indigo-700 p-6 flex justify-between items-center">
 					<h3 className="text-2xl font-bold text-white">Cập nhật sản phẩm</h3>
@@ -163,7 +176,7 @@ const UpdateProduct = () => {
 							</div>
 							<div className="flex items-center">
 								<span className="text-gray-500 w-32">Giá:</span>
-								<span className="font-medium text-gray-800">đ{product.price}</span>
+								<span className="font-medium text-gray-800">{Intl.NumberFormat("vi-VN").format(product.price)} VND</span>
 							</div>
 							<div className="flex items-center">
 								<span className="text-gray-500 w-32">Giảm giá:</span>
@@ -324,6 +337,7 @@ const UpdateProduct = () => {
 						onUpdate={updateProduct}
 						setProduct={setProduct}
 						setLoading={setLoading}
+						setErrors={setErrors}
 						close={() => setIsOpenUpdateInformation(false)}
 					/>
 				</Modal>
@@ -349,7 +363,7 @@ const UpdateProduct = () => {
 				>
 					<UpdateVariantForm
 						variant={variantSelected}
-						fetchProduct={fetchProduct}
+						onSetProduct={setProduct}
 						setLoading={setLoading}
 						onUpdateVariant={updateVariant}
 						onClose={()=> setIsOpenUpdateVariant(false)}
@@ -364,7 +378,7 @@ const UpdateProduct = () => {
 					<CreateVariantForm
 						setLoading={setLoading}
 						product={product}
-						fetchProduct={fetchProduct}
+						onSetProduct={setProduct}
 						onCreateVariant={createVariant}
 					/>
 				</Modal>
@@ -377,7 +391,7 @@ const UpdateProduct = () => {
 					<UpdateImageForm
 						image={imageSelected}
 						onUpdateImage={updateImage}
-						fetchProduct={fetchProduct}
+						onSetProduct={setProduct}
 						close={() => { setIsOpenUpdateImage(false) }}
 						onDelete={deleteImage}
 						setLoading={setLoading}
@@ -405,7 +419,7 @@ const UpdateProduct = () => {
 };
 
 // update information product
-const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduct, setLoading, close }) => {
+const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduct, setLoading, close ,setErrors}) => {
 	const [productUpdate, setProductUpdate] = useState({
 		id: product?.id || "",
 		name: product?.name || "",
@@ -440,16 +454,20 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 	};
 
 	const handleChange = (e) => {
-		const { name, value, type, checked } = e.target;
+		const { name, value, checked } = e.target;
 		setProductUpdate((prev) => {
-			const updatedProduct = {
-				...prev,
-				[name]: type === "checkbox" ? checked : value,
-			};
+			let newValue = value;
+			if (name === "status") {
+				newValue = checked;
+			} else if (name === "price") {
+				newValue = value ? parseInt(value.replace(/\D/g, ""), 10) || 0 : 0;
+			}
+			const updatedProduct = { ...prev, [name]: newValue };
 			checkProduct(updatedProduct);
 			return updatedProduct;
 		});
 	};
+
 
 	useEffect(() => {
 		checkProduct();
@@ -463,13 +481,25 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 			const updatedProduct = await onUpdate(productUpdate);
 			setProduct(updatedProduct);
 			close();
-		} catch (error) {
-			alert(error.message);
+		} catch (err) {
+			if (err.errors) {
+				let errorMessages = [];
+				for (let field in err.errors) {
+					if (Array.isArray(err.errors[field])) {
+						err.errors[field].forEach((message) => {
+							errorMessages.push(`${field}: ${message}`);
+						});
+					}
+				}
+				setErrors(errorMessages);
+			}
 		} finally {
 			setLoading(false);
 		}
 	};
-
+    const formatPrice = (value) => {
+        return new Intl.NumberFormat("vi-VN").format(value);
+    };
 	return (
 		<div className="p-6 overflow-y-auto max-h-[70vh]">
 			<form onSubmit={handleSubmit} className="space-y-5">
@@ -556,12 +586,12 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 								<span className="text-gray-500">đ</span>
 							</div>
 							<input
-								type="number"
+								type="text"
 								name="price"
-								value={productUpdate.price}
+								value={formatPrice(productUpdate.price)}
 								onChange={handleChange}
 								className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-								step="0.01"
+								step="0"
 								min="1"
 								required
 							/>
@@ -841,7 +871,7 @@ const AddMoreImageForm = ({ product, uploadImage, setProduct, close, setLoading 
 };
 
 // update variant
-const UpdateVariantForm = ({ variant, onUpdateVariant, setLoading, fetchProduct,onClose }) => {
+const UpdateVariantForm = ({ variant, onUpdateVariant, setLoading, onSetProduct,onClose }) => {
 	const [variantUpdate, setVariantUpdate] = useState(variant);
 
 	const handleVariantChange = (field, value) => {
@@ -854,7 +884,7 @@ const UpdateVariantForm = ({ variant, onUpdateVariant, setLoading, fetchProduct,
 		try {
 			var result = await onUpdateVariant(variantUpdate);
 			if (result) {
-				await fetchProduct();
+				onSetProduct(result);
 				onClose();
 			}
 		} catch (error) {
@@ -989,7 +1019,7 @@ const UpdateVariantForm = ({ variant, onUpdateVariant, setLoading, fetchProduct,
 };
 
 // create new variant
-const CreateVariantForm = ({ setLoading, fetchProduct, onCreateVariant, product }) => {
+const CreateVariantForm = ({ setLoading, onSetProduct, onCreateVariant, product }) => {
 	const [newVariant, setNewVariant] = useState({
 		productId: product.id,
 		size: "",
@@ -1033,7 +1063,7 @@ const CreateVariantForm = ({ setLoading, fetchProduct, onCreateVariant, product 
 		try {
 			setLoading(true);
 			const result = await onCreateVariant(newVariant);
-			if (result) await fetchProduct();
+			if (result) await onSetProduct(result);
 		} catch (error) {
 			console.error("Error creating variant:", error);
 			alert("Không thể tạo biến thể. Vui lòng thử lại!");
@@ -1181,7 +1211,7 @@ const CreateVariantForm = ({ setLoading, fetchProduct, onCreateVariant, product 
 };
 
 // update image
-const UpdateImageForm = ({ image, onUpdateImage, fetchProduct, close, onDelete, setLoading }) => {
+const UpdateImageForm = ({ image, onUpdateImage, onSetProduct, close, onDelete, setLoading }) => {
 	const [preview, setPreview] = useState(image.image || null);
 	const [newImage, setNewImage] = useState({
 		productImageId: image.id,
@@ -1240,7 +1270,7 @@ const UpdateImageForm = ({ image, onUpdateImage, fetchProduct, close, onDelete, 
 		try {
 			var result = await onUpdateImage(formData);
 			if (result) {
-				await fetchProduct();
+				onSetProduct(result);
 				close();
 			} else {
 				alert("Cập nhật thất bại!");
@@ -1260,8 +1290,8 @@ const UpdateImageForm = ({ image, onUpdateImage, fetchProduct, close, onDelete, 
 
 		setLoading(true);
 		try {
-			await onDelete(image.id);
-			await fetchProduct();
+		    var result =	await onDelete(image.id);
+			onSetProduct(result);
 			close();
 		} catch (error) {
 			console.error("Lỗi khi xóa ảnh:", error);

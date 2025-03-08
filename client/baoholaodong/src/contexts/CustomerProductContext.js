@@ -1,14 +1,48 @@
 ﻿import React, {createContext, useState, useEffect, useCallback} from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
+import {useNavigate} from "react-router-dom";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const CustomerProductContext = createContext();
 export const CustomerProductProvider =({ children }) => {
     const [topSaleProducts,setTopSaleProducts] = useState([]);
+    const [topDealProducts,setTopDealProducts] = useState([]);
     const [hubConnection, setHubConnection] = useState(null);
     const [groupCategories, setGroupCategories] = useState([]);
-
+    const [listTopProductOfGroups, setListTopProductOfGroups] = useState([]);
+    const navigate = useNavigate();
+    axios.interceptors.response.use(
+        (response) => response, // Nếu response thành công thì trả về bình thường
+        (error) => {
+            if (error.response) {
+                switch (error.response.status) {
+                    case 401:
+                        navigate("/login"); // Unauthorized
+                        break;
+                    case 403:
+                        navigate("/403"); // Forbidden
+                        break;
+                    case 404:
+                        navigate("/404"); // Not Found
+                        break;
+                    case 500:
+                        navigate("/500"); // Internal Server Error
+                        break;
+                    case 503:
+                        navigate("/503"); // Service Unavailable
+                        break;
+                    default:
+                        break;
+                }
+            } else if (error.request) {
+                navigate("/503"); // Có thể điều hướng đến trang "Không có kết nối mạng"
+            } else {
+                console.error("Lỗi không xác định:", error.message);
+            }
+            return Promise.reject(error);
+        }
+    );
     const searchProduct = async (value) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/Product/search-product`, {
@@ -19,6 +53,18 @@ export const CustomerProductProvider =({ children }) => {
             return [];
         }
     };
+    const getProductPage = async (group,category,page,size) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/Product/get-product-page`, {
+                params: {group:group, category: category, page: page, pagesize: size },
+            });
+            return response.data;
+        } catch (error) {
+
+        } finally {
+
+        }
+    }
     /** Lấy thông tin chi tiết sản phẩm */
     const getProductById = async (id) => {
         try {
@@ -38,7 +84,30 @@ export const CustomerProductProvider =({ children }) => {
             });
             setTopSaleProducts(response.data || []);
         }catch(error){
-            throw error;
+            return [];
+        }
+    }
+    const  fetchTopProductOfGroup = async (size)=>{
+        try{
+            const response = await axios.get(`${BASE_URL}/api/Product/top-product-group`, {
+                params: {size:size},
+            });
+            return response.data;
+        }catch(error){
+            return [];
+        }
+    }
+    const fetchTopDealProducts = async (size,minDiscount) => {
+        try{
+            const response = await axios.get(`${BASE_URL}/api/Product/top-deal`,{
+                params: {
+                    size: size,
+                    minDiscountPercent: minDiscount,
+                }
+            });
+            setTopDealProducts(response.data || []);
+        }catch(error){
+            return [];
         }
     }
     /**
@@ -50,9 +119,26 @@ export const CustomerProductProvider =({ children }) => {
             console.log("Fetched categories:", response.data); // Debug log
             setGroupCategories(response.data);
         }catch(error){
-            throw error;
+            return [];
         }
     }
+    useEffect(() => {
+        const loadTopProductsOfGroups = async () => {
+            try {
+                const result = await fetchTopProductOfGroup(10)
+                setListTopProductOfGroups(result);
+            } catch (error) {
+                console.error("Lỗi khi tải danh sách top sản phẩm của nhóm:", error);
+            }
+        };
+        if(listTopProductOfGroups.length===0){
+            loadTopProductsOfGroups();
+            console.log(listTopProductOfGroups);
+        }
+
+    }, [listTopProductOfGroups.length]);
+
+
     /** Kết nối với SignalR */
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
@@ -80,6 +166,10 @@ export const CustomerProductProvider =({ children }) => {
                     product.id === productUpdated.id ? productUpdated : product
                 )
             );
+            setTopDealProducts((prevProducts) =>
+            prevProducts.map((product) =>
+                 product.id === productUpdated.id ? productUpdated : product)
+            );
 
         };
         hubConnection.on("ProductUpdated", handleProductChange);
@@ -104,10 +194,12 @@ export const CustomerProductProvider =({ children }) => {
             if (groupCategories.length === 0) {
                 await fetchProductCategories();
             }
-
+            if(topDealProducts.length === 0) {
+                await fetchTopDealProducts(10,10);
+            }
         };
         loadData();
-    }, [topSaleProducts.length, groupCategories.length]);
+    }, [topSaleProducts.length, groupCategories.length, topDealProducts.length]);
 
     return (
         <CustomerProductContext.Provider
@@ -117,6 +209,9 @@ export const CustomerProductProvider =({ children }) => {
                 groupCategories,
                 fetchProductCategories,
                 searchProduct,
+                getProductPage,
+                topDealProducts,
+                listTopProductOfGroups,
             }}
         >
             {children}

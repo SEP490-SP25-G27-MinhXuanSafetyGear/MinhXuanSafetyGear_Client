@@ -1,19 +1,24 @@
 ﻿import React, { useState, useEffect, useContext } from 'react';
 import './style.css';
-import {FaFilter, FaCartPlus, FaRegFrown} from 'react-icons/fa';
+import { FaFilter, FaCartPlus, FaRegFrown } from 'react-icons/fa';
 import { CustomerProductContext } from '../../contexts/CustomerProductContext';
-import {useLocation, useParams} from "react-router-dom";
-import {motion} from 'framer-motion';
-const useQuery = () => {
-    return new URLSearchParams(useLocation().search);
-};
+import {useLocation, useNavigate} from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+const useQuery = () => new URLSearchParams(useLocation().search);
 
 const ProductList = () => {
     const query = useQuery();
-    const search = query.get("search");
+    const search = query.get("search")?.trim() || "";
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [products, setProducts] = useState([]);
-    const { groupCategories,searchProduct } = useContext(CustomerProductContext);
+    const { groupCategories, searchProduct, getProductPage } = useContext(CustomerProductContext);
+    const [currentPage, setCurrentPage] = useState(parseInt(query.get("page")) || 1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize] = useState(8);
+    const [groupSelected, setSelectedGroup] = useState(1);
+    const [categorySelected, setSelectedCategory] = useState(0);
+    const navigate = useNavigate();
 
     const priceFilters = [
         "Dưới 1 triệu",
@@ -24,29 +29,33 @@ const ProductList = () => {
 
     const handleFilterChange = (filter) => {
         setSelectedFilters((prev) =>
-            prev.includes(filter)
-                ? prev.filter((item) => item !== filter)
-                : [...prev, filter]
+            prev.includes(filter) ? prev.filter((item) => item !== filter) : [...prev, filter]
         );
     };
+
     useEffect(() => {
-        let isMounted = true; // Biến kiểm soát unmounting
+        let isMounted = true;
         const fetchProducts = async () => {
-            if (search?.trim()) {
-                const result = await searchProduct(search);
-                if (isMounted) {
-                    setProducts(result || []);
+            try {
+                let result;
+                if (search) {
+                    result = await searchProduct(search);
+                } else {
+                    result = await getProductPage(groupSelected, categorySelected, currentPage, pageSize);
                 }
-            } else {
-                setProducts([]);
+                if (isMounted) {
+                    setProducts(result?.items || []);
+                    setTotalPages(result?.totalPages || 0);
+                    navigate("/products?page=" + currentPage,{replace:true});
+                }
+            } catch (error) {
+                console.error("Error fetching products:", error);
             }
         };
-        fetchProducts();
-        return () => {
-            isMounted = false; // Cleanup effect
-        };
-    }, [search]);
 
+        fetchProducts();
+        return () => { isMounted = false; };
+    }, [search, groupSelected, categorySelected, currentPage, pageSize]);
 
     return (
         <div className="product-list-page">
@@ -78,11 +87,11 @@ const ProductList = () => {
                         <hr className="filter-divider" />
                         <div className="filter-options">
                             <h3 className="filter-subtitle">Loại Sản Phẩm</h3>
-                            {groupCategories.map((group, index) => (
-                                <div key={index}>
+                            {groupCategories.map((group) => (
+                                <div key={group.groupName}>
                                     <h4>{group.groupName}</h4>
-                                    {group.categories.map((category, catIndex) => (
-                                        <label key={catIndex} className="filter-label">
+                                    {group.categories.map((category) => (
+                                        <label key={category.categoryName} className="filter-label">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedFilters.includes(category.categoryName)}
@@ -100,45 +109,71 @@ const ProductList = () => {
                 <div className="product-section">
                     {products.length === 0 ? (
                         <div className="flex justify-center items-center">
-                            <FaRegFrown className="text-gray-500 w-12 h-12"/>
+                            <FaRegFrown className="text-gray-500 w-12 h-12" />
                             <span className="text-gray-500 ml-4">Không có sản phẩm nào</span>
                         </div>
                     ) : (
-                        <motion.div
-                            className="product-list"
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            variants={{
-                                hidden: { opacity: 0, y: 20 },
-                                visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
-                                exit: { opacity: 0, y: -20 }
-                            }}
-                        >
-                            {products.map(({ id, name, image, price }, index) => (
-                                <motion.div
-                                    key={id}
-                                    className="product-list-item"
-                                    variants={{
-                                        hidden: { opacity: 0, y: 20 },
-                                        visible: { opacity: 1, y: 0 },
-                                        exit: { opacity: 0, y: -20 }
-                                    }}
-                                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                                >
-                                    <img src={image} alt={name} className="product-image" />
-                                    <h3 className="product-list-name">{name}</h3>
-                                    <p className="product-list-price">{price.toLocaleString()} VND</p>
-                                    <button className="add-to-cart-button-product-list">
-                                        <FaCartPlus className="add-to-cart-icon" />
-                                        <span className="add-to-cart-text">Thêm vào giỏ</span>
-                                    </button>
-                                </motion.div>
-                            ))}
-                        </motion.div>
+                        <>
+                            <motion.div
+                                className="product-list"
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
+                                    exit: { opacity: 0, y: -20 },
+                                }}
+                            >
+                                {products.map(({ id, name, image, price }) => (
+                                    <motion.div
+                                        key={id}
+                                        className="product-list-item"
+                                        variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <img src={image} alt={name} className="product-image" />
+                                        <h3 className="product-list-name">{name}</h3>
+                                        <p className="product-list-price">{price.toLocaleString()} VND</p>
+                                        <button className="add-to-cart-button-product-list">
+                                            <FaCartPlus className="add-to-cart-icon" />
+                                            <span className="add-to-cart-text">Thêm vào giỏ</span>
+                                        </button>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                            {totalPages > 0 && (
+                                <div className="pagination-container">
+                                    <nav className="pagination-nav">
+                                        <button
+                                            onClick={() => setCurrentPage(prevPage => Math.max(prevPage - 1, 1))}
+                                            disabled={currentPage === 1}
+                                            className="pagination-button"
+                                        >
+                                            <i className="fas fa-angle-left"></i>
+                                        </button>
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                            <button
+                                                key={page}
+                                                onClick={() => setCurrentPage(Number(page))}
+                                                className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                                            >
+                                                {page}
+                                            </button>
+                                        ))}
+                                        <button
+                                            onClick={() => setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages))}
+                                            disabled={currentPage === totalPages}
+                                            className="pagination-button"
+                                        >
+                                            <i className="fas fa-angle-right"></i>
+                                        </button>
+                                    </nav>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
-
             </div>
         </div>
     );

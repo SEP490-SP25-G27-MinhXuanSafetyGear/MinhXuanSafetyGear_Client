@@ -12,7 +12,7 @@ const PrivateRoute = ({ element, roleRequired = [] }) => {
 
 	// Kiểm tra quyền truy cập (roleRequired là danh sách)
 	if (roleRequired.length > 0 && !roleRequired.includes(user.role)) {
-		return <Navigate to="/unauthorized" replace />;
+		return <Navigate to="/403" replace />;
 	}
 
 	// Nếu hợp lệ, hiển thị element

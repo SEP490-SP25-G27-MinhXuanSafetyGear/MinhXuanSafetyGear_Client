@@ -1,12 +1,14 @@
-﻿import React, {useContext, useMemo, useState} from "react";
-import {  Edit, Trash2, Plus } from "lucide-react";
+﻿import React, {useContext, useEffect, useMemo, useState} from "react";
+import {Edit, Trash2, Plus, CheckCircle} from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { ProductContext } from "../../../contexts/AdminProductContext";
 import Loading from "../../../components/Loading/Loading";
 import noImage from "../../../images/no-image-product.jpg";
 import { motion } from "framer-motion";
 import Modal from "../../../components/Modal/Modal";
+import {toSlug} from "../../../utils/SlugUtils";
+const useQuery = () => new URLSearchParams(useLocation().search);
 // Component bảng sản phẩm, sử dụng React.memo để tránh re-render không cần thiết
 const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 	const [selectImage, setSelectImage] = useState(null);
@@ -33,6 +35,7 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá đã giảm</th>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giảm giá</th>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
+						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
 					</tr>
 				</motion.thead>
@@ -43,7 +46,7 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 						hidden: { opacity: 0 },
 						visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
 					}}>
-					{products.map(({ id, name, price,quantity,priceDiscount,discount,image,isNew }, index) => (
+					{products.map(({ id, name, price,quantity,priceDiscount,discount,image,isNew,status }, index) => (
 						<motion.tr
 							key={id}
 							variants={{
@@ -66,6 +69,15 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{priceDiscount.toLocaleString("vi-VN")} đ</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{discount}%</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{quantity}</td>
+							<td className="px-6 py-4 whitespace-nowrap text-sm">
+								<span className={`font-medium ${status ? "text-green-600" : "text-red-600"} flex items-center`}>
+									{status ? (
+										<><CheckCircle size={16} className="mr-1" /> Đang bán</>
+									) : (
+										<><Trash2 size={16} className="mr-1" /> Ngừng bán</>
+									)}
+								</span>
+							</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm flex space-x-2">
 								<button className="p-2 text-blue-600 hover:bg-blue-50 rounded" onClick={() => handleUpdate(id)}>
 									<Edit className="w-5 h-5" />
@@ -82,15 +94,31 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 	);
 });
 const Products = () => {
+	const query = useQuery();
+	const page = parseInt(query.get("page") ?? "1", 10);
 	const navigate = useNavigate();
 	const { products, loading,groupCategories,selectedGroup,setSelectGroup, search, setSearch ,currentPage,setCurrentPage,totalPages} = useContext(ProductContext);
 	const handleCreate = () => navigate("/manager/createproduct");
-	const handleUpdate = (id) => navigate(`/manager/updateproduct/${id}`);
+	const handleUpdate = (id) => navigate(`/manager/update-product/${id}/slug`);
 	const handleDelete = (id) => {
 		if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
 			console.log("Xóa sản phẩm có ID:", id);
 		}
 	};
+	useEffect(() => {
+		if (selectedGroup) {
+			setCurrentPage(1);
+			navigate(`/manager/products?page=${1}`, { replace: true });
+		}
+	}, [selectedGroup]);
+
+	useEffect(() => {
+		if(currentPage){
+			navigate(`/manager/products?page=${currentPage}`, { replace: true });
+		}
+	}, [currentPage]);
+
+
 	// Dùng useMemo để tính toán danh sách sản phẩm
 	const memoizedProducts = useMemo(() => products, [products]);
 	return (

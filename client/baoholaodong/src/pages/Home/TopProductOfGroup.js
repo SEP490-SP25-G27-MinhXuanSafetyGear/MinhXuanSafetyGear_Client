@@ -1,13 +1,13 @@
-﻿import React, { useState, useContext } from "react";
-import { FaArrowRight, FaCheck, FaStar, FaCog, FaCartPlus } from "react-icons/fa";
-import "./TopSaleProductsStyle.css";
-import noImage from "../../images/no-image-product.jpg";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import ProductPopup from "../../components/productpopup";
-import { CartContext } from "../../contexts/CartContext";
+﻿import React, {useContext, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {CartContext} from "../../contexts/CartContext";
 import slugify from "slugify";
-const TopSaleProducts = ({ products = [], title = "" }) => {
+import {FaArrowRight, FaCartPlus, FaCheck, FaCog, FaStar} from "react-icons/fa";
+import {motion} from "framer-motion";
+import noImage from "../../images/no-image-product.jpg";
+import ProductPopup from "../../components/productpopup";
+
+export default function  TopProductOfGroup({products=[] ,title=""}){
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -122,5 +122,3 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
         </main>
     );
 };
-
-export default TopSaleProducts;
