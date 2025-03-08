@@ -32,6 +32,7 @@ import CartProvider from "../contexts/CartContext";
 import ScrollToTop from "../components/ScrollToTop";
 import Contact from "../pages/Contact";
 import CustomerInfo from "../pages/CustomerInfo";
+import Checkout from "../pages/Checkout";
 
 const UserRouter = () => {
     return (
@@ -55,6 +56,7 @@ const UserRouter = () => {
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/blog" element={<BlogList />} />
                         <Route path="/about" element={<About />} />
+                        <Route path="/checkout" element={<Checkout />} />
                         <Route path="/verification" element={<VerificationPage />} />
                         <Route path="/unauthorized" element={<UnauthorizedPage />} />
                         <Route path="/logout" element={<Logout />} />
