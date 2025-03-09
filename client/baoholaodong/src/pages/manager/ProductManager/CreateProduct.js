@@ -21,6 +21,8 @@ const CreateProduct = () => {
 		quantity: 1,
 		price: 0,
 		discount: 0,
+		freeShip:false,
+		guarantee :0,
 		status: true,
 		qualityCertificate: "",
 		productVariants: [],
@@ -34,13 +36,21 @@ const CreateProduct = () => {
 	const [errors, setErrors] = useState([]);
 	// Xử lý khi nhập thông tin sản phẩm
 	const handleChange = (e) => {
-		const { id, value } = e.target;
-		setProduct(prev => ({
+		const { id, value ,checked} = e.target;
+		let newValue = value;
+
+		if (id === "price") {
+			newValue = parseInt(value.replace(/\D/g, ""), 10) || 0;
+		}
+		else if(id === "freeShip") {
+			newValue = checked;
+		}
+		setProduct((prev) => ({
 			...prev,
-			[id]: id === "price" ? parseInt(value.replace(/\D/g, ""), 10) || 0 : value
+			[id]: newValue
 		}));
-		console.log(product)
 	};
+
 
 	// Thêm biến thể sản phẩm
 	const addVariant = () => {
@@ -111,6 +121,8 @@ const CreateProduct = () => {
 			formData.append("origin", product.origin);
 			formData.append("quantity", product.quantity);
 			formData.append("price", product.price);
+			formData.append("freeShip", product.freeShip);
+			formData.append("guarantee", product.guarantee);
 			formData.append("discount", product.discount);
 			formData.append("status", product.status);
 			formData.append("qualityCertificate", product.qualityCertificate);
@@ -126,7 +138,7 @@ const CreateProduct = () => {
 			images.forEach((image) => {
 				formData.append("files", image);
 			});
-		    var result=	await createProduct(formData);
+			await createProduct(formData);
 			navigate("/manager/products");
 			setIsLoading(false);
 		} catch (err) {
@@ -398,6 +410,41 @@ const CreateProduct = () => {
 										onChange={handleChange}
 										required
 									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="quantity">
+										Bảo hành (Tháng) <span className="text-red-500"></span>
+									</label>
+									<input
+										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+										id="guarantee"
+										type="number"
+										min="0"
+										placeholder="0"
+										value={product.guarantee}
+										onChange={handleChange}
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="quantity">
+										Miễn ship <span className="text-red-500"></span>
+									</label>
+									<div className="flex items-center">
+										<label className="flex items-center cursor-pointer">
+											<div className="relative">
+												<input
+													id="freeShip"
+													type="checkbox"
+													name="freeShip"
+													checked={Boolean(product.freeShip)}
+													onChange={handleChange}
+													className="sr-only"
+												/>
+												<div className="block bg-gray-200 w-14 h-8 rounded-full"></div>
+												<div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${product.freeShip ? 'transform translate-x-6 bg-blue-700' : ''}`}></div>
+											</div>
+										</label>
+									</div>
 								</div>
 							</div>
 

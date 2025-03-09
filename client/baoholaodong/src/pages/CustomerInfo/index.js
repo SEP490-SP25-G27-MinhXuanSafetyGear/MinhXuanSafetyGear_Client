@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import './style.css';
-
 
 const CustomerInfo = () => {
     const [formData, setFormData] = useState({

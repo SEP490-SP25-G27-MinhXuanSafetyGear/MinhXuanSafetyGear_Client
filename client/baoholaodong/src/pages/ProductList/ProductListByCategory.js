@@ -2,20 +2,24 @@
 import './style.css';
 import { FaFilter, FaCartPlus, FaRegFrown } from 'react-icons/fa';
 import { CustomerProductContext } from '../../contexts/CustomerProductContext';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {toSlug} from "../../utils/SlugUtils";
 
 const useQuery = () => new URLSearchParams(useLocation().search);
 
-const ProductList = () => {
+const ProductListCategory = () => {
+    const {group,cate,slug} = useParams();
     const query = useQuery();
-    const search = query.get("search")?.trim() || "";
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [products, setProducts] = useState([]);
-    const { groupCategories, searchProduct, getProductPage } = useContext(CustomerProductContext);
-    const [hoveredGroup, setHoveredGroup] = useState(null);
+    const {groupCategories, searchProduct, getProductPage } = useContext(CustomerProductContext);
+    const [currentPage, setCurrentPage] = useState(parseInt(query.get("page")) || 1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize] = useState(4);
+    const [categorySelected, setSelectedCategory] = useState(0);
     const navigate = useNavigate();
+    const [hoveredGroup, setHoveredGroup] = useState(null);
     const priceFilters = [
         "Dưới 1 triệu",
         "1 triệu - 3 triệu",
@@ -33,19 +37,37 @@ const ProductList = () => {
         let isMounted = true;
         const fetchProducts = async () => {
             try {
-                const products  = await searchProduct(search);
-                setProducts(products);
+                let result = await getProductPage(parseInt(group), parseInt(cate), currentPage, pageSize);
+                if (isMounted) {
+                    setProducts(result?.items || []);
+                    setTotalPages(result?.totalPages || 0);
+                }
             } catch (error) {
                 console.error("Error fetching products:", error);
+            } finally {
+                if (groupCategories && groupCategories.length > 0) {
+                    const groupExit = groupCategories.find(g => g.groupId === parseInt(group));
+
+                    if (groupExit) {
+                        const slugGroup = groupExit.groupName || "";
+                        navigate(`/products/${group}/${cate}/${toSlug(slugGroup)}`, { replace: true });
+                    } else {
+                        console.warn("groupExit is undefined, check if groupId is valid:", group);
+                    }
+                } else {
+                    console.warn("groupCategories is empty or undefined.");
+                }
             }
         };
+
         fetchProducts();
+
         return () => { isMounted = false; };
-    }, [search]);
+    }, [group, cate, slug, groupCategories, currentPage, pageSize]);
 
     return (
         <div className="product-list-page">
-            <h1 className="page-title">{search}</h1>
+            <h1 className="page-title">{}</h1>
             <div className="banner">
                 <img src="https://bhld.net/wp-content/uploads/2015/01/banner-mu-bhld-1.jpg" alt="Banner" />
             </div>
@@ -91,9 +113,9 @@ const ProductList = () => {
                                         <div className="submenu">
                                             {group.categories.map((cate) => (
                                                 <label key={cate.categoryName} className="filter-label"
-                                                   onClick={()=>{
-                                                       window.location.href =(`/products/${group.groupId}/${cate.categoryId}/${toSlug(group.groupName)}`)
-                                                   }}
+                                                       onClick={()=>{
+                                                           navigate(`/products/${group.groupId}/${cate.categoryId}/${toSlug(group.groupName)}`)
+                                                       }}
                                                 >
                                                     <span>{cate.categoryName}</span>
                                                 </label>
@@ -141,7 +163,35 @@ const ProductList = () => {
                                     </motion.div>
                                 ))}
                             </motion.div>
-
+                            {totalPages > 0 && (
+                                <div className="pagination-container">
+                                    <nav className="pagination-nav">
+                                        <button
+                                            onClick={() => setCurrentPage(prevPage => Math.max(prevPage - 1, 1))}
+                                            disabled={currentPage === 1}
+                                            className="pagination-button"
+                                        >
+                                            <i className="fas fa-angle-left"></i>
+                                        </button>
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                            <button
+                                                key={page}
+                                                onClick={() => setCurrentPage(Number(page))}
+                                                className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+                                            >
+                                                {page}
+                                            </button>
+                                        ))}
+                                        <button
+                                            onClick={() => setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages))}
+                                            disabled={currentPage === totalPages}
+                                            className="pagination-button"
+                                        >
+                                            <i className="fas fa-angle-right"></i>
+                                        </button>
+                                    </nav>
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
@@ -150,4 +200,4 @@ const ProductList = () => {
     );
 };
 
-export default ProductList;
+export default ProductListCategory;
