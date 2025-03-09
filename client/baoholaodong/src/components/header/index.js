@@ -20,7 +20,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     const handleSearch = (e)=>{
         e.preventDefault();
         if(search !== ""){
-            navigate("/products?search="+search);
+            window.location.href= ("/products?search="+search);
         }
     }
     useEffect(() => {
@@ -62,7 +62,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
             <header className={`header-gradient shadow ${isScrolled ? "scrolled" : ""}`}>
                 <div className="container mx-auto flex justify-between items-center py-4">
                     <div className="flex items-center">
-                        <button onClick={toggleSidebar} className="text-white mr-4">
+                        <button onClick={toggleSidebar} className="text-white mr-4 ">
                             {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
                             <span className="ml-2">MENU</span>
                         </button>
@@ -79,7 +79,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                         </div>
                     </div>
                     <div className="search-container mx-8 flex items-center mt-4">
-                        <FaSearch className="text-white h-5 w-5 mr-2" />
+                        <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
                         <form className="w-full" onSubmit={(e)=>handleSearch(e)}>
                             <input
                                 value={search}

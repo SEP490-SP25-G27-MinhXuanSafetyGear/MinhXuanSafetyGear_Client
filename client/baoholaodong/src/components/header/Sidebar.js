@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { FaHardHat, FaBolt, FaTint, FaShieldAlt, FaBiohazard, FaFireExtinguisher, FaTimes, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CustomerProductContext } from "../../contexts/CustomerProductContext";
 import { useNavigate } from "react-router-dom";
+import {toSlug} from "../../utils/SlugUtils";
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
     const [openIndex, setOpenIndex] = useState(null);
@@ -9,26 +10,35 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     const [menuItems, setMenuItems] = useState([]);
     const navigate = useNavigate();
 
-    const handleItemClick = (index, label, event) => {
-        if (event.target.classList.contains('arrow-icon')) {
+    const handleItemClick = (index, groupId, cateId, event) => {
+        toggleSidebar();
+        if (event.target.classList.contains("arrow-icon")) {
             setOpenIndex(openIndex === index ? null : index);
-        } else if (label === "Trang Thiết bị bảo hộ") {
-            navigate("/products");
+
+        } else {
+            const group = groupCategories.find(g => g.groupId === groupId);
+            const slug = group ? toSlug(group.groupName) : "unknown";
+            navigate(`/products/${groupId}/${cateId}/${slug}`);
         }
     };
 
+
     useEffect(() => {
-        if (groupCategories.length > 0) {
+        if (groupCategories && groupCategories.length > 0) {
             const updatedMenuItems = groupCategories.map(group => {
                 return {
-                    icon: getIconForGroup(group.groupName),
-                    label: group.groupName,
-                    subItems: group.categories.map(category => category.categoryName)
+                    icon: getIconForGroup(group?.groupName || ""), // Kiểm tra groupName
+                    label: group?.groupName || "Chưa xác định",
+                    groupId: group?.groupId || 0,
+                    subItems: (group?.categories || []).map(category => category?.categoryName || "Không xác định")
                 };
             });
             setMenuItems(updatedMenuItems);
+        } else {
+            setMenuItems([]); // Đảm bảo không bị lỗi khi không có dữ liệu
         }
     }, [groupCategories]);
+
 
     const getIconForGroup = (groupName) => {
         switch (groupName) {
@@ -63,20 +73,35 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                     </button>
                 </div>
                 <ul className="p-4 text-red-700">
-                    {menuItems.map((item, index) => (
+                    {menuItems.map(({icon,subItems,groupId,label,}, index) => (
                         <li key={index} className="flex flex-col">
-                            <div className="flex items-center gap-3 p-3 border-b cursor-pointer hover:bg-gray-100" onClick={(event) => handleItemClick(index, item.label, event)}>
-                                {item.icon} {item.label}
-                                {openIndex === index ? <FaChevronUp className="arrow-icon" /> : <FaChevronDown className="arrow-icon" />}
+                            {/* Chỉ icon và label mới điều hướng */}
+                            <div className="flex items-center gap-3 p-3 border-b cursor-pointer hover:bg-gray-100">
+                                <div className="flex items-center gap-2" onClick={(event) => handleItemClick(index, groupId, 0, event)}>
+                                    {icon} {label}
+                                </div>
+                                {/* Sự kiện toggle danh mục con được đặt riêng cho icon */}
+                                <div onClick={() => setOpenIndex(openIndex === index ? null : index)} className="cursor-pointer">
+                                    {openIndex === index ? <FaChevronUp className="arrow-icon" /> : <FaChevronDown className="arrow-icon" />}
+                                </div>
                             </div>
+
+                            {/* Hiển thị danh mục con nếu openIndex === index */}
                             {openIndex === index && (
                                 <ul className="pl-8">
-                                    {item.subItems.map((subItem, subIndex) => (
-                                        <li key={subIndex} className="p-2 hover:bg-gray-200">{subItem}</li>
+                                    {subItems.map((subItem, subIndex) => (
+                                        <li
+                                            key={subIndex}
+                                            className="p-2 hover:bg-gray-200 cursor-pointer"
+                                            onClick={(event) => handleItemClick(index, groupId, subIndex, event)}
+                                        >
+                                            {subItem}
+                                        </li>
                                     ))}
                                 </ul>
                             )}
                         </li>
+
                     ))}
                 </ul>
                 <div className="p-4 mt-4 border-t text-red-600">

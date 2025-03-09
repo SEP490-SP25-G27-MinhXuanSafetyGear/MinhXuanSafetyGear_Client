@@ -110,6 +110,32 @@ export const CustomerProductProvider =({ children }) => {
             return [];
         }
     }
+    const fetchReviewProduct= async (id,size) => {
+        try{
+            const response = await axios.get(`${BASE_URL}/api/Product/reviews`,{
+                params: {
+                    size:size,
+                    id:id
+                }
+            })
+            return response.data
+        }catch(error){
+            return null;
+        }
+    }
+    const fetchRelatedProducts = async (id,size) => {
+        try{
+            const response = await axios.get(`${BASE_URL}/api/Product/related`, {
+                params: {
+                    size:size,
+                    id:id,
+                }
+            })
+            return response.data;
+        }catch (error){
+            return [];
+        }
+    }
     /**
      * get categories
      * */
@@ -212,6 +238,8 @@ export const CustomerProductProvider =({ children }) => {
                 getProductPage,
                 topDealProducts,
                 listTopProductOfGroups,
+                fetchRelatedProducts,
+                fetchReviewProduct,
             }}
         >
             {children}

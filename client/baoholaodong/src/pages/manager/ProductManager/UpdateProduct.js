@@ -1,16 +1,60 @@
 ﻿import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { ProductContext } from "../../../contexts/AdminProductContext";
 import {useNavigate, useParams} from "react-router-dom";
-import { Edit, Plus, Trash2, Image, Package, Tag, CheckCircle } from "lucide-react";
+import { Edit, Plus, Trash2, Image, Package, Tag, CheckCircle ,XCircle} from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
-import Loading from "../../../components/Loading/Loading";
 import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imageUtils";
 import {toSlug} from "../../../utils/SlugUtils";
 import ErrorList from "../../../components/ErrorList/ErrorList";
+import {motion} from "framer-motion";
 
 const MAX_IMAGE_SIZE_MB = 0.5; // 2MB
 const TARGET_IMAGE_SIZE_KB = 10; // 100KB
+const LoadingSkeleton = () => {
+	return (
+		<div >
+			{/* Product Information Skeleton */}
+			<div className="p-6 space-y-4">
+				<div className="h-6 w-32 bg-gray-200 rounded"></div>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+					{[...Array(8)].map((_, i) => (
+						<div key={i} className="flex items-center">
+							<div className="h-5 w-32 bg-gray-200 rounded"></div>
+							<div className="h-5 w-48 bg-gray-300 rounded ml-4"></div>
+						</div>
+					))}
+				</div>
+				<div className="h-16 bg-gray-200 rounded"></div>
+			</div>
+
+			{/* Product Images Skeleton */}
+			<div className="p-6">
+				<div className="h-6 w-48 bg-gray-200 rounded mb-4"></div>
+				<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+					{[...Array(5)].map((_, i) => (
+						<div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+					))}
+				</div>
+			</div>
+
+			{/* Product Variants Skeleton */}
+			<div className="p-6">
+				<div className="h-6 w-48 bg-gray-200 rounded mb-4"></div>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+					{[...Array(3)].map((_, i) => (
+						<div key={i} className="p-4 border rounded-lg shadow-sm bg-gray-100">
+							<div className="h-6 w-32 bg-gray-300 rounded mb-2"></div>
+							<div className="h-5 w-full bg-gray-200 rounded mb-2"></div>
+							<div className="h-5 w-full bg-gray-200 rounded"></div>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+};
+
 
 const UpdateProduct = () => {
 	const { id,slug } = useParams();
@@ -30,6 +74,8 @@ const UpdateProduct = () => {
 		createdAt: "",
 		updatedAt: "",
 		status: true,
+		freeShip:false,
+		guarantee :0,
 		averageRating: 0,
 		qualityCertificate: "",
 		totalTax: 0,
@@ -112,9 +158,9 @@ const UpdateProduct = () => {
 	if (!product) return <div className="text-center mt-10">Loading...</div>;
 
 	return (
-		<div className="space-y-6">
+		<div
+			className="space-y-6">
 			<div className="bg-white rounded-lg shadow-lg overflow-hidden ">
-				<Loading isLoading={isLoading} />
 				<ErrorList errors={errors}/>
 				{/* Header */}
 				<div className="bg-gradient-to-r  from-blue-600 to-indigo-700 p-6 flex justify-between items-center">
@@ -146,185 +192,205 @@ const UpdateProduct = () => {
 						</button>
 					</div>
 				</div>
-
-				{/* Product Information */}
-				<div className="p-6">
-					<div className="mb-6">
-						<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
-							Thông tin sản phẩm
-						</h4>
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">ID sản phẩm:</span>
-								<span className="font-medium text-gray-800">{product.id}</span>
-							</div>
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">Tên sản phẩm:</span>
-								<span className="font-medium text-gray-800">{product.name}</span>
-							</div>
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">Chất liệu:</span>
-								<span className="font-medium text-gray-800">{product.material}</span>
-							</div>
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">Xuất xứ:</span>
-								<span className="font-medium text-gray-800">{product.origin}</span>
-							</div>
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">Số lượng:</span>
-								<span className="font-medium text-gray-800">{product.quantity}</span>
-							</div>
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">Giá:</span>
-								<span className="font-medium text-gray-800">{Intl.NumberFormat("vi-VN").format(product.price)} VND</span>
-							</div>
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">Giảm giá:</span>
-								<span className="font-medium text-gray-800">{product.discount}%</span>
-							</div>
-							<div className="flex items-center">
-								<span className="text-gray-500 w-32">Trạng thái:</span>
-								<span className={`font-medium ${product.status ? "text-green-600" : "text-red-600"} flex items-center`}>
+				{isLoading ?(
+					<LoadingSkeleton/>
+				):(
+					<>
+						{/* Product Information */}
+						<div className="p-6">
+							<div className="mb-6">
+								<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+									Thông tin sản phẩm
+								</h4>
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">ID sản phẩm:</span>
+										<span className="font-medium text-gray-800">{product.id}</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Tên sản phẩm:</span>
+										<span className="font-medium text-gray-800">{product.name}</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Chất liệu:</span>
+										<span className="font-medium text-gray-800">{product.material}</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Xuất xứ:</span>
+										<span className="font-medium text-gray-800">{product.origin}</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Số lượng:</span>
+										<span className="font-medium text-gray-800">{product.quantity}</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Giá:</span>
+										<span className="font-medium text-gray-800">{Intl.NumberFormat("vi-VN").format(product.price)} VND</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Giảm giá:</span>
+										<span className="font-medium text-gray-800">{product.discount}%</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Trạng thái:</span>
+										<span className={`font-medium ${product.status ? "text-green-600" : "text-red-600"} flex items-center`}>
 									{product.status ? (
 										<><CheckCircle size={16} className="mr-1" /> Đang bán</>
 									) : (
-										<><Trash2 size={16} className="mr-1" /> Ngừng bán</>
+										<><XCircle size={16} className="mr-1" /> Ngừng bán</>
 									)}
-								</span>
+								        </span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Bảo hành:</span>
+										<span className="font-medium text-gray-800">{product.guarantee} Tháng</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-32">Free Ship:</span>
+										<span className={`font-medium ${product.status ? "text-green-600" : "text-red-600"} flex items-center`}>
+									{product.freeShip ? (
+										<CheckCircle size={16} className="mr-1" />
+									) : (
+										<XCircle size={16} className="mr-1" />
+									)}
+								        </span>
+									</div>
+									<div className="flex items-center col-span-2">
+										<span className="text-gray-500 w-32">Danh mục:</span>
+										<span className="font-medium text-gray-800">{product.categoryName}</span>
+									</div>
+									<div className="col-span-2">
+										<span className="text-gray-500 block mb-1">Mô tả:</span>
+										{product.description.split("\n").map((line, index) => (
+											<p className="text-gray-800 bg-gray-50 rounded-lg" key={index}>{line}</p>
+										))}
+									</div>
+									<div className="col-span-2">
+										<span className="text-gray-500 block mb-1">Chứng nhận chất lượng:</span>
+										<p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{product.qualityCertificate}</p>
+									</div>
+									<div className="col-span-2">
+										<span className="text-gray-500 block mb-1">Thuế: <span className="font-medium text-gray-800">{product.totalTax}%</span></span>
+										{product && product.taxes && product.taxes.length > 0 ? (
+											<div className="mt-2 bg-gray-50 p-3 rounded-lg">
+												<ul className="space-y-1">
+													{product.taxes.map((tax) => (
+														<li key={tax.productTaxId} className="flex items-center text-gray-700">
+															<Tag size={14} className="mr-2 text-blue-500" />
+															{tax.taxName} - {tax.taxRate}%
+														</li>
+													))}
+												</ul>
+											</div>
+										) : (
+											<p className="text-gray-500 italic">Không có thuế</p>
+										)}
+									</div>
+								</div>
 							</div>
-							<div className="flex items-center col-span-2">
-								<span className="text-gray-500 w-32">Danh mục:</span>
-								<span className="font-medium text-gray-800">{product.categoryName}</span>
-							</div>
-							<div className="col-span-2">
-								<span className="text-gray-500 block mb-1">Mô tả:</span>
-								<p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{product.description}</p>
-							</div>
-							<div className="col-span-2">
-								<span className="text-gray-500 block mb-1">Chứng nhận chất lượng:</span>
-								<p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{product.qualityCertificate}</p>
-							</div>
-							<div className="col-span-2">
-								<span className="text-gray-500 block mb-1">Thuế: <span className="font-medium text-gray-800">{product.totalTax}%</span></span>
-								{product && product.taxes && product.taxes.length > 0 ? (
-									<div className="mt-2 bg-gray-50 p-3 rounded-lg">
-										<ul className="space-y-1">
-											{product.taxes.map((tax) => (
-												<li key={tax.productTaxId} className="flex items-center text-gray-700">
-													<Tag size={14} className="mr-2 text-blue-500" />
-													{tax.taxName} - {tax.taxRate}%
-												</li>
-											))}
-										</ul>
+
+							{/* Product Images */}
+							<div className="mb-6">
+								<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center">
+									<Image size={20} className="mr-2 text-blue-500" /> Hình ảnh sản phẩm
+								</h4>
+								{product.productImages?.length > 0 ? (
+									<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+										{product.productImages.map((image, index) => (
+											<div key={image.id} className="group relative">
+												<div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 shadow-md">
+													<img
+														src={image.image}
+														alt={`Product ${index}`}
+														className="h-full w-full object-cover object-center group-hover:opacity-75 transition-all"
+													/>
+													{image.isPrimary && (
+														<div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+															Chính
+														</div>
+													)}
+												</div>
+												<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-30 rounded-lg">
+													<button
+														onClick={() => handleClickUpdateImage(image)}
+														className="bg-white p-2 rounded-full shadow-lg hover:bg-blue-50 transition-colors"
+													>
+														<Edit size={18} className="text-blue-600" />
+													</button>
+												</div>
+											</div>
+										))}
 									</div>
 								) : (
-									<p className="text-gray-500 italic">Không có thuế</p>
+									<div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+										<div className="text-center">
+											<FaRegFrown className="mx-auto text-gray-400 text-2xl mb-2" />
+											<p className="text-gray-500">Không có hình ảnh nào.</p>
+										</div>
+									</div>
+								)}
+							</div>
+
+							{/* Product Variants */}
+							<div>
+								<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center">
+									<Package size={20} className="mr-2 text-purple-500" /> Biến thể sản phẩm
+								</h4>
+								{product.productVariants?.length > 0 ? (
+									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+										{product.productVariants.map((variant, index) => (
+											<div
+												key={index}
+												className="p-4 border rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow cursor-pointer"
+												onClick={() => handleClickUpdateVariant(variant)}
+											>
+												<div className="flex justify-between items-center mb-2">
+													<h5 className="font-semibold text-gray-800">Biến thể #{index + 1}</h5>
+													<span className={`px-2 py-1 rounded-full text-xs ${variant.status ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+												{variant.status ? "Đang bán" : "Ngừng bán"}
+											</span>
+												</div>
+												<div className="space-y-1">
+													<div className="grid grid-cols-2 gap-2">
+														<div className="bg-gray-50 p-2 rounded">
+															<span className="text-gray-500 text-sm">Kích thước:</span>
+															<p className="font-medium">{variant.size}</p>
+														</div>
+														<div className="bg-gray-50 p-2 rounded">
+															<span className="text-gray-500 text-sm">Màu sắc:</span>
+															<p className="font-medium">{variant.color}</p>
+														</div>
+													</div>
+													<div className="grid grid-cols-3 gap-2">
+														<div className="bg-gray-50 p-2 rounded">
+															<span className="text-gray-500 text-sm">Số lượng:</span>
+															<p className="font-medium">{variant.quantity}</p>
+														</div>
+														<div className="bg-gray-50 p-2 rounded">
+															<span className="text-gray-500 text-sm">Giá:</span>
+															<p className="font-medium">đ{variant.price}</p>
+														</div>
+														<div className="bg-gray-50 p-2 rounded">
+															<span className="text-gray-500 text-sm">Giảm giá:</span>
+															<p className="font-medium">{variant.discount}%</p>
+														</div>
+													</div>
+												</div>
+											</div>
+										))}
+									</div>
+								) : (
+									<div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+										<div className="text-center">
+											<FaRegFrown className="mx-auto text-gray-400 text-2xl mb-2" />
+											<p className="text-gray-500">Không có biến thể nào.</p>
+										</div>
+									</div>
 								)}
 							</div>
 						</div>
-					</div>
-
-					{/* Product Images */}
-					<div className="mb-6">
-						<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center">
-							<Image size={20} className="mr-2 text-blue-500" /> Hình ảnh sản phẩm
-						</h4>
-						{product.productImages?.length > 0 ? (
-							<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-								{product.productImages.map((image, index) => (
-									<div key={image.id} className="group relative">
-										<div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 shadow-md">
-											<img
-												src={image.image}
-												alt={`Product ${index}`}
-												className="h-full w-full object-cover object-center group-hover:opacity-75 transition-all"
-											/>
-											{image.isPrimary && (
-												<div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-													Chính
-												</div>
-											)}
-										</div>
-										<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-30 rounded-lg">
-											<button
-												onClick={() => handleClickUpdateImage(image)}
-												className="bg-white p-2 rounded-full shadow-lg hover:bg-blue-50 transition-colors"
-											>
-												<Edit size={18} className="text-blue-600" />
-											</button>
-										</div>
-									</div>
-								))}
-							</div>
-						) : (
-							<div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-								<div className="text-center">
-									<FaRegFrown className="mx-auto text-gray-400 text-2xl mb-2" />
-									<p className="text-gray-500">Không có hình ảnh nào.</p>
-								</div>
-							</div>
-						)}
-					</div>
-
-					{/* Product Variants */}
-					<div>
-						<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center">
-							<Package size={20} className="mr-2 text-purple-500" /> Biến thể sản phẩm
-						</h4>
-						{product.productVariants?.length > 0 ? (
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-								{product.productVariants.map((variant, index) => (
-									<div
-										key={index}
-										className="p-4 border rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow cursor-pointer"
-										onClick={() => handleClickUpdateVariant(variant)}
-									>
-										<div className="flex justify-between items-center mb-2">
-											<h5 className="font-semibold text-gray-800">Biến thể #{index + 1}</h5>
-											<span className={`px-2 py-1 rounded-full text-xs ${variant.status ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-												{variant.status ? "Đang bán" : "Ngừng bán"}
-											</span>
-										</div>
-										<div className="space-y-1">
-											<div className="grid grid-cols-2 gap-2">
-												<div className="bg-gray-50 p-2 rounded">
-													<span className="text-gray-500 text-sm">Kích thước:</span>
-													<p className="font-medium">{variant.size}</p>
-												</div>
-												<div className="bg-gray-50 p-2 rounded">
-													<span className="text-gray-500 text-sm">Màu sắc:</span>
-													<p className="font-medium">{variant.color}</p>
-												</div>
-											</div>
-											<div className="grid grid-cols-3 gap-2">
-												<div className="bg-gray-50 p-2 rounded">
-													<span className="text-gray-500 text-sm">Số lượng:</span>
-													<p className="font-medium">{variant.quantity}</p>
-												</div>
-												<div className="bg-gray-50 p-2 rounded">
-													<span className="text-gray-500 text-sm">Giá:</span>
-													<p className="font-medium">đ{variant.price}</p>
-												</div>
-												<div className="bg-gray-50 p-2 rounded">
-													<span className="text-gray-500 text-sm">Giảm giá:</span>
-													<p className="font-medium">{variant.discount}%</p>
-												</div>
-											</div>
-										</div>
-									</div>
-								))}
-							</div>
-						) : (
-							<div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-								<div className="text-center">
-									<FaRegFrown className="mx-auto text-gray-400 text-2xl mb-2" />
-									<p className="text-gray-500">Không có biến thể nào.</p>
-								</div>
-							</div>
-						)}
-					</div>
-				</div>
-
+					</>
+				)}
 				{/* Modals */}
 				<Modal
 					onClose={() => setIsOpenUpdateInformation(false)}
@@ -415,6 +481,7 @@ const UpdateProduct = () => {
 				</Modal>
 			</div>
 		</div>
+
 	);
 };
 
@@ -430,6 +497,8 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 		price: product?.price || 0,
 		discount: product?.discount || 0,
 		categoryId: product?.categoryId || "",
+		freeShip:product.freeShip || false,
+		guarantee: product?.guarantee || 0,
 		status: product?.status || false,
 		qualityCertificate: product.qualityCertificate
 	});
@@ -459,7 +528,11 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 			let newValue = value;
 			if (name === "status") {
 				newValue = checked;
-			} else if (name === "price") {
+			}
+			else if(name=== "freeShip") {
+				newValue = checked;
+			}
+			else if (name === "price") {
 				newValue = value ? parseInt(value.replace(/\D/g, ""), 10) || 0 : 0;
 			}
 			const updatedProduct = { ...prev, [name]: newValue };
@@ -616,6 +689,18 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 							</div>
 						</div>
 					</div>
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-1">Bảo hành (Tháng)<span className="text-red-500">*</span></label>
+						<input
+							type="number"
+							name="guarantee"
+							value={productUpdate.guarantee}
+							onChange={handleChange}
+							className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+							min="1"
+							required
+						/>
+					</div>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -648,14 +733,33 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 									className="sr-only"
 								/>
 								<div className="block bg-gray-200 w-14 h-8 rounded-full"></div>
-								<div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${productUpdate.status ? 'transform translate-x-6 bg-blue-500' : ''}`}></div>
+								<div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${productUpdate.status ? 'transform translate-x-6 bg-blue-700' : ''}`}></div>
 							</div>
 							<div className="ml-3 text-gray-700 font-medium">
 								{productUpdate.status ? 'Đang bán' : 'Ngừng bán'}
 							</div>
 						</label>
 					</div>
+					<div className="flex items-center">
+						<label className="flex items-center cursor-pointer">
+							<div className="relative">
+								<input
+									type="checkbox"
+									name="freeShip"
+									checked={Boolean(productUpdate.freeShip)}
+									onChange={handleChange}
+									className="sr-only"
+								/>
+								<div className="block bg-gray-200 w-14 h-8 rounded-full"></div>
+								<div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${productUpdate.freeShip ? 'transform translate-x-6 bg-blue-700' : ''}`}></div>
+							</div>
+							<div className="ml-3 text-gray-700 font-medium">
+								{productUpdate.freeShip ? 'Miễn ship' : 'Không miễn ship'}
+							</div>
+						</label>
+					</div>
 				</div>
+
 
 				<div className="flex justify-end pt-4 border-t border-gray-200">
 					<button
@@ -1025,7 +1129,7 @@ const CreateVariantForm = ({ setLoading, onSetProduct, onCreateVariant, product 
 		size: "",
 		color: "",
 		quantity: 0,
-		price: 0.0,
+		price: product.price,
 		discount: 0,
 		status: true,
 	});
@@ -1251,6 +1355,26 @@ const UpdateImageForm = ({ image, onUpdateImage, onSetProduct, close, onDelete, 
 	const handlePrimaryChange = () => {
 		setNewImage((prev) => ({ ...prev, isPrimary: !prev.isPrimary }));
 	};
+	const handleDrop = async (e) => {
+		e.preventDefault();
+		const file = e.dataTransfer.files[0];  // Lấy file từ event
+
+		if (!file) return;
+		if (!isImageSizeValid(file, MAX_IMAGE_SIZE_MB)) {
+			alert("Ảnh vượt quá 0.5MB! Hệ thống sẽ tự động nén ảnh...");
+			try {
+				const compressedFile = await compressImageToTargetSize(file, TARGET_IMAGE_SIZE_KB);
+				setPreview(URL.createObjectURL(compressedFile));
+				setNewImage((prev) => ({ ...prev, file: compressedFile }));
+			} catch (error) {
+				console.error("Lỗi khi nén ảnh:", error);
+				alert("Không thể nén ảnh, vui lòng chọn ảnh khác.");
+			}
+		} else {
+			setPreview(URL.createObjectURL(file));
+			setNewImage((prev) => ({ ...prev, file }));
+		}
+	};
 
 	// Gửi ảnh lên server
 	const handleSubmit = async () => {
@@ -1340,7 +1464,10 @@ const UpdateImageForm = ({ image, onUpdateImage, onSetProduct, close, onDelete, 
 					<div className="mb-4">
 						<label className="block text-sm font-medium text-gray-700 mb-2">Chọn ảnh mới</label>
 						<div className="flex items-center justify-center w-full">
-							<label className="flex flex-col items-center justify-center w-full h-32 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 transition-all">
+							<label className="flex flex-col items-center justify-center w-full h-32 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 transition-all"
+
+								   onDragOver={(e) => e.preventDefault()}  // Cho phép kéo thả
+								   onDrop={handleDrop}>
 								<div className="flex flex-col items-center justify-center pt-5 pb-6">
 									<svg className="w-8 h-8 mb-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>

@@ -55,7 +55,10 @@
     align-items: center;
     margin-bottom: 5px;
 }
-
+.filter-label>span:hover {
+    color: #ff5722;
+    cursor: pointer;
+}
 .filter-checkbox {
     margin-right: 10px;
 }
@@ -198,6 +201,29 @@
     .product-list {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+.group-container {
+    position: relative;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.submenu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.group-title:hover {
+    color: #ff5722; /* Màu khi hover */
 }
 
 @media (max-width: 480px) {
