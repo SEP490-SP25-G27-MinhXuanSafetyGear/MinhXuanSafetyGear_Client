@@ -1,13 +1,16 @@
 .header-gradient {
     width: 100%;
-    background: linear-gradient(to top, #620805, #c7170e);
+    background: linear-gradient(to top, #4a0403, #a50d0b); /* Darker gradient */
     position: relative; /* Initially relative */
     top: 0;
     z-index: 1000;
     transition: background 2s ease-in-out, padding 0.5s ease-in-out, top 50s ease-in-out; /* Use ease-in-out for smoother transition */
     transition-delay: 2s, 0s, 30s;
     padding: 5px 10px;
+
 }
+
+
 
 .header-gradient.scrolled {
     background: linear-gradient(to top, #4a0403, #a50d0b); /* Darker gradient */
@@ -18,7 +21,7 @@
 }
 
 .siderbar-head{
-    background: linear-gradient(to top, #620805, #c7170e);
+    background: linear-gradient(to top, #4a0403, #a50d0b); /* Darker gradient */
 }
 
 
@@ -35,7 +38,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px; /* Reduce padding to minimize empty space on the sides */
+    padding: 0 20px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .header-gradient .container .flex.items-center button {
@@ -62,58 +67,74 @@
 
 }
 
-
 .header-gradient .search-container input {
     width: 100%; /* Make the search bar take the full width */
 }
 
-/* Responsive styles for header */
+
+
+/* Mobile Header Styles */
 @media (max-width: 768px) {
+    .header-gradient {
+        padding: 2px; /* Reduce padding */
+    }
     .header-gradient .container {
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px;
+        flex-direction: row; /* Align items horizontally */
+        justify-content: space-between; /* Space out elements */
+        align-items: center; /* Center elements vertically */
+        padding: 0 10px; /* Reduce padding */
+        overflow: hidden; /* Prevent elements from overflowing */
     }
-
     .header-gradient .container .flex.items-center {
-        flex-direction: row;
+        width: auto; /* Adjust width to auto */
+        margin: 0; /* Remove margin */
+        display: flex;
         align-items: center;
+        flex-shrink: 0; /* Prevent shrinking */
     }
-
-    .header-gradient .container .contact-info {
-        display: none; /* Hide contact info on mobile */
-    }
-
     .header-gradient .container .flex.items-center button {
         margin-left: 0;
     }
-
-    .header-gradient .container .flex.items-center img {
-        margin-bottom: 0;
+    .header-gradient .search-container {
+        display: none !important; /* Hide the original search container on mobile */
     }
-
-    .header-gradient .container .flex.items-center .ml-4 {
-        margin-left: 10px;
-    }
-
-    .header-gradient .flex.items-center.space-x-6 {
-        flex-direction: row;
+    .mobile-search-container {
+        width: 97%;
+        margin: 5px 0; /* Reduce margin */
+        display: flex;
         align-items: center;
     }
-
+    .header-gradient .flex.items-center.space-x-6 {
+        width: auto; /* Adjust width to auto */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Align items to the end */
+        flex-shrink: 0; /* Prevent shrinking */
+    }
+    .header-gradient .logo {
+        flex-grow: 1; /* Allow the logo to take up available space */
+        text-align: center; /* Center the logo */
+    }
+    .header-gradient .container .flex.items-center button {
+        margin-left: 0; /* Remove negative margin */
+    }
     .header-gradient .flex.items-center.space-x-6 .relative.flex.items-center {
-        margin-right: 0;
-        font-size: 0.8em; /* Make account and cart smaller */
+        margin-right: 0; /* Remove negative margin */
+    }
+    .header-gradient .flex.items-center.space-x-6 {
+        flex-direction: row; /* Stack avatar and cart vertically */
+        align-items: flex-end; /* Align to the right */
+        gap: 10px; /* Add some space between elements */
     }
 
-    .header-gradient .search-container {
-        width: 100%;
-        margin: 10px 0;
-        order: 1; /* Move search container below other elements on mobile */
-    }
 
-    .header-gradient .search-container input {
-        width: calc(100% - 40px);
+
+    /* Hide contact info, header text while keeping logo and icons visible */
+    .contact-info,
+    .header-gradient h1,
+    .header-gradient p,
+    .header-gradient .flex.items-center.space-x-6 .relative.flex.items-center span,
+    .header-gradient .flex.items-center.space-x-6 .relative.group .flex.items-center div {
+        display: none !important;
     }
 }

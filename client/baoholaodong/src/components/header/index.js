@@ -60,33 +60,33 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     return (
         <>
             <header className={`header-gradient shadow ${isScrolled ? "scrolled" : ""}`}>
-                <div className="container mx-auto flex justify-between items-center py-4">
-                    <div className="flex items-center">
-                        <button onClick={toggleSidebar} className="text-white mr-4 ">
-                            {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
-                            <span className="ml-2">MENU</span>
-                        </button>
-                        <a href="/">
-                            <img alt="Company Logo" className="h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />
-                        </a>
-                        <div className="ml-4">
-                            <h1 className="text-xl font-bold text-white">
-                                BẢO HỘ LAO ĐỘNG MINH XUÂN
-                            </h1>
-                            <p className="text-sm text-white">
-                                Luôn đem lại an toàn và hoàn hảo nhất cho bạn!
-                            </p>
-                        </div>
+                <div className="container mx-auto flex flex-col md:flex-row justify-between items-center py-4">
+                <div className="flex items-center w-full md:w-auto mb-4 md:mb-0">
+                    <button onClick={toggleSidebar} className="text-white mr-4">
+                        {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
+                        <span className="ml-2  md:inline">MENU</span>
+                    </button>
+                    <a href="/">
+                        <img alt="Company Logo" className="h-12 md:h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />
+                    </a>
+                    <div className="ml-4">
+                        <h1 className="text-lg md:text-xl font-bold text-white">
+                            BẢO HỘ LAO ĐỘNG MINH XUÂN
+                        </h1>
+                        <p className="text-xs md:text-sm text-white">
+                            Luôn đem lại an toàn và hoàn hảo nhất cho bạn!
+                        </p>
                     </div>
-                    <div className="search-container mx-8 flex items-center mt-4">
+                </div>
+                    <div className="search-container w-full md:w-auto mx-4 md:mx-8 flex items-center">
                         <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
-                        <form className="w-full" onSubmit={(e)=>handleSearch(e)}>
+                        <form className="w-full" onSubmit={handleSearch}>
                             <input
                                 value={search}
                                 onChange={(e)=>{setSearch(e.target.value)}}
                                 type="text"
                                 placeholder="Tìm kiếm..."
-                                className="w-full  px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-white"
+                                className="w-full px-4 py-2 "
                             />
                         </form>
                     </div>
@@ -153,7 +153,21 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             {dropdownVisible && <CartDropdown cartItems={cartItems} removeFromCart={removeFromCart} updateCartItemQuantity={updateCartItemQuantity} showToast={showToast} />}
                         </div>
                     </div>
+
                 </div>
+                <div className="mobile-search-container w-full md:hidden mx-4 md:mx-8 flex items-center">
+                    <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
+                    <form className="w-full" onSubmit={handleSearch}>
+                        <input
+                            value={search}
+                            onChange={(e)=>{setSearch(e.target.value)}}
+                            type="text"
+                            placeholder="Tìm kiếm..."
+                            className="w-full px-4 py-2 "
+                        />
+                    </form>
+                </div>
+
             </header>
             <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
         </>

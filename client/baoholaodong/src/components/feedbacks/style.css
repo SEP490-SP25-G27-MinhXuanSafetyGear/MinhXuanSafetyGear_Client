@@ -118,3 +118,50 @@ body {
     font-size: 16px;
     color: black;
 }
+
+@media (max-width: 768px) {
+    .feedback-title {
+        font-size: 20px;
+    }
+
+    .feedback-subtitle {
+        font-size: 16px;
+    }
+
+    .feedback-name {
+        font-size: 16px;
+    }
+
+    .feedback-text {
+        font-size: 14px;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .feedback-navigation {
+        position: absolute;
+        top: 400px;
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Center alignment */
+        display: flex;
+        justify-content: center; /* Center the buttons */
+        width: 100%; /* Ensure the container takes full width */
+    }
+
+    .feedback-title {
+        font-size: 18px;
+    }
+
+    .feedback-subtitle {
+        font-size: 14px;
+    }
+
+    .feedback-name {
+        font-size: 14px;
+    }
+
+    .feedback-text {
+        font-size: 12px;
+    }
+}

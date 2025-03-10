@@ -1,5 +1,4 @@
-﻿/* Product List Page Layout */
-.product-list-page {
+﻿.product-list-page {
     display: flex;
     flex-direction: column;
     align-items: stretch;
