@@ -33,6 +33,8 @@ import Contact from "../pages/Contact";
 import CustomerInfo from "../pages/CustomerInfo";
 import Checkout from "../pages/Checkout";
 import ProductListByCategory from "../pages/ProductList/ProductListByCategory";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ForgotPassword/ResetPassword";
 
 const UserRouter = () => {
     return (
@@ -43,6 +45,8 @@ const UserRouter = () => {
                 <Route path="/503" element={<Error503 />} />
                 <Route path="/404" element={<Error404 />} />
                 <Route path="*" element={<Error404 />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
                     path="/"
                     element={
