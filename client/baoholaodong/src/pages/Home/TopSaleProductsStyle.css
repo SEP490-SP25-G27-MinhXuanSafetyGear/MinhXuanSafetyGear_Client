@@ -8,6 +8,12 @@
     flex-direction: column;
     padding: 16px;
     gap: 8px;
+    transition: transform 0.3s ease;
+
+}
+
+.product-card:hover {
+    transform: translateY(-5px); /* Add hover effect */
 }
 
 .product-container-best-products {
@@ -190,66 +196,95 @@
         transform: translateX(0);
     }
 }
-@media (max-width: 1200px) {
-    .product-container-best-products {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-@media (max-width: 992px) {
-    .product-container-best-products {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    .product-card {
-        padding: 12px;
-    }
-}
 
 @media (max-width: 768px) {
     .product-container-best-products {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-    .product-image {
-        height: 200px;
-    }
-}
-
-@media (max-width: 576px) {
-    .product-container-best-products {
-        grid-template-columns: repeat(2, 1fr); /* 2 cột thay vì 1 */
-        gap: 15px; /* Giảm khoảng cách */
-    }
-    .product-image {
-        height: 160px; /* Điều chỉnh kích thước ảnh */
-    }
-    .product-card {
-        padding: 10px;
-    }
-    .add-to-cart-button{
         display: flex;
-        align-items: center;
-        padding: 8px 16px;
-        background-color: #b50a00;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        gap: 20px; /* Adjust gap for smaller screens */
+        -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
     }
-    .add-to-cart-button span {
-        display: none;
-    }
-}
 
-@media (max-width: 400px) {
-    .product-container-best-products {
-        grid-template-columns: repeat(2, 1fr); /* Giữ nguyên 2 cột */
+    .product-card {
+        flex: 0 0 auto; /* Prevent flex items from shrinking */
+        width: 80%; /* Adjust width as needed */
+        padding: 12px; /* Adjust padding for smaller screens */
     }
+
     .product-image {
-        height: 150px;
+        height: 150px; /* Adjust image height for smaller screens */
     }
+
+    .best-products {
+        font-size: 18px; /* Adjust font size for smaller screens */
+    }
+
+    .filter-button {
+        padding: 8px 16px; /* Adjust padding for filter buttons */
+    }
+
     .view-all-button-products {
-        width: 100%;
+        width: 120px; /* Adjust button width */
+        height: 35px; /* Adjust button height */
+    }
+
+    .view-all-button-products span {
+        font-size: 14px; /* Adjust font size */
+    }
+
+    .filter-container {
+        flex-direction: column; /* Stack filters vertically */
+        align-items: flex-start; /* Align filters to the start */
+        margin-top: 30px !important; /* Add margin to separate from title */
+    }
+
+    .flex-space-x-4 {
+        margin-top: 20px; /* Add margin to move down */
     }
 }
 
+@media (max-width: 480px) {
+    .product-container-best-products {
+        display: flex;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        gap: 20px; /* Adjust gap for extra small screens */
+        -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+    }
+
+    .product-card {
+        flex: 0 0 auto; /* Prevent flex items from shrinking */
+        width: 80%; /* Adjust width as needed */
+    }
+
+    .product-image {
+        height: auto; /* Further adjust image height */
+    }
+
+    .best-products {
+        font-size: 24px; /* Further adjust font size */
+        margin-bottom: 10px; /* Add margin to separate from products */
+    }
+
+    .filter-button {
+        padding: 6px 12px; /* Further adjust padding for filter buttons */
+    }
+
+    .view-all-button-products {
+        width: 100px; /* Further adjust button width */
+        height: 30px; /* Further adjust button height */
+    }
+
+    .view-all-button-products span {
+        font-size: 12px; /* Further adjust font size */
+    }
+
+    .filter-container {
+        flex-direction: column; /* Stack filters vertically */
+        align-items: flex-start; /* Align filters to the start */
+        margin-top: 30px !important; /* Add margin to separate from title */
+    }
+
+    .flex-space-x-4 {
+        margin-top: 20px; /* Add margin to move down */
+    }
+}

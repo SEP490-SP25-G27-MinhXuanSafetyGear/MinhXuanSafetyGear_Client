@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './style.css';
-import {FaArrowRight} from "react-icons/fa";
-import { FaClock } from 'react-icons/fa';
+import { FaArrowRight, FaArrowLeft, FaClock } from 'react-icons/fa';
 
 const NewBlog = () => {
+    const [currentIndex, setCurrentIndex] = useState(0);
     const blogs = [
         {
             title: "Tầm quan trọng của đồ bảo hộ lao động",
@@ -29,14 +29,50 @@ const NewBlog = () => {
             image: "https://baoholaodonglasa.com/wp-content/uploads/2021/04/thiet-bi-bao-ho-lao-dong.webp",
             date: "06/09/2024"
         },
-
+        {
+            title: "Tầm quan trọng của đồ bảo hộ lao động",
+            description: "Đồ bảo hộ lao động giúp người lao động tránh được nguy hiểm từ tai nạn lao động như chấn thương, bỏng, hay ngộ độc. Việc trang bị đầy đủ đồ bảo hộ như mũ, găng tay, áo chống cháy là điều bắt buộc.",
+            image: "https://baoholaodonglasa.com/wp-content/uploads/2021/04/thiet-bi-bao-ho-lao-dong.webp",
+            date: "06/09/2024"
+        },
+        {
+            title: "Tầm quan trọng của đồ bảo hộ lao động",
+            description: "Đồ bảo hộ lao động giúp người lao động tránh được nguy hiểm từ tai nạn lao động như chấn thương, bỏng, hay ngộ độc. Việc trang bị đầy đủ đồ bảo hộ như mũ, găng tay, áo chống cháy là điều bắt buộc.",
+            image: "https://baoholaodonglasa.com/wp-content/uploads/2021/04/thiet-bi-bao-ho-lao-dong.webp",
+            date: "06/09/2024"
+        },
+        {
+            title: "Tầm quan trọng của đồ bảo hộ lao động",
+            description: "Đồ bảo hộ lao động giúp người lao động tránh được nguy hiểm từ tai nạn lao động như chấn thương, bỏng, hay ngộ độc. Việc trang bị đầy đủ đồ bảo hộ như mũ, găng tay, áo chống cháy là điều bắt buộc.",
+            image: "https://baoholaodonglasa.com/wp-content/uploads/2021/04/thiet-bi-bao-ho-lao-dong.webp",
+            date: "06/09/2024"
+        },
+        // ... (other blog data)
     ];
+
+    const handlePrev = () => {
+        setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    };
+
+    const handleNext = () => {
+        setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, blogs.length - 1));
+    };
 
     return (
         <section className="new-blog-section">
-            <h2 className="new-blog-title">KIẾN THỨC AN TOÀN LAO ĐỘNG</h2>
+            <div className="new-blog-title-container">
+                <h2 className="new-blog-title">KIẾN THỨC AN TOÀN LAO ĐỘNG</h2>
+                <div className="new-blog-navigation">
+                    <button onClick={handlePrev} disabled={currentIndex === 0} className="new-blog-nav-button">
+                        <FaArrowLeft />
+                    </button>
+                    <button onClick={handleNext} disabled={currentIndex >= blogs.length - 1} className="new-blog-nav-button">
+                        <FaArrowRight />
+                    </button>
+                </div>
+            </div>
             <div className="new-blog-list">
-                {blogs.map((blog, index) => (
+                {blogs.slice(currentIndex, currentIndex + 4).map((blog, index) => (
                     <div key={index} className="new-blog-item">
                         <div className="new-blog-image-container">
                             <img src={blog.image} alt={blog.title} className="new-blog-image" />
