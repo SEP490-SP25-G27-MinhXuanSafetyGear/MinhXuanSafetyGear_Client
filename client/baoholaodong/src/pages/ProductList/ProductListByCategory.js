@@ -1,25 +1,29 @@
 ﻿import React, { useState, useEffect, useContext } from 'react';
 import './style.css';
-import { FaFilter, FaCartPlus, FaRegFrown } from 'react-icons/fa';
+import { FaFilter, FaCartPlus, FaRegFrown, FaCog } from 'react-icons/fa';
 import { CustomerProductContext } from '../../contexts/CustomerProductContext';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import { CartContext } from '../../contexts/CartContext';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {toSlug} from "../../utils/SlugUtils";
+import { toSlug } from "../../utils/SlugUtils";
+import ProductPopup from '../../components/productpopup';
 
 const useQuery = () => new URLSearchParams(useLocation().search);
 
 const ProductListCategory = () => {
-    const {group,cate,slug} = useParams();
+    const { group, cate, slug } = useParams();
     const query = useQuery();
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [products, setProducts] = useState([]);
-    const {groupCategories, searchProduct, getProductPage } = useContext(CustomerProductContext);
+    const { groupCategories, searchProduct, getProductPage } = useContext(CustomerProductContext);
+    const { addToCart } = useContext(CartContext);
     const [currentPage, setCurrentPage] = useState(parseInt(query.get("page")) || 1);
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize] = useState(4);
     const [categorySelected, setSelectedCategory] = useState(0);
     const navigate = useNavigate();
     const [hoveredGroup, setHoveredGroup] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const priceFilters = [
         "Dưới 1 triệu",
         "1 triệu - 3 triệu",
@@ -31,6 +35,18 @@ const ProductListCategory = () => {
         setSelectedFilters((prev) =>
             prev.includes(filter) ? prev.filter((item) => item !== filter) : [...prev, filter]
         );
+    };
+
+    const handleOpenPopup = (product) => {
+        setSelectedProduct(product);
+    };
+
+    const handleClosePopup = () => {
+        setSelectedProduct(null);
+    };
+
+    const handleAddToCart = (product) => {
+        addToCart(product);
     };
 
     useEffect(() => {
@@ -103,17 +119,16 @@ const ProductListCategory = () => {
                                     onMouseLeave={() => setHoveredGroup(null)}
                                 >
                                     <h4 className="group-title"
-                                        onClick={()=>{
+                                        onClick={() => {
                                             navigate(`/products/${group.groupId}/${0}/${toSlug(group.groupName)}`)
                                         }}
                                     >{group.groupName}</h4>
 
-                                    {/* Chỉ hiển thị danh mục con khi hover */}
                                     {hoveredGroup === index && (
                                         <div className="submenu">
                                             {group.categories.map((cate) => (
                                                 <label key={cate.categoryName} className="filter-label"
-                                                       onClick={()=>{
+                                                       onClick={() => {
                                                            navigate(`/products/${group.groupId}/${cate.categoryId}/${toSlug(group.groupName)}`)
                                                        }}
                                                 >
@@ -146,20 +161,33 @@ const ProductListCategory = () => {
                                     exit: { opacity: 0, y: -20 },
                                 }}
                             >
-                                {products.map(({ id, name, image, price }) => (
+                                {products.map((product) => (
                                     <motion.div
-                                        key={id}
+                                        key={product.id}
                                         className="product-list-item"
                                         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                                         transition={{ duration: 0.3 }}
                                     >
-                                        <img src={image} alt={name} className="product-image" />
-                                        <h3 className="product-list-name">{name}</h3>
-                                        <p className="product-list-price">{price.toLocaleString()} VND</p>
-                                        <button className="add-to-cart-button-product-list">
-                                            <FaCartPlus className="add-to-cart-icon" />
-                                            <span className="add-to-cart-text">Thêm vào giỏ</span>
-                                        </button>
+                                        <img src={product.image} alt={product.name} className="product-image" />
+                                        <h3 className="product-list-name">{product.name}</h3>
+                                        <p className="product-list-price">{product.price.toLocaleString()} VND</p>
+                                        {product.productVariants && product.productVariants.length > 0 ? (
+                                            <button
+                                                className="add-to-cart-button-product-list"
+                                                onClick={() => handleOpenPopup(product)}
+                                            >
+                                                <FaCog className="add-to-cart-icon" />
+                                                <span className="add-to-cart-text">Tùy chọn</span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="add-to-cart-button-product-list"
+                                                onClick={() => handleAddToCart(product)}
+                                            >
+                                                <FaCartPlus className="add-to-cart-icon" />
+                                                <span className="add-to-cart-text">Thêm vào giỏ</span>
+                                            </button>
+                                        )}
                                     </motion.div>
                                 ))}
                             </motion.div>
@@ -196,6 +224,9 @@ const ProductListCategory = () => {
                     )}
                 </div>
             </div>
+            {selectedProduct && (
+                <ProductPopup product={selectedProduct} onClose={handleClosePopup} />
+            )}
         </div>
     );
 };

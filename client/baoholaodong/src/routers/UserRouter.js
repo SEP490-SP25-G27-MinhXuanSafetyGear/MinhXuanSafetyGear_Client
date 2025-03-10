@@ -22,13 +22,13 @@ import ProductDetail from "../pages/ProductDetail";
 import { CustomerProductProvider } from "../contexts/CustomerProductContext";
 import { BlogPostProvider } from "../contexts/BlogPostContext";
 import { AdminProductProvider } from "../contexts/AdminProductContext";
-import  Taxes  from "../pages/manager/TaxManager";
+import Taxes from "../pages/manager/TaxManager";
 import VerificationPage from "../pages/register/Verification";
 import Logout from "../pages/Logout";
 import { AdminUserContextProvider } from "../contexts/AdminUserContext";
 import Dashboard from "../pages/manager/Dashboard";
 import ScrollToTop from "../components/ScrollToTop";
-import {Error403, Error404, Error503} from "../pages/Errors";
+import { Error403, Error404, Error503 } from "../pages/Errors";
 import Contact from "../pages/Contact";
 import CustomerInfo from "../pages/CustomerInfo";
 import Checkout from "../pages/Checkout";
@@ -65,6 +65,7 @@ const UserRouter = () => {
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/customer-info" element={<CustomerInfo />} />
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
+                    <Route path="/category/:categoryId" element={<ProductListByCategory />} />
                 </Route>
 
                 {/* Admin Routes */}
