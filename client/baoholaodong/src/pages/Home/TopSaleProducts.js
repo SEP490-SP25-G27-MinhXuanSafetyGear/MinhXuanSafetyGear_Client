@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
 import slugify from "slugify";
+
+
 const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -56,7 +58,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
 
     return (
         <main className="container mx-auto p-4">
-            <div className="flex justify-between items-center mb-4" style={{ marginTop: "30px" }}>
+            <div className="flex justify-between items-center mb-4 filter-container" style={{ marginTop: "30px" }}>
                 <h2 className="best-products">{title}</h2>
                 <div className="flex space-x-4">
                     {filters.map((filter, index) => (
