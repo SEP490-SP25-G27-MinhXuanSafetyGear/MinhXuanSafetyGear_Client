@@ -7,10 +7,7 @@
     transition: background 2s ease-in-out, padding 0.5s ease-in-out, top 50s ease-in-out; /* Use ease-in-out for smoother transition */
     transition-delay: 2s, 0s, 30s;
     padding: 5px 10px;
-
 }
-
-
 
 .header-gradient.scrolled {
     background: linear-gradient(to top, #4a0403, #a50d0b); /* Darker gradient */
@@ -20,11 +17,9 @@
     z-index: 1000; /* Ensure it stays on top of other elements */
 }
 
-.siderbar-head{
+.siderbar-head {
     background: linear-gradient(to top, #4a0403, #a50d0b); /* Darker gradient */
 }
-
-
 
 .sidebar-overlay {
     z-index: 2000; /* Ensure the overlay is above other elements */
@@ -64,14 +59,11 @@
     display: flex;
     align-items: center;
     margin: 0 10px;
-
 }
 
 .header-gradient .search-container input {
     width: 100%; /* Make the search bar take the full width */
 }
-
-
 
 /* Mobile Header Styles */
 @media (max-width: 768px) {
@@ -127,14 +119,22 @@
         gap: 10px; /* Add some space between elements */
     }
 
-
-
     /* Hide contact info, header text while keeping logo and icons visible */
     .contact-info,
     .header-gradient h1,
     .header-gradient p,
     .header-gradient .flex.items-center.space-x-6 .relative.flex.items-center span,
     .header-gradient .flex.items-center.space-x-6 .relative.group .flex.items-center div {
+        display: none !important;
+    }
+
+    /* Hide hover dropdown lists for account and cart on mobile */
+    .header-gradient .relative.group .absolute {
+        display: none !important;
+    }
+
+    /* Hide CartDropdown on mobile */
+    .cart-dropdown {
         display: none !important;
     }
 }

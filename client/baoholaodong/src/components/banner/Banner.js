@@ -1,35 +1,50 @@
-import React from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "./Banner.css"; // Import the CSS file
+import React, { useState, useEffect } from "react";
+import "./Banner.css";
 
 const Banner = () => {
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 7000,
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const banners = [
+        {
+            image: "http://baoholaodongminhxuan.com/images/common/slider1.jpg",
+            link: "/product/1"
+        },
+        {
+            image: "http://baoholaodongminhxuan.com/images/common/slider2.jpg",
+            link: "/product/2"
+        },
+        {
+            image: "http://baoholaodongminhxuan.com/images/common/slider3.jpg",
+            link: "/product/3"
+        },
+    ];
+
+    const nextSlide = () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
     };
 
-    const images = [
-        "http://baoholaodongminhxuan.com/images/common/slider1.jpg",
-        "http://baoholaodongminhxuan.com/images/common/slider2.jpg",
-        "http://baoholaodongminhxuan.com/images/common/slider3.jpg",
-    ];
+    const prevSlide = () => {
+        setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
+    };
+
+    useEffect(() => {
+        const interval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+        return () => clearInterval(interval); // Clear interval on component unmount
+    }, []);
 
     return (
         <div className="banner-main">
-            <Slider {...settings}>
-                {images.map((image, index) => (
-                    <div key={index}>
-                        <img src={image} alt={`Slide ${index + 1}`} className="w-full" />
-                    </div>
-                ))}
-            </Slider>
+            <button className="prev" onClick={prevSlide}>❮</button>
+            {banners.map((banner, index) => (
+                <a href={banner.link} key={index}>
+                    <img
+                        src={banner.image}
+                        alt={`Slide ${index + 1}`}
+                        className={index === currentIndex ? "active" : ""}
+                    />
+                </a>
+            ))}
+            <button className="next" onClick={nextSlide}>❯</button>
         </div>
     );
 };
