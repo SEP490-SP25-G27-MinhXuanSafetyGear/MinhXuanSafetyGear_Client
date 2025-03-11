@@ -32,6 +32,12 @@ const CartDropdown = () => {
                                 <img src={item.productImages?.[0]?.image || "/images/default.png"} alt={item.name} className="cart-item-image" />
                                 <div className="cart-item-details">
                                     <span className="cart-item-name">{item.name}</span>
+                                    <span className="cart-item-variant">
+                                        {item.productVariants?.[0] && (
+                                        <p className="text-gray-500 text-sm">
+                                            {item.productVariants[0].size} / {item.productVariants[0].color}
+                                        </p>
+                                    )}</span>
                                     <div className="cart-item-quantity">
                                         <button className="quantity-btn" onClick={() => handleQuantityChange(item.id, item.quantity - 1)}>
                                             <FontAwesomeIcon icon={faMinus} />
