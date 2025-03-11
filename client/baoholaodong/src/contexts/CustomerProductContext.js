@@ -1,4 +1,4 @@
-﻿import React, {createContext, useState, useEffect, useCallback} from "react";
+﻿import React, {createContext, useState, useEffect} from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import {useNavigate} from "react-router-dom";
@@ -10,7 +10,6 @@ export const CustomerProductProvider =({ children }) => {
     const [topDealProducts,setTopDealProducts] = useState([]);
     const [hubConnection, setHubConnection] = useState(null);
     const [groupCategories, setGroupCategories] = useState([]);
-    const [listTopProductOfGroups, setListTopProductOfGroups] = useState([]);
     const navigate = useNavigate();
     axios.interceptors.response.use(
         (response) => response, // Nếu response thành công thì trả về bình thường
@@ -82,17 +81,8 @@ export const CustomerProductProvider =({ children }) => {
                     size: size
                 }
             });
+            console.log(response.data.length);
             setTopSaleProducts(response.data || []);
-        }catch(error){
-            return [];
-        }
-    }
-    const  fetchTopProductOfGroup = async (size)=>{
-        try{
-            const response = await axios.get(`${BASE_URL}/api/Product/top-product-group`, {
-                params: {size:size},
-            });
-            return response.data;
         }catch(error){
             return [];
         }
@@ -148,22 +138,6 @@ export const CustomerProductProvider =({ children }) => {
             return [];
         }
     }
-    useEffect(() => {
-        const loadTopProductsOfGroups = async () => {
-            try {
-                const result = await fetchTopProductOfGroup(10)
-                setListTopProductOfGroups(result);
-            } catch (error) {
-                console.error("Lỗi khi tải danh sách top sản phẩm của nhóm:", error);
-            }
-        };
-        if(listTopProductOfGroups.length===0){
-            loadTopProductsOfGroups();
-            console.log(listTopProductOfGroups);
-        }
-
-    }, [listTopProductOfGroups.length]);
-
 
     /** Kết nối với SignalR */
     useEffect(() => {
@@ -215,7 +189,7 @@ export const CustomerProductProvider =({ children }) => {
     useEffect(() => {
         const loadData = async () => {
             if (topSaleProducts.length === 0) {
-                await fetchTopSaleProducts();
+                await fetchTopSaleProducts(15);
             }
             if (groupCategories.length === 0) {
                 await fetchProductCategories();
@@ -237,7 +211,6 @@ export const CustomerProductProvider =({ children }) => {
                 searchProduct,
                 getProductPage,
                 topDealProducts,
-                listTopProductOfGroups,
                 fetchRelatedProducts,
                 fetchReviewProduct,
             }}

@@ -1,11 +1,14 @@
-﻿import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CustomerProductContext } from "../../contexts/CustomerProductContext";
 import Banner from "../../components/banner/Banner";
 import Feedbacks from "../../components/feedbacks";
 import NewBlog from "../../components/newblog";
 import TopSaleProducts from "./TopSaleProducts";
 import TopDealProducts from "./TopDealProducts";
-import TopProductOfGroup from "./TopProductOfGroup";
+
+
+function Index() {
+    const { topSaleProducts,topDealProducts} = useContext(CustomerProductContext);
 import "./home.css"; // Import the CSS file
 
 function Index() {
@@ -26,9 +29,6 @@ function Index() {
             <Banner />
             <TopDealProducts products={topDealProducts} />
             <TopSaleProducts products={topSaleProducts} title="TOP SẢN PHẨM BÁN CHẠY" />
-            {listTopProductOfGroups.map(({ groupName, products }, index) =>
-                products.length > 0 && <TopProductOfGroup key={index} products={products} title={groupName} />
-            )}
             <Feedbacks />
             <NewBlog />
         </div>
