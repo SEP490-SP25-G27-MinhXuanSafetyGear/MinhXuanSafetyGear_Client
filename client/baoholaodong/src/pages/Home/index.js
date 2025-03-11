@@ -5,14 +5,10 @@ import Feedbacks from "../../components/feedbacks";
 import NewBlog from "../../components/newblog";
 import TopSaleProducts from "./TopSaleProducts";
 import TopDealProducts from "./TopDealProducts";
-
-
-function Index() {
-    const { topSaleProducts,topDealProducts} = useContext(CustomerProductContext);
 import "./home.css"; // Import the CSS file
 
 function Index() {
-    const { topSaleProducts, topDealProducts, listTopProductOfGroups } = useContext(CustomerProductContext);
+    const { topSaleProducts, topDealProducts } = useContext(CustomerProductContext);
     const [showWelcome, setShowWelcome] = useState(false);
 
     useEffect(() => {
