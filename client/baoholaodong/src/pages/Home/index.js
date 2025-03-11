@@ -26,9 +26,6 @@ function Index() {
             <Banner />
             <TopDealProducts products={topDealProducts} />
             <TopSaleProducts products={topSaleProducts} title="TOP SẢN PHẨM BÁN CHẠY" />
-            {listTopProductOfGroups.map(({ groupName, products }, index) =>
-                products.length > 0 && <TopProductOfGroup key={index} products={products} title={groupName} />
-            )}
             <Feedbacks />
             <NewBlog />
         </div>

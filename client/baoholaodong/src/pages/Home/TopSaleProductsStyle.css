@@ -13,7 +13,7 @@
 }
 
 .product-card:hover {
-    transform: translateY(-5px); /* Add hover effect */
+    transform: translateY(-5px)!important; ; /* Add hover effect */
 }
 
 .product-container-best-products {
@@ -200,14 +200,12 @@
 @media (max-width: 768px) {
     .product-container-best-products {
         display: flex;
-        overflow-x: auto; /* Enable horizontal scrolling */
+        overflow-x: auto !important; /* Enable horizontal scrolling */
         gap: 20px; /* Adjust gap for smaller screens */
-        -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
     }
 
     .product-card {
-        flex: 0 0 auto; /* Prevent flex items from shrinking */
-        width: 80%; /* Adjust width as needed */
+        min-width: 75%; /* Chiều rộng tối thiểu */
         padding: 12px; /* Adjust padding for smaller screens */
     }
 
@@ -249,11 +247,13 @@
         overflow-x: auto; /* Enable horizontal scrolling */
         gap: 20px; /* Adjust gap for extra small screens */
         -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+        padding: 10px; /* Adjust padding for smaller screens */
     }
 
     .product-card {
         flex: 0 0 auto; /* Prevent flex items from shrinking */
-        width: 80%; /* Adjust width as needed */
+        width: 75%; /* Adjust width as needed */
+
     }
 
     .product-image {

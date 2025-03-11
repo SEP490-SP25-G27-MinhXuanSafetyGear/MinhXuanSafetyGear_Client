@@ -116,7 +116,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
             <div className="flex justify-center mt-4">
                 <div className="new-blog-read-more">
                     <button className="new-blog-read-more-button">
-                        <div className="new-blog-read-more-text">Xem tất cả <FaArrowRight className="inline" /></div>
+                        <div className="new-blog-read-more-text">Xem tất cả   <FaArrowRight className="inline" /></div>
                     </button>
                 </div>
             </div>

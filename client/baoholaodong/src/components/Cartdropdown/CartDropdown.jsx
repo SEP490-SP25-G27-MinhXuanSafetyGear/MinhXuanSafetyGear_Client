@@ -63,8 +63,8 @@ const CartDropdown = () => {
                             <span className="total-label">Tổng tiền:</span>
                             <span className="total-price">{totalPrice.toLocaleString()}đ</span>
                         </div>
-                        <button className="new-blog-read-more-button">
-                            <a href="/checkout" className="new-blog-read-more-text">THANH TOÁN</a>
+                        <button className="checkout-button">
+                            <a href="/checkout" className="checkout-button-text">THANH TOÁN</a>
                         </button>
                     </div>
                 </div>

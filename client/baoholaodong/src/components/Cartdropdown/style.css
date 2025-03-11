@@ -180,7 +180,7 @@
 }
 
 .checkout-button:hover .checkout-button-text {
-    color: #b50a00;
+    color: gold;
     animation: slideIn 0.3s forwards;
 }
 
