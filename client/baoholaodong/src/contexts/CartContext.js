@@ -34,17 +34,21 @@ const CartProvider = ({ children }) => {
     const addToCart = (product) => {
         const price = product.discount > 0 ? product.price - product.discount : product.price;
         const quantity = product.selectedVariant ? product.quantity : 1;
+        const variantKey = product.selectedVariant ? JSON.stringify(product.selectedVariant) : '';
+
         setCartItems((prevItems) => {
-            const existingItem = prevItems.find(item => item.id === product.id);
+            const existingItem = prevItems.find(item => item.id === product.id && JSON.stringify(item.selectedVariant) === variantKey);
             let updatedItems;
             if (existingItem) {
                 updatedItems = prevItems.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + quantity, price } : item
+                    item.id === product.id && JSON.stringify(item.selectedVariant) === variantKey
+                        ? { ...item, quantity: item.quantity + quantity, price }
+                        : item
                 );
             } else {
-                updatedItems = [...prevItems, { ...product, quantity, price }];
+                updatedItems = [...prevItems, { ...product, quantity, price, selectedVariant: product.selectedVariant }];
             }
-            sessionStorage.setItem("cartItems", JSON.stringify(updatedItems)); // Cập nhật sessionStorage ngay sau khi thêm vào giỏ hàng
+            sessionStorage.setItem("cartItems", JSON.stringify(updatedItems));
             return updatedItems;
         });
         showToast("Sản phẩm đã được thêm vào giỏ hàng");
@@ -60,9 +64,11 @@ const CartProvider = ({ children }) => {
         });
     };
 
-    const removeFromCart = (productId) => {
+    const removeFromCart = (productId, selectedVariant) => {
         setCartItems((prevItems) => {
-            const updatedItems = prevItems.filter(item => item.id !== productId);
+            const updatedItems = prevItems.filter(item =>
+                item.id !== productId || JSON.stringify(item.selectedVariant) !== JSON.stringify(selectedVariant)
+            );
             sessionStorage.setItem("cartItems", JSON.stringify(updatedItems));
             return updatedItems;
         });
