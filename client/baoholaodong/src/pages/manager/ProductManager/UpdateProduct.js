@@ -1,13 +1,12 @@
 ﻿import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { ProductContext } from "../../../contexts/AdminProductContext";
 import {useNavigate, useParams} from "react-router-dom";
-import { Edit, Plus, Trash2, Image, Package, Tag, CheckCircle ,XCircle} from "lucide-react";
+import { Edit, Plus, Trash2, Image, Package, Tag, CheckCircle ,XCircle,Eye} from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
 import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imageUtils";
 import {toSlug} from "../../../utils/SlugUtils";
 import ErrorList from "../../../components/ErrorList/ErrorList";
-import {motion} from "framer-motion";
 
 const MAX_IMAGE_SIZE_MB = 0.5; // 2MB
 const TARGET_IMAGE_SIZE_KB = 10; // 100KB
@@ -166,31 +165,32 @@ const UpdateProduct = () => {
 				<div className="bg-gradient-to-r  from-blue-600 to-indigo-700 p-6 flex justify-between items-center">
 					<h3 className="text-2xl font-bold text-white">Cập nhật sản phẩm</h3>
 					<div className="flex space-x-3">
-						<button
-							onClick={() => setIsOpenUpdateInformation(true)}
-							className="flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-all shadow-md"
-						>
-							<Edit size={18} className="mr-2" /> Cập nhật thông tin
-						</button>
-						<button
-							onClick={(e) => setIsOpenAddMoreImage(true)}
-							className="flex items-center px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-all shadow-md"
-						>
-							<Image size={18} className="mr-2" /> Thêm ảnh
-						</button>
-						<button
-							onClick={(e) => setIsOpenCreateVariant(true)}
-							className="flex items-center px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-all shadow-md"
-						>
-							<Package size={18} className="mr-2" /> Thêm biến thể
-						</button>
+
+
 						<button
 							onClick={() => setIsOpenAddTax(true)}
 							className="flex items-center px-4 py-2 bg-white text-orange-600 rounded-lg hover:bg-orange-50 transition-all shadow-md"
 						>
 							<Tag size={18} className="mr-2" /> Cập nhật thuế
 						</button>
-					</div>
+                        <button
+                            onClick={() => {
+                                const url = `/product/${product.id}/${toSlug(product.name)}`;
+                                const popup = window.open(
+                                    url,
+                                    "ProductPreview",
+                                    "width=600,height=700,left=300,top=100,toolbar=no,menubar=no,scrollbars=yes,resizable=yes"
+                                );
+                                if (popup) {
+                                    popup.focus();
+                                }
+                            }}
+                            className="flex items-center px-4 py-2 bg-white text-gray-600 rounded-lg hover:bg-gray-50 transition-all shadow-md"
+                        >
+                            <Eye size={18} className="mr-2" /> Xem trước sản phẩm
+                        </button>
+
+                    </div>
 				</div>
 				{isLoading ?(
 					<LoadingSkeleton/>
@@ -199,10 +199,16 @@ const UpdateProduct = () => {
 						{/* Product Information */}
 						<div className="p-6">
 							<div className="mb-6">
-								<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
-									Thông tin sản phẩm
-								</h4>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+								<div className="flex items-center justify-between border-b border-gray-200 pb-3">
+									<h4 className="text-lg font-semibold text-gray-800">Thông tin sản phẩm</h4>
+									<button
+										onClick={() => setIsOpenUpdateInformation(true)}
+										className="flex items-center gap-2 text-blue-600 font-medium px-3 py-2 rounded-lg transition-all duration-200 bg-blue-100 active:bg-blue-200"
+									>
+										<Edit size={18} /> Cập nhật thông tin
+									</button>
+								</div>
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 pt-6 gap-y-4">
 									<div className="flex items-center">
 										<span className="text-gray-500 w-32">ID sản phẩm:</span>
 										<span className="font-medium text-gray-800">{product.id}</span>
@@ -291,86 +297,119 @@ const UpdateProduct = () => {
 
 							{/* Product Images */}
 							<div className="mb-6">
-								<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center">
-									<Image size={20} className="mr-2 text-blue-500" /> Hình ảnh sản phẩm
-								</h4>
-								{product.productImages?.length > 0 ? (
-									<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-										{product.productImages.map((image, index) => (
-											<div key={image.id} className="group relative">
-												<div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 shadow-md">
-													<img
-														src={image.image}
-														alt={`Product ${index}`}
-														className="h-full w-full object-cover object-center group-hover:opacity-75 transition-all"
-													/>
-													{image.isPrimary && (
-														<div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-															Chính
-														</div>
-													)}
+								<div className="flex items-center justify-between border-b border-gray-200 pb-3">
+									<h4 className="flex text-lg font-semibold text-gray-800">
+										<Image size={20} className="mr-2 text-blue-500" /> Hình ảnh sản phẩm
+									</h4>
+									<button
+										onClick={(e) => setIsOpenAddMoreImage(true)}
+										className="flex items-center gap-2 text-blue-600 font-medium px-3 py-2 rounded-lg transition-all duration-200 bg-purple-100 active:bg-blue-200"
+									>
+										<Image size={18} className="mr-2" /> Thêm ảnh
+									</button>
+								</div>
+
+								<div className="pt-6">
+									{product.productImages?.length > 0 ? (
+										<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+											{product.productImages.map((image, index) => (
+												<div key={image.id} className="group relative">
+													<div className="relative w-full aspect-square overflow-hidden rounded-lg bg-gray-200 shadow-md">
+														<img
+															src={image.image}
+															alt={`Product ${index}`}
+															className="w-full h-full object-cover object-center transition-all duration-200 group-hover:opacity-75"
+														/>
+														{image.isPrimary && (
+															<div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+																Chính
+															</div>
+														)}
+													</div>
+
+													<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-30 rounded-lg">
+														<button
+															onClick={() => handleClickUpdateImage(image)}
+															className="bg-white p-2 rounded-full shadow-lg hover:bg-blue-50 transition-colors"
+														>
+															<Edit size={18} className="text-blue-600" />
+														</button>
+													</div>
 												</div>
-												<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-30 rounded-lg">
-													<button
-														onClick={() => handleClickUpdateImage(image)}
-														className="bg-white p-2 rounded-full shadow-lg hover:bg-blue-50 transition-colors"
-													>
-														<Edit size={18} className="text-blue-600" />
-													</button>
-												</div>
-											</div>
-										))}
-									</div>
-								) : (
-									<div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-										<div className="text-center">
-											<FaRegFrown className="mx-auto text-gray-400 text-2xl mb-2" />
-											<p className="text-gray-500">Không có hình ảnh nào.</p>
+											))}
 										</div>
-									</div>
-								)}
+
+									) : (
+										<div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+											<div className="text-center">
+												<FaRegFrown className="mx-auto text-gray-400 text-2xl mb-2" />
+												<p className="text-gray-500">Không có hình ảnh nào.</p>
+											</div>
+										</div>
+									)}
+								</div>
 							</div>
 
 							{/* Product Variants */}
 							<div>
-								<h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200 flex items-center">
-									<Package size={20} className="mr-2 text-purple-500" /> Biến thể sản phẩm
-								</h4>
+								<div className="flex items-center justify-between border-b border-gray-200 pb-3">
+									<h4 className="flex items-center text-lg font-semibold text-gray-800">
+										<Package size={20} className="mr-2 text-purple-500" /> Biến thể sản phẩm
+									</h4>
+									<button
+										onClick={() => setIsOpenCreateVariant(true)}
+										className="flex items-center gap-2 px-4 py-2 text-purple-600 font-medium  rounded-lg shadow-sm transition-all duration-200 bg-purple-100 active:bg-purple-200"
+									>
+										<Package size={18} /> Thêm biến thể
+									</button>
+								</div>
+
 								{product.productVariants?.length > 0 ? (
 									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 										{product.productVariants.map((variant, index) => (
 											<div
 												key={index}
 												className="p-4 border rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow cursor-pointer"
-												onClick={() => handleClickUpdateVariant(variant)}
 											>
-												<div className="flex justify-between items-center mb-2">
+												{/* Header */}
+												<div className="flex justify-between items-center mb-3">
 													<h5 className="font-semibold text-gray-800">Biến thể #{index + 1}</h5>
-													<span className={`px-2 py-1 rounded-full text-xs ${variant.status ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-												{variant.status ? "Đang bán" : "Ngừng bán"}
-											</span>
+													<div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${variant.status ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+														{variant.status ? "Đang bán" : "Ngừng bán"}
+													</div>
+													<button
+														onClick={() => handleClickUpdateVariant(variant)}
+														className="text-gray-600 hover:text-blue-500 transition-colors"
+													>
+														<Edit size={18} />
+													</button>
 												</div>
-												<div className="space-y-1">
-													<div className="grid grid-cols-2 gap-2">
-														<div className="bg-gray-50 p-2 rounded">
+
+												{/* Thông tin chi tiết */}
+												<div className="space-y-2">
+													<div className="grid grid-cols-2 gap-3">
+														<div className="bg-gray-50 p-3 rounded">
 															<span className="text-gray-500 text-sm">Kích thước:</span>
 															<p className="font-medium">{variant.size}</p>
 														</div>
-														<div className="bg-gray-50 p-2 rounded">
+														<div className="bg-gray-50 p-3 rounded">
 															<span className="text-gray-500 text-sm">Màu sắc:</span>
 															<p className="font-medium">{variant.color}</p>
 														</div>
 													</div>
-													<div className="grid grid-cols-3 gap-2">
-														<div className="bg-gray-50 p-2 rounded">
+
+													<div className="grid grid-cols-3 gap-3">
+														<div className="bg-gray-50 p-3 rounded">
 															<span className="text-gray-500 text-sm">Số lượng:</span>
 															<p className="font-medium">{variant.quantity}</p>
 														</div>
-														<div className="bg-gray-50 p-2 rounded">
+														<div className="bg-gray-50 p-3 rounded">
 															<span className="text-gray-500 text-sm">Giá:</span>
-															<p className="font-medium">đ{variant.price}</p>
+															<p className="font-medium">
+																{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(variant.price)}
+															</p>
 														</div>
-														<div className="bg-gray-50 p-2 rounded">
+														<div className="bg-gray-50 p-3 rounded">
 															<span className="text-gray-500 text-sm">Giảm giá:</span>
 															<p className="font-medium">{variant.discount}%</p>
 														</div>
@@ -442,6 +481,7 @@ const UpdateProduct = () => {
 					title={"Thêm biến thể"}
 				>
 					<CreateVariantForm
+						onClose={() => setIsOpenCreateVariant(false)}
 						setLoading={setLoading}
 						product={product}
 						onSetProduct={setProduct}
@@ -697,7 +737,7 @@ const UpdateInformationProductForm = ({ product, categories, onUpdate, setProduc
 							value={productUpdate.guarantee}
 							onChange={handleChange}
 							className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-							min="1"
+							min="0"
 							required
 						/>
 					</div>
@@ -988,7 +1028,7 @@ const UpdateVariantForm = ({ variant, onUpdateVariant, setLoading, onSetProduct,
 		try {
 			var result = await onUpdateVariant(variantUpdate);
 			if (result) {
-				onSetProduct(result);
+			   await onSetProduct(result);
 				onClose();
 			}
 		} catch (error) {
@@ -1123,7 +1163,7 @@ const UpdateVariantForm = ({ variant, onUpdateVariant, setLoading, onSetProduct,
 };
 
 // create new variant
-const CreateVariantForm = ({ setLoading, onSetProduct, onCreateVariant, product }) => {
+const CreateVariantForm = ({ setLoading, onSetProduct, onCreateVariant, product,onClose }) => {
 	const [newVariant, setNewVariant] = useState({
 		productId: product.id,
 		size: "",
@@ -1167,7 +1207,10 @@ const CreateVariantForm = ({ setLoading, onSetProduct, onCreateVariant, product 
 		try {
 			setLoading(true);
 			const result = await onCreateVariant(newVariant);
-			if (result) await onSetProduct(result);
+			if (result){
+				await onSetProduct(result);
+				onClose();
+			}
 		} catch (error) {
 			console.error("Error creating variant:", error);
 			alert("Không thể tạo biến thể. Vui lòng thử lại!");

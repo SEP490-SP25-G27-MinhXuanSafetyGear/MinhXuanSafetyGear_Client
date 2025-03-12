@@ -4,7 +4,6 @@ import { AuthContext } from "../contexts/AuthContext";
 
 const PrivateRoute = ({ element, roleRequired = [] }) => {
 	const { user } = useContext(AuthContext);
-
 	// Kiểm tra nếu chưa đăng nhập
 	if (!user || !user.email || !user.token) {
 		return <Navigate to="/login" replace />;

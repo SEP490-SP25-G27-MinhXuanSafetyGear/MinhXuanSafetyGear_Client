@@ -280,43 +280,47 @@ function ProductDetail() {
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div>
-                                        <h3 className="text-sm font-medium text-gray-900">Kích thước</h3>
-                                        <div className="mt-2 grid grid-cols-4 gap-2">
-                                            {[...new Set(product.productVariants.map(({ size }) => size))].map((size, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => setSelectedSize(size)}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-md ${
-                                                        selectedSize === size
-                                                            ? 'bg-blue-600 text-white'
-                                                            : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                    {size}
-                                                </button>
-                                            ))}
+                                    {product.productVariants.length>0 &&(
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-900">Kích thước</h3>
+                                            <div className="mt-2 grid grid-cols-4 gap-2">
+                                                {[...new Set(product.productVariants.map(({ size }) => size))].map((size, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => setSelectedSize(size)}
+                                                        className={`px-4 py-2 text-sm font-medium rounded-md ${
+                                                            selectedSize === size
+                                                                ? 'bg-blue-600 text-white'
+                                                                : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
+                                                        }`}
+                                                    >
+                                                        {size}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
+                                    {product.productVariants.length>0 &&(
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-900">Màu sắc</h3>
+                                            <div className="mt-2 grid grid-cols-4 gap-2">
+                                                {[...new Set(product.productVariants.map(({ color }) => color))].map((color, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => setSelectedColor(color)}
+                                                        className={`px-4 py-2 text-sm font-medium rounded-md ${
+                                                            selectedColor === color
+                                                                ? 'bg-blue-600 text-white'
+                                                                : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
+                                                        }`}
+                                                    >
+                                                        {color}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
-                                    <div>
-                                        <h3 className="text-sm font-medium text-gray-900">Màu sắc</h3>
-                                        <div className="mt-2 grid grid-cols-4 gap-2">
-                                            {[...new Set(product.productVariants.map(({ color }) => color))].map((color, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => setSelectedColor(color)}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-md ${
-                                                        selectedColor === color
-                                                            ? 'bg-blue-600 text-white'
-                                                            : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                    {color}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div className="space-y-4">

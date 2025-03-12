@@ -33,7 +33,8 @@ import {
 import './style.css';
 import {ProductContext} from "../../../contexts/AdminProductContext";
 import Loading from "../../../components/Loading/Loading";
-
+import axios from "axios";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 const Dashboard = () => {
     const {reports} = useContext(ProductContext)
     const [salesData, setSalesData] = useState([]);
@@ -101,7 +102,6 @@ useEffect(()=>{
             default: return 'text-gray-600';
         }
     };
-
     return (
         <>
             {reports === null ? (

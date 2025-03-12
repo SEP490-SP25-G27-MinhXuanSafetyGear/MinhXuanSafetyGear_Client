@@ -27,9 +27,6 @@ export const AdminProductProvider = ({ children }) => {
         (error) => {
             if (error.response) {
                 switch (error.response.status) {
-                    case 401:
-                        navigate("/login"); // Unauthorized
-                        break;
                     case 403:
                         navigate("/403"); // Forbidden
                         break;

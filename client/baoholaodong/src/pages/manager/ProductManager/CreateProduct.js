@@ -3,7 +3,6 @@ import { ProductContext } from "../../../contexts/AdminProductContext";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../../components/Loading/Loading";
 import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imageUtils";
-import Modal from "../../../components/Modal/Modal";
 import ErrorList from "../../../components/ErrorList/ErrorList";
 
 const MAX_IMAGE_SIZE_MB = 0.2;
@@ -32,9 +31,7 @@ const CreateProduct = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentStep, setCurrentStep] = useState(1);
 	const totalSteps = 4;
-	const [isShowMessage, setIsShowMessage] = useState(false);
 	const [errors, setErrors] = useState([]);
-	// Xử lý khi nhập thông tin sản phẩm
 	const handleChange = (e) => {
 		const { id, value ,checked} = e.target;
 		let newValue = value;
@@ -51,8 +48,6 @@ const CreateProduct = () => {
 		}));
 	};
 
-
-	// Thêm biến thể sản phẩm
 	const addVariant = () => {
 		setProduct(prev => ({
 			...prev,
@@ -61,7 +56,7 @@ const CreateProduct = () => {
 				size: "",
 				color: "",
 				quantity: 1,
-				price: 0.01,
+				price: product.price,
 				discount: 0,
 				status: true
 			}]
@@ -73,7 +68,7 @@ const CreateProduct = () => {
 		const { id, value } = e.target;
 		setProduct(prev => {
 			const updatedVariants = [...prev.productVariants];
-			updatedVariants[index][id] = value;
+			updatedVariants[index][id] = id === "price" ? parseInt(value.replace(/\D/g, ""), 10) || 0 : value;
 			return { ...prev, productVariants: updatedVariants };
 		});
 	};
@@ -189,10 +184,10 @@ const CreateProduct = () => {
 	};
 
 	return (
-		<div className=" min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+		<div className=" space-y-6">
 			<Loading isLoading={isLoading} />
 			<ErrorList errors={errors}/>
-			<div className="max-w-6xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
+			<div className="max-w-[100%] mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
 				<div className="bg-gradient-to-r from-blue-600 to-indigo-700 py-6 px-8">
 					<h2 className="text-3xl font-extrabold text-white">Create New Product</h2>
 				</div>
@@ -208,7 +203,11 @@ const CreateProduct = () => {
 						</div>
 						<div className="flex justify-between">
 							{[1, 2, 3, 4].map(step => (
-								<div
+								<div onClick={() => {
+									if (currentStep > step ) {
+										setCurrentStep(step);
+									}
+								}}
 									key={step}
 									className={`flex flex-col items-center ${step <= currentStep ? 'text-blue-600' : 'text-gray-400'}`}
 								>
@@ -250,6 +249,7 @@ const CreateProduct = () => {
 							</h3>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								{/*name*/}
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">
 										Tên Sản Phẩm<span className="text-red-500">*</span>
@@ -264,7 +264,7 @@ const CreateProduct = () => {
 										required
 									/>
 								</div>
-
+								{/*category*/}
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="category">
 										Danh mục sản phẩm <span className="text-red-500">*</span>
@@ -282,35 +282,41 @@ const CreateProduct = () => {
 										))}
 									</select>
 								</div>
-
-								<div className="md:col-span-2">
-									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="description">
-										Mô Tả sản phẩm <span className="text-red-500">*</span>
-									</label>
-									<textarea
-										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-										id="description"
-										rows="3"
-										placeholder="Describe your product"
-										value={product.description}
-										onChange={handleChange}
-										required
-									></textarea>
+								{/*{description}*/}
+								<div>
+									<div className="md:col-span-2">
+										<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="description">
+											Mô Tả sản phẩm <span className="text-red-500">*</span>
+										</label>
+										<textarea
+											className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+											id="description"
+											rows="3"
+											placeholder="Describe your product"
+											value={product.description}
+											onChange={handleChange}
+											required
+										></textarea>
+									</div>
 								</div>
-								<div className="md:col-span-2">
-									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="qualityCertificate">
-										Chứng nhận sản phẩm(CO,CQ) <span className="text-red-500">*</span>
-									</label>
-									<textarea
-										className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-										id="qualityCertificate"
-										rows="3"
-										placeholder="Certificate information"
-										value={product.qualityCertificate}
-										onChange={handleChange}
-										required
-									></textarea>
+								{/*qualityCertificate*/}
+								<div>
+									<div className="md:col-span-2">
+										<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="qualityCertificate">
+											Chứng nhận sản phẩm(CO,CQ) <span className="text-red-500">*</span>
+										</label>
+										<textarea
+											className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+											id="qualityCertificate"
+											rows="3"
+											placeholder="Certificate information"
+											value={product.qualityCertificate}
+											onChange={handleChange}
+											required
+										></textarea>
+									</div>
 								</div>
+								{/*material*/}
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="material">
 										Chất liệu sản phẩm <span className="text-red-500">*</span>
@@ -325,7 +331,7 @@ const CreateProduct = () => {
 										required
 									/>
 								</div>
-
+								{/*origin*/}
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="origin">
 										Xuất xứ <span className="text-red-500">*</span>
@@ -636,7 +642,7 @@ const CreateProduct = () => {
 														type="number"
 														min="1"
 														placeholder="1"
-														value={variant.quantity}
+														value={product.quantity}
 														onChange={(e) => handleVariantChange(index, e)}
 													/>
 												</div>
@@ -652,11 +658,9 @@ const CreateProduct = () => {
 														<input
 															className="w-full pl-7 pr-3 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
 															id="price"
-															type="number"
-															step="0.01"
-															min="0.01"
+															type="text"
 															placeholder="0.00"
-															value={variant.price}
+															value={formatPrice(variant.price)}
 															onChange={(e) => handleVariantChange(index, e)}
 														/>
 													</div>
@@ -674,7 +678,7 @@ const CreateProduct = () => {
 															min="0"
 															max="100"
 															placeholder="0"
-															value={variant.discount}
+															value={product.discount}
 															onChange={(e) => handleVariantChange(index, e)}
 														/>
 														<div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -731,7 +735,7 @@ const CreateProduct = () => {
 							</button>
 						) : (
 							<button
-								type="button" onClick={(e)=>{handleSubmit(e)}}
+								type="button" onClick={(e)=>handleSubmit(e)}
 								className="px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
 							>
 								Create Product

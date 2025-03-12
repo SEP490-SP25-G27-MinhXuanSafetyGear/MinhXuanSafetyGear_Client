@@ -5,7 +5,6 @@ import "./style.css";
 const Cart = () => {
     const { cartItems, setCartItems } = useContext(CartContext);
     const [selectedItems, setSelectedItems] = useState([]);
-
     const handleQuantityChange = (id, delta) => {
         setCartItems((prevItems) =>
             prevItems.map((item) =>
