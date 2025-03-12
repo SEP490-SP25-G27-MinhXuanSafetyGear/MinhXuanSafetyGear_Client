@@ -33,11 +33,14 @@ const CartDropdown = () => {
                                 <div className="cart-item-details">
                                     <span className="cart-item-name">{item.name}</span>
                                     <span className="cart-item-variant">
-                                        {item.productVariants?.[0] && (
-                                        <p className="text-gray-500 text-sm">
-                                            {item.productVariants[0].size} / {item.productVariants[0].color}
-                                        </p>
-                                    )}</span>
+                                        {item.selectedVariant && (
+                                            <p className="text-gray-500 text-sm">
+                                                {item.selectedVariant.Size && item.selectedVariant.Color && (
+                                                    <span>{item.selectedVariant.Size} / {item.selectedVariant.Color}</span>
+                                                )}
+                                            </p>
+                                        )}
+                                    </span>
                                     <div className="cart-item-quantity">
                                         <button className="quantity-btn" onClick={() => handleQuantityChange(item.id, item.quantity - 1)}>
                                             <FontAwesomeIcon icon={faMinus} />
@@ -50,8 +53,7 @@ const CartDropdown = () => {
                                 </div>
                                 <div className="cart-item-price">
                                     {item.price.toLocaleString()}đ
-                                    <FontAwesomeIcon icon={faTimes} className="cart-item-remove" onClick={() => removeFromCart(item.id)} />
-                                </div>
+                                    <FontAwesomeIcon icon={faTimes} className="cart-item-remove" onClick={() => removeFromCart(item.id, item.selectedVariant)} />                                </div>
                             </div>
                         ))}
                     </>
