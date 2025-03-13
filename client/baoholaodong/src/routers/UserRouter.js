@@ -9,7 +9,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import Users from "../pages/manager/Users/Users";
 import { Orders } from "../pages/manager/OrderManager";
 import { CreateProduct, Products, UpdateProduct } from "../pages/manager/ProductManager";
-import BlogPosts from "../pages/manager/BlogManager/BlogPosts";
+import {UpdateBlogs,CreateBlogs, BlogPosts} from "../pages/manager/BlogManager";
 import Invoices from "../pages/manager/InvoiceManager/Invoices";
 import { Notifications } from "../pages/manager/NotificationManager";
 import Settings from "../pages/manager/Settings";
@@ -91,6 +91,8 @@ const UserRouter = () => {
                     <Route path="orders" element={<Orders />} />
                     <Route path="products" element={<Products />} />
                     <Route path="blog-posts" element={<BlogPosts />} />
+                    <Route path="createblogs" element={<CreateBlogs />} />
+                    <Route path="update-blog/:id" element={<UpdateBlogs />} />
                     <Route path="invoices" element={<Invoices />} />
                     <Route path="notifications" element={<Notifications />} />
                     <Route path="settings" element={<Settings />} />
