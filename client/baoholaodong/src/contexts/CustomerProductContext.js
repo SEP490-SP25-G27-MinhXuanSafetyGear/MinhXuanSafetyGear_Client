@@ -12,7 +12,7 @@ export const CustomerProductProvider =({ children }) => {
     const [groupCategories, setGroupCategories] = useState([]);
     const navigate = useNavigate();
     axios.interceptors.response.use(
-        (response) => response, // Nếu response thành công thì trả về bình thường
+        (response) => response, 
         (error) => {
             if (error.response) {
                 switch (error.response.status) {
