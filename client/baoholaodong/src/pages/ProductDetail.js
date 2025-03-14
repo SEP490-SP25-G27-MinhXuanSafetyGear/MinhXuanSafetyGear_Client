@@ -237,6 +237,10 @@ function ProductDetail() {
                                         src={product.productImages.length > 0 ? product.productImages[imageIndex].image : noImage}
                                         alt="Product"
                                         className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = noImage;
+                                        }}
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 gap-4">
@@ -246,6 +250,10 @@ function ProductDetail() {
                                                  src={img.image}
                                                  alt={`View ${index}`}
                                                  className="w-full h-full object-cover"
+                                                 onError={(e) => {
+                                                     e.target.onerror = null;
+                                                     e.target.src = noImage;
+                                                 }}
                                             />
                                         </div>
                                     )) : (

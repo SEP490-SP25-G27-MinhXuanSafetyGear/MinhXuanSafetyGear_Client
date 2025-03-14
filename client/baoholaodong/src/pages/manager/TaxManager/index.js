@@ -1,18 +1,32 @@
-﻿import React, { useContext } from "react";
+﻿import React, {useContext, useState} from "react";
 import { ProductContext } from "../../../contexts/AdminProductContext";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
+import Modal from "../../../components/Modal/Modal";
+import CreateTaxForm from "./CreateTaxeForm";
+import Loading from "../../../components/Loading/Loading";
+import UpdateTaxForm from "./UpdateTaxeForm";
 
 const Taxes = () => {
-    const { taxes } = useContext(ProductContext);
-
+    const { taxes,createTax,updateTax } = useContext(ProductContext);
+    const [isCreateModal,setIsCreateModal ] = useState(false);
+    const [isUpdateModal,setIsUpdateModal ] = useState(false);
+    const [isLoading,setIsLoading] = useState(false);
+    const [selectedTaxes,setSelectedTaxes] = useState({});
+    const handelClickUpdate=(tax)=>{
+        setSelectedTaxes(tax);
+        setIsUpdateModal(true);
+    }
     return (
         <div className="space-y-6">
+            <Loading isLoading={isLoading}/>
             <div className="bg-white rounded-lg shadow">
                 {/* Header */}
                 <div className="p-6 border-b flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-gray-800">Danh sách Thuế</h3>
-                    <button className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600">
+                    <button
+                        onClick={()=>setIsCreateModal(true)}
+                        className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600">
                         <Plus size={20} className="mr-2" />
                         Thêm thuế
                     </button>
@@ -39,7 +53,9 @@ const Taxes = () => {
                                     <td className="p-3 border">{tax.taxRate}%</td>
                                     <td className="p-3 border">{tax.description || "Không có mô tả"}</td>
                                     <td className="p-3 border text-center">
-                                        <button className="text-blue-500 hover:text-blue-700 mx-2">
+                                        <button
+                                            onClick={()=>handelClickUpdate(tax)}
+                                            className="text-blue-500 hover:text-blue-700 mx-2">
                                             <Edit size={18} />
                                         </button>
                                         <button className="text-red-500 hover:text-red-700">
@@ -57,6 +73,13 @@ const Taxes = () => {
                         <p>Không có thuế nào.</p>
                     </div>
                 )}
+
+                <Modal isOpen={isCreateModal} onClose={()=>{setIsCreateModal(false)}} title={'Create tax'}>
+                    <CreateTaxForm onCreate={createTax} onClose={()=>{setIsCreateModal(false)}} setLoading={setIsLoading} />
+                </Modal>
+                <Modal isOpen={isUpdateModal} onClose={()=>{setIsUpdateModal(false)}} title={'Update tax'}>
+                    <UpdateTaxForm tax={selectedTaxes} onUpdate={updateTax} onClose={()=>{setIsUpdateModal(false)}} setLoading={setIsLoading} />
+                </Modal>
             </div>
         </div>
     );

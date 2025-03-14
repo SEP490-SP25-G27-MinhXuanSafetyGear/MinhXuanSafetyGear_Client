@@ -93,7 +93,7 @@ const Register = () => {
                             type="text"
                             name="fullName"
                             value={formRegister.fullName}
-                            onChange={(e) => setFormRegister({...formRegister, fullName: e.target.value})}
+                            onChange={(e) => setFormRegister({...formRegister, name: e.target.value})}
                             placeholder="Họ và Tên"
                         />
                     </div>

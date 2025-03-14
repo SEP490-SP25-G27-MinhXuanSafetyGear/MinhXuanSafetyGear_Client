@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { KeyRound, ArrowLeft, Loader2, Eye, EyeOff, Clock } from 'lucide-react';
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const queryParams = new URLSearchParams(window.location.search);
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
@@ -19,7 +20,7 @@ function ResetPassword() {
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState('');
     const [isExpired, setIsExpired] = useState(false);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const timeStr = queryParams.get('time');
         if (timeStr) {
@@ -31,10 +32,10 @@ function ResetPassword() {
                 setIsExpired(true);
                 return;
             }
-
             setTimeLeft(difference);
+            navigate('/reset-password',{replace: true});
         }
-    }, []);
+    }, [navigate]);
 
     useEffect(() => {
         if (timeLeft <= 0) {

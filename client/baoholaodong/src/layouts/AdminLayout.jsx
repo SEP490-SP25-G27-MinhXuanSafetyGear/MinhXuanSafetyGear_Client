@@ -13,7 +13,8 @@ import {
     Menu,
     ChevronLeft,
     Boxes,
-    Percent
+    Percent,
+    Briefcase
 } from 'lucide-react';
 import {AuthContext} from "../contexts/AuthContext";
 const AdminLayout = () => {
@@ -24,6 +25,7 @@ const AdminLayout = () => {
     const navItems = useMemo(
         () => [
             { path: '/manager/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            {path: '/manager/employees',icon:Briefcase,label: 'Employee'},
             { path: '/manager/users', icon: Users, label: 'Users' },
             { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
             { path: '/manager/products', icon: Package, label: 'Products' },
