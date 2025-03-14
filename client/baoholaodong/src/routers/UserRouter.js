@@ -35,6 +35,9 @@ import Checkout from "../pages/Checkout";
 import ProductListByCategory from "../pages/ProductList/ProductListByCategory";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ForgotPassword/ResetPassword";
+import Employees from "../pages/manager/EmployeeManager";
+import CreateEmployee from "../pages/manager/EmployeeManager/CreateEmployee";
+import UpdateEmployee from "../pages/manager/EmployeeManager/UpdateEmployee";
 
 const UserRouter = () => {
     return (
@@ -88,6 +91,9 @@ const UserRouter = () => {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route index element={<Dashboard />} />
                     <Route path="users" element={<Users />} />
+                    <Route path="employees" element={<Employees />} />
+                    <Route path="create-employee" element={<CreateEmployee/>} />
+                    <Route path="update-employee" element={<UpdateEmployee />} />
                     <Route path="orders" element={<Orders />} />
                     <Route path="products" element={<Products />} />
                     <Route path="blog-posts" element={<BlogPosts />} />
