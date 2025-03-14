@@ -19,9 +19,10 @@ const ProductPopup = ({ product, onClose }) => {
     if (!product) return null;
 
     const handleAddToCart = () => {
-        const selectedVariant = product.productVariants.find(
-            variant => variant.size === selectedSize && variant.color === selectedColor
-        );
+        const selectedVariant = {
+            Size: selectedSize,
+            Color: selectedColor
+        };
         addToCart({ ...product, selectedVariant, quantity });
         onClose();
     };

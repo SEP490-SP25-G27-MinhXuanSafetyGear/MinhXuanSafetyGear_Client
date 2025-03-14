@@ -61,23 +61,23 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
         <>
             <header className={`header-gradient shadow ${isScrolled ? "scrolled" : ""}`}>
                 <div className="container mx-auto flex flex-col md:flex-row justify-between items-center py-4">
-                <div className="flex items-center w-full md:w-auto mb-4 md:mb-0">
-                    <button onClick={toggleSidebar} className="text-white mr-4">
-                        {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
-                        <span className="ml-2  md:inline">MENU</span>
-                    </button>
-                    <a href="/">
-                        <img alt="Company Logo" className="h-12 md:h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />
-                    </a>
-                    <div className="ml-4">
-                        <h1 className="text-lg md:text-xl font-bold text-white">
-                            BẢO HỘ LAO ĐỘNG MINH XUÂN
-                        </h1>
-                        <p className="text-xs md:text-sm text-white">
-                            Luôn đem lại an toàn và hoàn hảo nhất cho bạn!
-                        </p>
+                    <div className="flex items-center w-full md:w-auto mb-4 md:mb-0">
+                        <button onClick={toggleSidebar} className="text-white mr-4">
+                            {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
+                            <span className="ml-2  md:inline">MENU</span>
+                        </button>
+                        <a href="/">
+                            <img alt="Company Logo" className="h-12 md:h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />
+                        </a>
+                        <div className="ml-4">
+                            <h1 className="text-lg md:text-xl font-bold text-white">
+                                BẢO HỘ LAO ĐỘNG MINH XUÂN
+                            </h1>
+                            <p className="text-xs md:text-sm text-white">
+                                Luôn đem lại an toàn và hoàn hảo nhất cho bạn!
+                            </p>
+                        </div>
                     </div>
-                </div>
                     <div className="search-container w-full md:w-auto mx-4 md:mx-8 flex items-center">
                         <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
                         <form className="w-full" onSubmit={handleSearch}>
@@ -115,7 +115,14 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                                         className="h-8 w-8 rounded-full object-cover"
                                     />
                                 ) : (
-                                    <FaUser className="text-white h-6 w-6"/>
+                                    <FaUser
+                                        className="text-white h-6 w-6"
+                                        onClick={() => {
+                                            if (!user) {
+                                                navigate("/login");
+                                            }
+                                        }}
+                                    />
                                 )}
                                 <div className="ml-2">
                                     <p className="text-sm text-white">Thông tin</p>

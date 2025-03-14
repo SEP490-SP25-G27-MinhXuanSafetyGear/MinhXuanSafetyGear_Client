@@ -3,14 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import './style.css';
 import { AuthContext } from "../../contexts/AuthContext";
 import Loading from "../../components/Loading/Loading";
-import LoginGoogle from "./LoginGoogle";
 const clientId ="389645565421-f4i91jcfq910iulpmps1go62ounqbnt4.apps.googleusercontent.com";
 const Signin = () => {
     const [formSignin, setFormSignin] = useState({
         email: '',
         password: ''
     });
-    const { user,login ,setUser} = useContext(AuthContext);
+    const { user,login ,setUser,LoginGoogle} = useContext(AuthContext);
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);

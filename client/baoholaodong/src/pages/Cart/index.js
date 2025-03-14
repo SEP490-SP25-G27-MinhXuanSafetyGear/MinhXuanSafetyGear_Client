@@ -6,30 +6,31 @@ const Cart = () => {
     const { cartItems, setCartItems } = useContext(CartContext);
     const [selectedItems, setSelectedItems] = useState([]);
 
-    const handleQuantityChange = (id, delta) => {
+    const handleQuantityChange = (id, selectedVariant, delta) => {
         setCartItems((prevItems) =>
             prevItems.map((item) =>
-                item.id === id
+                item.id === id && JSON.stringify(item.selectedVariant) === JSON.stringify(selectedVariant)
                     ? { ...item, quantity: Math.max(1, item.quantity + delta) }
                     : item
             )
         );
     };
 
-    const handleRemove = (id) => {
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    const handleRemove = (id, selectedVariant) => {
+        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id || JSON.stringify(item.selectedVariant) !== JSON.stringify(selectedVariant)));
     };
 
-    const handleSelectItem = (id) => {
+    const handleSelectItem = (id, selectedVariant) => {
+        const itemKey = `${id}-${JSON.stringify(selectedVariant)}`;
         setSelectedItems((prevSelected) =>
-            prevSelected.includes(id)
-                ? prevSelected.filter((itemId) => itemId !== id)
-                : [...prevSelected, id]
+            prevSelected.includes(itemKey)
+                ? prevSelected.filter((key) => key !== itemKey)
+                : [...prevSelected, itemKey]
         );
     };
 
     const totalPrice = cartItems
-        .filter((item) => selectedItems.includes(item.id))
+        .filter((item) => selectedItems.includes(`${item.id}-${JSON.stringify(item.selectedVariant)}`))
         .reduce((total, item) => total + item.price * item.quantity, 0);
 
     return (
@@ -56,26 +57,28 @@ const Cart = () => {
                                 </thead>
                                 <tbody>
                                 {cartItems.map((item) => (
-                                    <tr key={item.id} className="border-b">
+                                    <tr key={`${item.id}-${JSON.stringify(item.selectedVariant)}`} className="border-b">
                                         <td className="p-2">
                                             <input
                                                 type="checkbox"
-                                                checked={selectedItems.includes(item.id)}
-                                                onChange={() => handleSelectItem(item.id)}
+                                                checked={selectedItems.includes(`${item.id}-${JSON.stringify(item.selectedVariant)}`)}
+                                                onChange={() => handleSelectItem(item.id, item.selectedVariant)}
                                             />
                                         </td>
                                         <td className="p-9 flex items-center gap-20">
                                             <img src={item.productImages?.[0]?.image || "/images/default.png"} alt={item.name} className="w-16 h-16" />
                                             <div>
                                                 <p className="font-semibold">{item.name}</p>
-                                                {item.productVariants?.[0] && (
+                                                {item.selectedVariant && (
                                                     <p className="text-gray-500 text-sm">
-                                                        {item.productVariants[0].size} / {item.productVariants[0].color}
+                                                        {item.selectedVariant.Size && item.selectedVariant.Color && (
+                                                            <span>{item.selectedVariant.Size} / {item.selectedVariant.Color}</span>
+                                                        )}
                                                     </p>
                                                 )}
                                                 <button
                                                     className="text-red-500 text-sm mt-1"
-                                                    onClick={() => handleRemove(item.id)}
+                                                    onClick={() => handleRemove(item.id, item.selectedVariant)}
                                                 >
                                                     Xóa
                                                 </button>
@@ -86,14 +89,14 @@ const Cart = () => {
                                             <div className="flex items-center">
                                                 <button
                                                     className="border px-2"
-                                                    onClick={() => handleQuantityChange(item.id, -1)}
+                                                    onClick={() => handleQuantityChange(item.id, item.selectedVariant, -1)}
                                                 >
                                                     -
                                                 </button>
                                                 <span className="mx-2">{item.quantity}</span>
                                                 <button
                                                     className="border px-2"
-                                                    onClick={() => handleQuantityChange(item.id, 1)}
+                                                    onClick={() => handleQuantityChange(item.id, item.selectedVariant, 1)}
                                                 >
                                                     +
                                                 </button>

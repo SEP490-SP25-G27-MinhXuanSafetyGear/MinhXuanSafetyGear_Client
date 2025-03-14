@@ -27,9 +27,6 @@ export const AdminProductProvider = ({ children }) => {
         (error) => {
             if (error.response) {
                 switch (error.response.status) {
-                    case 401:
-                        navigate("/login"); // Unauthorized
-                        break;
                     case 403:
                         navigate("/403"); // Forbidden
                         break;
@@ -103,6 +100,27 @@ export const AdminProductProvider = ({ children }) => {
 		}
 	}
 
+	const createTax = async (newTax)=>{
+		try{
+			const response = await axios.post(`${BASE_URL}/api/tax/create`, newTax);
+			const data = response.data;
+			setTaxes((prev)=>[...prev, data]);
+		}catch(error){
+			console.log(error.response);
+		}
+	}
+	const updateTax = async (tax) =>{
+		try{
+			const response = await axios.put(`${BASE_URL}/api/tax/update`, tax);
+			const updatedTax = response.data;
+
+			setTaxes((prev) =>
+				prev.map((item) => (item.taxId === updatedTax.taxId ? updatedTax : item))
+			);
+		}catch(error){
+
+		}
+	}
 	/** Thêm danh mục sản phẩm */
 	const createCategory = async (category) => {
 		try{
@@ -297,19 +315,15 @@ export const AdminProductProvider = ({ children }) => {
 			throw error;
 		}
 	}
-	useEffect(()=>{
-		const fetchReport = async () => {
-			try{
-				const response = await axios.get(`${BASE_URL}/api/Report`);
-				setReports(response.data);
-			}catch (error){
+	const fetchReport = async () => {
+		try{
+			const response = await axios.get(`${BASE_URL}/api/Report`);
+			setReports(response.data);
+		}catch (error){
 
-			}
 		}
-		if(reports === null){
-			fetchReport();
-		}
-	},[reports])
+	}
+
 	/** Gọi API khi thay đổi danh mục, trang hoặc kích thước trang */
 	useEffect(() => {
 		if (search === "") {
@@ -383,6 +397,9 @@ export const AdminProductProvider = ({ children }) => {
 				newProduct,
 				setNewProduct,
 				reports,
+				createTax,
+				updateTax,
+				fetchReport,
 			}}
 		>
 			{children}

@@ -8,9 +8,10 @@ import noImage from "../../../images/no-image-product.jpg";
 import { motion } from "framer-motion";
 import Modal from "../../../components/Modal/Modal";
 import {toSlug} from "../../../utils/SlugUtils";
+import {formatVND} from "../../../utils/format";
 const useQuery = () => new URLSearchParams(useLocation().search);
 // Component bảng sản phẩm, sử dụng React.memo để tránh re-render không cần thiết
-const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
+const ProductTable = React.memo(({ products, handleUpdate }) => {
 	const [selectImage, setSelectImage] = useState(null);
 	const [isOpenShowImage, setIsOpenShowImage] = useState(false);
 	const handelClickImage =(image)=>{
@@ -36,7 +37,7 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giảm giá</th>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cập nhât</th>
 					</tr>
 				</motion.thead>
 				<motion.tbody
@@ -65,8 +66,8 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 								{name}
 							</td>
 
-							<td className="px-6 py-4 whitespace-nowrap text-sm">{price.toLocaleString("vi-VN")} đ</td>
-							<td className="px-6 py-4 whitespace-nowrap text-sm">{priceDiscount.toLocaleString("vi-VN")} đ</td>
+							<td className="px-6 py-4 whitespace-nowrap text-sm">{formatVND(price)}</td>
+							<td className="px-6 py-4 whitespace-nowrap text-sm">{formatVND(priceDiscount)}</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{discount}%</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{quantity}</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -81,9 +82,6 @@ const ProductTable = React.memo(({ products, handleUpdate, handleDelete }) => {
 							<td className="px-6 py-4 whitespace-nowrap text-sm flex space-x-2">
 								<button className="p-2 text-blue-600 hover:bg-blue-50 rounded" onClick={() => handleUpdate(id)}>
 									<Edit className="w-5 h-5" />
-								</button>
-								<button className="p-2 text-red-600 hover:bg-red-50 rounded" onClick={() => handleDelete(id)}>
-									<Trash2 className="w-5 h-5" />
 								</button>
 							</td>
 						</motion.tr>
@@ -100,11 +98,7 @@ const Products = () => {
 	const { products, loading,groupCategories,selectedGroup,setSelectGroup, search, setSearch ,currentPage,setCurrentPage,totalPages} = useContext(ProductContext);
 	const handleCreate = () => navigate("/manager/createproduct");
 	const handleUpdate = (id) => navigate(`/manager/update-product/${id}/slug`);
-	const handleDelete = (id) => {
-		if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-			console.log("Xóa sản phẩm có ID:", id);
-		}
-	};
+
 	useEffect(() => {
 		if (selectedGroup) {
 			setCurrentPage(1);
@@ -172,8 +166,7 @@ const Products = () => {
 						</div>
 					) : (
 						<div className="overflow-x-auto">
-							<ProductTable products={memoizedProducts} handleUpdate={handleUpdate}
-										  handleDelete={handleDelete}/>
+							<ProductTable products={memoizedProducts} handleUpdate={handleUpdate}/>
 						</div>
 					)}
 				</div>

@@ -178,9 +178,14 @@
     transition: color 0.3s ease;
 
 }
+.cart-item-variant {
+    font-size: 12px; /* Smaller font size */
+    color: #b0b0b0; /* Light gray color */
+    display: block; /* Ensure it appears on a new line */
+}
 
 .checkout-button:hover .checkout-button-text {
-    color: #b50a00;
+    color: gold;
     animation: slideIn 0.3s forwards;
 }
 

@@ -12,28 +12,42 @@ export const AdminUserContextProvider = ({ children }) => {
         totalPages: 0,
         items: []
     });
-
-    const fetchUser = useCallback(async (role) => {
+    const [pageEmployee, setPageEmployee] = useState({
+        currentPage: 1,
+        pageSize: 10,
+        totalItems: 0,
+        totalPages: 0,
+        items: []
+    });
+    const pushEmployee = (emp) => {
+        setPageEmployee((prev) => ({
+            ...prev,
+            items: [...prev.items, emp], // Thêm nhân viên mới vào danh sách
+            totalItems: prev.totalItems + 1, // Cập nhật tổng số nhân viên
+        }));
+    };
+    const fetchUser = useCallback(async (role, setState) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/User/get-users`, {
                 params: {
-                    page: pageUser.currentPage,
-                    size: pageUser.pageSize,
+                    page: 1, // Reset về trang 1 khi fetch lại
+                    size: 10,
                     role: role
                 }
             });
-            setPageUsers(prev => ({ ...prev, ...response.data }));
+            setState(response.data);
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu người dùng:", error);
+            console.error(`Lỗi khi lấy dữ liệu ${role}:`, error);
         }
-    }, [pageUser.currentPage, pageUser.pageSize]);
+    }, []);
 
     useEffect(() => {
-        fetchUser("Customer");
+        fetchUser("Customer", setPageUsers);
+        fetchUser("Employee", setPageEmployee);
     }, [fetchUser]);
 
     return (
-        <UserContext.Provider value={{ pageUser }}>
+        <UserContext.Provider value={{ pageUser, pageEmployee,pushEmployee }}>
             {children}
         </UserContext.Provider>
     );

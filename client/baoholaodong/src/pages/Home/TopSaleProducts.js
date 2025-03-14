@@ -13,7 +13,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const productsPerPage = 10;
+    const productsPerPage = 30;
     const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
     const totalPages = Math.ceil(products.length / productsPerPage);
     const navigate = useNavigate();
@@ -116,7 +116,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
             <div className="flex justify-center mt-4">
                 <div className="new-blog-read-more">
                     <button className="new-blog-read-more-button">
-                        <div className="new-blog-read-more-text">Xem tất cả <FaArrowRight className="inline" /></div>
+                        <div className="new-blog-read-more-text">Xem tất cả   <FaArrowRight className="inline" /></div>
                     </button>
                 </div>
             </div>

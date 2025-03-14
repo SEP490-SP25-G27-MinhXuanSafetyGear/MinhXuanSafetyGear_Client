@@ -33,9 +33,10 @@ import {
 import './style.css';
 import {ProductContext} from "../../../contexts/AdminProductContext";
 import Loading from "../../../components/Loading/Loading";
-
+import axios from "axios";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 const Dashboard = () => {
-    const {reports} = useContext(ProductContext)
+    const {reports,fetchReport} = useContext(ProductContext)
     const [salesData, setSalesData] = useState([]);
     const [productData, setProductData] = useState([]);
     const [categoryData, setCategoryData] = useState([]);
@@ -46,7 +47,12 @@ const Dashboard = () => {
         totalProducts: 0,
         totalRevenue: 0
     });
-useEffect(()=>{
+    useEffect(()=>{
+        if(reports === null){
+            fetchReport();
+        }
+    },[reports])
+    useEffect(()=>{
     if(reports !== null){
         const revenuce = reports.revenues || [];
         const topSaleproduct = reports.topSaleproduct || [];
@@ -101,7 +107,6 @@ useEffect(()=>{
             default: return 'text-gray-600';
         }
     };
-
     return (
         <>
             {reports === null ? (

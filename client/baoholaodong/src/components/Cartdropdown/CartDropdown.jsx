@@ -7,11 +7,11 @@ import { CartContext } from "../../contexts/CartContext";
 const CartDropdown = () => {
     const { cartItems, removeFromCart, updateCartItemQuantity } = useContext(CartContext);
 
-    const handleQuantityChange = (itemId, newQuantity) => {
+    const handleQuantityChange = (itemId, selectedVariant, newQuantity) => {
         if (newQuantity > 0) {
             updateCartItemQuantity(itemId, newQuantity);
         } else {
-            removeFromCart(itemId);
+            removeFromCart(itemId, selectedVariant);
         }
     };
 
@@ -32,11 +32,20 @@ const CartDropdown = () => {
                                 <img src={item.productImages?.[0]?.image || "/images/default.png"} alt={item.name} className="cart-item-image" />
                                 <div className="cart-item-details">
                                     <span className="cart-item-name">{item.name}</span>
+                                    <span className="cart-item-variant">
+                                        {item.selectedVariant && (
+                                            <p className="text-gray-500 text-sm">
+                                                {item.selectedVariant.Size && item.selectedVariant.Color && (
+                                                    <span>{item.selectedVariant.Size} / {item.selectedVariant.Color}</span>
+                                                )}
+                                            </p>
+                                        )}
+                                    </span>
                                     <div className="cart-item-quantity">
-                                        <button className="quantity-btn" onClick={() => handleQuantityChange(item.id, item.quantity - 1)}>
+                                        <button className="quantity-btn" onClick={() => handleQuantityChange(item.id, item.selectedVariant, item.quantity - 1)}>
                                             <FontAwesomeIcon icon={faMinus} />
                                         </button>
-                                        <button className="quantity-btn" onClick={() => handleQuantityChange(item.id, item.quantity + 1)}>
+                                        <button className="quantity-btn" onClick={() => handleQuantityChange(item.id, item.selectedVariant, item.quantity + 1)}>
                                             <FontAwesomeIcon icon={faPlus} />
                                         </button>
                                         <span className="quantity-value">{item.quantity}</span>
@@ -44,7 +53,7 @@ const CartDropdown = () => {
                                 </div>
                                 <div className="cart-item-price">
                                     {item.price.toLocaleString()}đ
-                                    <FontAwesomeIcon icon={faTimes} className="cart-item-remove" onClick={() => removeFromCart(item.id)} />
+                                    <FontAwesomeIcon icon={faTimes} className="cart-item-remove" onClick={() => removeFromCart(item.id, item.selectedVariant)} />
                                 </div>
                             </div>
                         ))}
@@ -63,8 +72,8 @@ const CartDropdown = () => {
                             <span className="total-label">Tổng tiền:</span>
                             <span className="total-price">{totalPrice.toLocaleString()}đ</span>
                         </div>
-                        <button className="new-blog-read-more-button">
-                            <a href="/checkout" className="new-blog-read-more-text">THANH TOÁN</a>
+                        <button className="checkout-button">
+                            <a href="/checkout" className="checkout-button-text">THANH TOÁN</a>
                         </button>
                     </div>
                 </div>

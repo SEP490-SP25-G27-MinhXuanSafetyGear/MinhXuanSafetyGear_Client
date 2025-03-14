@@ -13,17 +13,19 @@ import {
     Menu,
     ChevronLeft,
     Boxes,
-    Percent
+    Percent,
+    Briefcase
 } from 'lucide-react';
 import {AuthContext} from "../contexts/AuthContext";
 const AdminLayout = () => {
     const {user,logout} = useContext(AuthContext);
     const location = useLocation();
     const navigate = useNavigate();
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const navItems = useMemo(
         () => [
             { path: '/manager/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            {path: '/manager/employees',icon:Briefcase,label: 'Employee'},
             { path: '/manager/users', icon: Users, label: 'Users' },
             { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
             { path: '/manager/products', icon: Package, label: 'Products' },
@@ -85,7 +87,8 @@ const AdminLayout = () => {
             </div>
             
             <div className="flex-1 overflow-auto">
-                <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+                <header
+                    className={`bg-white shadow-sm fixed top-0 left-${isCollapsed ? '16' : '64'} w-[calc(100%-${isCollapsed ? '4rem' : '16rem'})] z-10 transition-all duration-300`}>
                     <div className="flex items-center justify-between px-6 py-4">
                         <h2 className="text-xl font-semibold text-gray-800">
                             {navItems.find((item) => location.pathname.includes(item.path))?.label}
@@ -105,10 +108,11 @@ const AdminLayout = () => {
                         </div>
                     </div>
                 </header>
-                
-                <main className="pt-20 p-6">
+
+                <main className=" transition-all duration-300 pt-20 p-6">
                     <Outlet />
                 </main>
+
             </div>
         </div>
     );
