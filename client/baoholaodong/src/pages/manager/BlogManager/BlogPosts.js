@@ -1,151 +1,146 @@
-﻿import React, { useContext, useState } from "react";
-import { FaRegFrown } from "react-icons/fa";
+﻿import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import { BlogPostContext } from "../../../contexts/BlogPostContext";
-import { Edit, Trash2, Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {Edit, Trash2, Plus, CheckCircle, Delete} from "lucide-react";
 import Loading from "../../../components/Loading/Loading";
-
+import {motion} from "framer-motion";
+import {FaRegFrown} from "react-icons/fa";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 const BlogPosts = () => {
+  const { blogPosts,setBlogPosts, loading, categories,fetchCategories } = useContext(BlogPostContext);
+  const memoizedBlogPosts = useMemo(() => blogPosts, [blogPosts]);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(8);
+  const [categorySelected, setCategorySelected] = useState(0);
   const navigate = useNavigate();
-  const { blogPosts, loading, categories, search, setSearch } = useContext(BlogPostContext);
-
-  const handleCreate = () => navigate("/manager/createblogs");
-  const handleUpdate = (id) => navigate(`/manager/updateblog/${id}`);
-  const handleDelete = (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-      console.log("Xóa bài viết có ID:", id);
+  useEffect(() => {
+    if(categories.length ===0){
+      fetchCategories();
     }
-  };
-
-  // Phân trang theo cách cũ của bạn
-  const itemsPerPage = 5; // Số bài viết mỗi trang
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPosts = blogPosts.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(blogPosts.length / itemsPerPage);
-
+    if(blogPosts.length === 0 ){
+      fetchBlogPosts();
+    }
+    if(categorySelected){
+      fetchBlogPosts();
+    }
+  }, [categories.length,blogPosts.length,categorySelected]);
+  const fetchBlogPosts = useCallback( async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-page`, {
+        params: { categoryId: categorySelected, page:page, size:size }
+      });
+      setBlogPosts(response.data.items);
+    } catch (error) {
+      console.error("Lỗi khi tải bài viết:", error.response?.data || error.message);
+    } finally {
+    }
+  },[categorySelected,page,size]);
+  const handelUpdate =(id)=>{
+    navigate('/manager/update-blog/'+id);
+  }
   return (
-    <div className="p-6 bg-white rounded-lg shadow">
-      <Loading isLoading={loading} />
+      <div className="space-y-6">
+        <div className="bg-white min-h-[800px] rounded-lg shadow">
+          <Loading isLoading={loading}/>
+          <div className="p-6 border-b flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-800">Danh sách blog</h3>
+            <div className="flex space-x-4">
+              <input
+                  type="text"
+                  placeholder="Tìm kiếm sản phẩm..."
+                  className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+              <select
+                  className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={categorySelected}
+                  onChange={(e) => setCategorySelected(e.target.value)}
+              >
+                <option  value={0}>
+                  {'All'}
+                </option>
+                {categories.map(({id,name},index) => (
+                    <option key={index} value={id}>
+                      {name}
+                    </option>
+                ))}
+              </select>
+              <button
+                  onClick={()=>window.location.href="create-blog"}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center">
+                <Plus className="w-5 h-5 mr-2"/>
+                Thêm bai viet
+              </button>
+            </div>
+          </div>
 
-      {/* Header */}
-      <div className="flex justify-between items-center pb-4 border-b">
-        <h3 className="text-lg font-semibold text-gray-800">Danh sách bài viết</h3>
-        <div className="flex space-x-4">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            type="text"
-            placeholder="Tìm kiếm bài viết..."
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
-            onClick={handleCreate}
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Thêm bài viết
-          </button>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-left">Tiêu đề</th>
-              <th className="border px-4 py-2 text-left">Nội dung</th>
-              <th className="border px-4 py-2 text-left">Ảnh</th>
-              <th className="border px-4 py-2 text-left">Thể loại</th>
-              <th className="border px-4 py-2 text-left">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
+          <div className="p-6">
             {loading ? (
-              <tr>
-                <td colSpan="5" className="text-center py-6">Đang tải...</td>
-              </tr>
-            ) : currentPosts.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500 flex items-center justify-center">
-                  <FaRegFrown className="text-gray-500 w-6 h-6 mr-2" />
-                  Không có bài viết nào
-                </td>
-              </tr>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {Array.from({length: 4}).map((_, index) => (
+                      <div key={index} className="animate-pulse bg-gray-200 h-48 rounded-lg"></div>
+                  ))}
+                </div>
+            ) : memoizedBlogPosts.length === 0 ? (
+                <div className="flex justify-center items-center">
+                  <FaRegFrown className="text-gray-500 w-12 h-12"/>
+                  <span className="text-gray-500 ml-4">Không có sản phẩm nào</span>
+                </div>
             ) : (
-              currentPosts.map(({ id, title, content, ImageURL, categoryBlogId }) => {
-                const imageUrl = ImageURL || "https://via.placeholder.com/100";
-                const categoryObj = categories.find(cat => cat.categoryBlogId === categoryBlogId);
-                const categoryName = categoryObj ? categoryObj.categoryName : "Chưa có thể loại";
-
-                return (
-                  <tr key={id} className="hover:bg-gray-50">
-                    <td className="border px-4 py-2">{title}</td>
-                    <td className="border px-4 py-2">{content || "Không có nội dung"}</td>
-                    <td className="border px-4 py-2">
-                      <img src={imageUrl} alt={title} className="w-16 h-16 object-cover rounded-md" />
-                    </td>
-                    <td className="border px-4 py-2">{categoryName}</td>
-                    <td className="border px-4 py-2 flex space-x-2">
-                      <button
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                        onClick={() => handleUpdate(id)}
-                      >
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      <button
-                        className="p-2 text-red-600 hover:bg-red-50 rounded"
-                        onClick={() => handleDelete(id)}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
+                <div className="overflow-x-auto">
+                  <BlogPostTable blogPosts={memoizedBlogPosts} handelUpdate={handelUpdate} />
+                </div>
             )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination (cách cũ của bạn) */}
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 border rounded-md mx-1 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
-          >
-            ← Trước
-          </button>
-
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentPage(index + 1)}
-              className={`px-4 py-2 border rounded-md mx-1 ${
-                currentPage === index + 1 ? "bg-blue-500 text-white" : "hover:bg-gray-100"
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 border rounded-md mx-1 ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
-          >
-            Tiếp →
-          </button>
+          </div>
         </div>
-      )}
-    </div>
+      </div>
   );
 };
+const BlogPostTable = React.memo(({ blogPosts=[],handelUpdate }) => {
 
+  return (
+      <table className="min-w-full divide-y divide-gray-200">
+              <motion.thead>
+                <tr >
+                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
+                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên đề tài</th>
+                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nội dung</th>
+                </tr>
+              </motion.thead>
+              <motion.tbody
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+                  }}>
+                {blogPosts.map(({ postId, title,status }, index) => (
+                    <motion.tr
+                        key={postId}
+                        variants={{
+                          hidden: { opacity: 0, y: 0 },
+                          visible: { opacity: 1, y: 0 },
+                        }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        className="border-b bg-white divide-y divide-gray-200 hover:bg-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        {index+1}
+                      </td>
+                      <td className="px-6 py-4 text-sm truncate max-w-[150px]">
+                        {title}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">{status}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm flex space-x-2">
+                        <button
+                            onClick={()=> handelUpdate(postId)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded" >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                      </td>
+                    </motion.tr>
+                ))}
+              </motion.tbody>
+            </table>
+  );
+});
 export default BlogPosts;
