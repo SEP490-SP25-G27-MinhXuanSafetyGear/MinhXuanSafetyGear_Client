@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import './style.css';
 
 const Contact = () => {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        message: ""
+    });
+
+    const [submissionStatus, setSubmissionStatus] = useState(null);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Xử lý dữ liệu form ở đây (ví dụ: gửi dữ liệu đến API)
+        console.log("Form Data Submitted:", formData);
+        setSubmissionStatus("Form submitted successfully!");
+        setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            message: ""
+        });
+    };
+
     return (
-        <div className="contact-page"> {/* Thêm lớp cha cụ thể */}
+        <div className="contact-page" id="yourElementId">
             <div className="contact-container">
                 <div className="contact-grid">
                     {/* Left Column - Contact Form */}
@@ -31,26 +61,42 @@ const Contact = () => {
 
                         <div className="contact-form-container">
                             <h3 className="form-title">GỬI THẮC MẮC CHO CHÚNG TÔI</h3>
-                            <form className="contact-form">
+                            <form className="contact-form" onSubmit={handleSubmit}>
                                 <input
                                     type="text"
+                                    name="name"
                                     placeholder="Họ và tên"
                                     className="form-input"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
                                 />
                                 <input
                                     type="email"
+                                    name="email"
                                     placeholder="Email"
                                     className="form-input"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    required
                                 />
                                 <input
                                     type="tel"
+                                    name="phone"
                                     placeholder="Điện thoại"
                                     className="form-input"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    required
                                 />
                                 <textarea
+                                    name="message"
                                     placeholder="Nội dung"
                                     rows={4}
                                     className="form-textarea"
+                                    value={formData.message}
+                                    onChange={handleInputChange}
+                                    required
                                 />
                                 <button
                                     type="submit"
@@ -59,6 +105,7 @@ const Contact = () => {
                                     Gửi tin nhắn
                                 </button>
                             </form>
+                            {submissionStatus && <p className="submission-status">{submissionStatus}</p>}
                         </div>
                     </div>
 

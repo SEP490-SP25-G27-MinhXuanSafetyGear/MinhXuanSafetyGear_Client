@@ -23,14 +23,14 @@ const CustomerInfo = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Xử lý dữ liệu form ở đây
         console.log(formData);
     };
 
     return (
-        <div className="customer-info-page"> {/* Thêm lớp cha cụ thể */}
+        <div className="customer-info-page">
             <div className="customer-info">
-                <h1>Thông Tin Khách Hàng</h1>
+                <h1>THÔNG TIN KHÁCH HÀNG</h1>
+                <p className="subtitle">Vui lòng điền đầy đủ thông tin đặt hàng</p>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Họ và tên</label>
@@ -112,7 +112,6 @@ const CustomerInfo = () => {
                             <option value="">Chọn tỉnh/thành phố</option>
                             <option value="Hanoi">Hà Nội</option>
                             <option value="HCM">Hồ Chí Minh</option>
-                            {/* Thêm các tỉnh/thành phố khác tại đây */}
                         </select>
                     </div>
                     <button type="submit">Xác nhận thông tin</button>

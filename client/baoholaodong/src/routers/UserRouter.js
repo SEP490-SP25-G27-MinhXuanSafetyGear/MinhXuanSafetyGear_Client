@@ -70,7 +70,7 @@ const UserRouter = () => {
                     <Route path="/verification" element={<VerificationPage />} />
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/contact" element={<Contact />} />
-                    <Route path="/customer-info" element={<CustomerInfo />} />
+                    <Route path="/customerInfo" element={<CustomerInfo />} />
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
                     <Route path="/category/:categoryId" element={<ProductListByCategory />} />
                 </Route>
