@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
                     user.imageUrl = decodedToken.picture;
                     setUser(user);
                     Cookies.set("user", JSON.stringify(user), { expires: 1 });
-                    if(res.data.role === "Admin"){
+                    if(user.role ==='Admin' || user.role === 'Manager'){
                         navigate("/manager");
                     }else{
                         navigate("/");

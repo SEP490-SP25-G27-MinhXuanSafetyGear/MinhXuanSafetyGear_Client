@@ -18,9 +18,9 @@ const Signin = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            var result = await login(formSignin.email, formSignin.password);
+            let result = await login(formSignin.email, formSignin.password);
             setUser(result);
-            if(result.role ==='Admin'){
+            if(result.role ==='Admin' || result.role === 'Manager'){
                 navigate('/manager');
             }else if(result.role ==='Customer'){
                 localStorage.setItem("welcomeBack", "true");

@@ -1,57 +1,44 @@
-﻿import React, { useState, useEffect, useContext } from 'react';
-import { SquarePen, Eye } from 'lucide-react';
+﻿import React, {useState, useEffect, useContext, useCallback} from 'react';
+import {SquarePen, Eye, Plus} from 'lucide-react';
 import { OrderContext } from '../../../contexts/OrderContext';
 import Modal from "../../../components/Modal/Modal";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const Orders = () => {
 	const [isOpenImage, setIsOpenImage] = useState(false);
 	const [image, setImage] = useState('');
 	const [orders, setOrders] = useState([]);
-	const { getAllOrders, getInvoiceImage, updateOrderStatus } = useContext(OrderContext);
+	const navigate = useNavigate();
 	useEffect(() => {
-		const fetchOrders = async () => {
-			try {
-				const data = await getAllOrders();
-				setOrders(data);
-			} catch (error) {
-				console.error("Error fetching orders:", error);
-			}
-		};
-
-		fetchOrders();
-	}, [getAllOrders]);
-	const handleViewInvoice = async (orderId) => {
-		try {
-			const response = await getInvoiceImage(orderId);
-			if (!response) {
-				setImage('');
-				setIsOpenImage(true);
-				return;
-			}
-			setImage(`data:image/jpeg;base64,${response.imageBase64}`);
-			setIsOpenImage(true);
-		} catch (error) {
-			setImage('');
+		if(orders.length === 0){
+			getAllOrders();
 		}
-	}
-
-	const handleUpdateOrderStatus = async (orderId) => {
+	},[orders.length] );
+	const getAllOrders = async () => {
 		try {
-			const isConfirmed = window.confirm('Xác nhận thay đổi trạng thái đơn hàng?');
-			if (isConfirmed) {
-				await updateOrderStatus(orderId);
-				const updatedOrders = await getAllOrders();
-				setOrders(updatedOrders);
-			}
+			const response = await axios.get(`${BASE_URL}/api/Order/getall-orders`);
+			setOrders(response.data);
 		} catch (error) {
-			console.error("Error updating order:", error);
+			console.error("Lỗi khi lấy đơn hàng:", error.response?.data || error.message);
 		}
 	};
-
+	const handleCreate =()=>{
+		navigate("/manager/create-order");
+	}
 	return (
 		<div className="bg-white rounded-lg shadow">
-			<div className="p-6 border-b">
+			<div className="flex p-6 border-b justify-between">
 				<h3 className="text-lg font-semibold text-gray-800">Orders Management</h3>
+				<div className="flex space-x-4">
+					<button
+						className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
+						onClick={handleCreate}>
+						<Plus className="w-5 h-5 mr-2"/>
+						Tạo đơn hàng
+					</button>
+				</div>
 			</div>
 			<div className="p-6">
 				<div className="overflow-x-auto">
@@ -79,7 +66,7 @@ const Orders = () => {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{orders.map((order) => (
+							{ orders.length >0 && orders.map((order) => (
 								<tr key={order.orderId}>
 									<td className="px-6 py-4 whitespace-nowrap">
 										<div className="text-sm text-gray-900">{order.orderId}</div>
@@ -101,10 +88,10 @@ const Orders = () => {
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<button className="text-blue-600 hover:text-blue-900 mr-4">
-											<Eye onClick={() => handleViewInvoice(order.orderId)} className="h-5 w-5" />
+											<Eye  className="h-5 w-5" />
 										</button>
 										<button className="text-blue-600 hover:text-blue-900">
-											<SquarePen onClick={() => handleUpdateOrderStatus(order.orderId)} className="h-5 w-5" />
+											<SquarePen  className="h-5 w-5" />
 										</button>
 									</td>
 								</tr>

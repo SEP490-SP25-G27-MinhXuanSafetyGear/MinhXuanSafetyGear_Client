@@ -26,6 +26,15 @@ export const AdminUserContextProvider = ({ children }) => {
             totalItems: prev.totalItems + 1, // Cập nhật tổng số nhân viên
         }));
     };
+    const updateListEmployee = (emp) => {
+        setPageEmployee((prev) => ({
+            ...prev,
+            items: prev.items.map((e) =>
+                e.id === emp.id ? emp : e
+            ),
+        }));
+    };
+
     const fetchUser = useCallback(async (role, setState) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/User/get-users`, {

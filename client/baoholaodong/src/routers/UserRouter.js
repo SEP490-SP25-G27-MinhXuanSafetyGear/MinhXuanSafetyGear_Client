@@ -38,6 +38,7 @@ import ResetPassword from "../pages/ForgotPassword/ResetPassword";
 import Employees from "../pages/manager/EmployeeManager";
 import CreateEmployee from "../pages/manager/EmployeeManager/CreateEmployee";
 import UpdateEmployee from "../pages/manager/EmployeeManager/UpdateEmployee";
+import CreateOrder from "../pages/manager/OrderManager/CreateOrder";
 
 const UserRouter = () => {
     return (
@@ -88,16 +89,19 @@ const UserRouter = () => {
                         </AdminProductProvider>
                     }
                 >
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route index element={<Dashboard />} />
+                    <Route
+                        path="dashboard"
+                        element={<PrivateRoute element={<Dashboard />} roleRequired={['Admin']} />}
+                    />
                     <Route path="users" element={<Users />} />
                     <Route path="employees" element={<Employees />} />
                     <Route path="create-employee" element={<CreateEmployee/>} />
                     <Route path="update-employee" element={<UpdateEmployee />} />
                     <Route path="orders" element={<Orders />} />
+                    <Route path="create-order" element={<CreateOrder />} />
                     <Route path="products" element={<Products />} />
                     <Route path="blog-posts" element={<BlogPosts />} />
-                    <Route path="createblogs" element={<CreateBlogs />} />
+                    <Route path="create-blog" element={<CreateBlogs />} />
                     <Route path="update-blog/:id" element={<UpdateBlogs />} />
                     <Route path="invoices" element={<Invoices />} />
                     <Route path="notifications" element={<Notifications />} />

@@ -22,22 +22,34 @@ const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const navItems = useMemo(
-        () => [
-            { path: '/manager/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-            {path: '/manager/employees',icon:Briefcase,label: 'Employee'},
-            { path: '/manager/users', icon: Users, label: 'Users' },
-            { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
-            { path: '/manager/products', icon: Package, label: 'Products' },
-            { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
-            { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
-            { path: '/manager/invoices', icon: Receipt, label: 'Invoices' },
-            { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
-            { path: '/manager/taxes', icon: Percent, label: 'Taxes' }, // Thêm mục Taxes
-            { path: '/manager/settings', icon: Settings, label: 'Settings' },
-        ],
-        []
-    );
+    const navItems = useMemo(() => {
+        if (user.role === 'Admin') {
+            return [
+                { path: '/manager/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+                {path: '/manager/employees',icon:Briefcase,label: 'Employee'},
+                { path: '/manager/users', icon: Users, label: 'Users' },
+                { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
+                { path: '/manager/products', icon: Package, label: 'Products' },
+                { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
+                { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
+                { path: '/manager/invoices', icon: Receipt, label: 'Invoices' },
+                { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
+                { path: '/manager/taxes', icon: Percent, label: 'Taxes' }, // Thêm mục Taxes
+                { path: '/manager/settings', icon: Settings, label: 'Settings' },
+            ];
+        } else if (user.role === 'Manager') {
+            return [
+                { path: '/manager/employees', icon: Briefcase, label: 'Employee' },
+                { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
+                { path: '/manager/products', icon: Package, label: 'Products' },
+                { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
+                { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
+                { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
+                { path: '/manager/settings', icon: Settings, label: 'Settings' },
+            ];
+        }
+    }, [user.role]);
+
 
 
     return (

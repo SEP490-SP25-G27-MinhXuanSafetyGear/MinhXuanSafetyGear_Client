@@ -11,37 +11,6 @@ export const CustomerProductProvider =({ children }) => {
     const [hubConnection, setHubConnection] = useState(null);
     const [groupCategories, setGroupCategories] = useState([]);
     const navigate = useNavigate();
-    axios.interceptors.response.use(
-        (response) => response, 
-        (error) => {
-            if (error.response) {
-                switch (error.response.status) {
-                    case 401:
-                        navigate("/login"); // Unauthorized
-                        break;
-                    case 403:
-                        navigate("/403"); // Forbidden
-                        break;
-                    case 404:
-                        navigate("/404"); // Not Found
-                        break;
-                    case 500:
-                        navigate("/500"); // Internal Server Error
-                        break;
-                    case 503:
-                        navigate("/503"); // Service Unavailable
-                        break;
-                    default:
-                        break;
-                }
-            } else if (error.request) {
-                navigate("/503"); // Có thể điều hướng đến trang "Không có kết nối mạng"
-            } else {
-                console.error("Lỗi không xác định:", error.message);
-            }
-            return Promise.reject(error);
-        }
-    );
     const searchProduct = async (value) => {
         try {
             const response = await axios.get(`${BASE_URL}/api/Product/search-product`, {

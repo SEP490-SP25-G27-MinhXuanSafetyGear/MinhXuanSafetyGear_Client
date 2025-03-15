@@ -21,36 +21,6 @@ export const AdminProductProvider = ({ children }) => {
 	const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
 	const [reports, setReports] = useState(null);
-    // Thiết lập Axios Interceptors để bắt lỗi 500
-    axios.interceptors.response.use(
-        (response) => response, // Nếu response thành công thì trả về bình thường
-        (error) => {
-            if (error.response) {
-                switch (error.response.status) {
-                    case 403:
-                        navigate("/403"); // Forbidden
-                        break;
-                    case 404:
-                        navigate("/404"); // Not Found
-                        break;
-                    case 500:
-                        navigate("/500"); // Internal Server Error
-                        break;
-                    case 503:
-                        navigate("/503"); // Service Unavailable
-                        break;
-                    default:
-                        break;
-                }
-            } else if (error.request) {
-                console.error("Không có phản hồi từ server:", error.request);
-                navigate("/offline"); // Có thể điều hướng đến trang "Không có kết nối mạng"
-            } else {
-                console.error("Lỗi không xác định:", error.message);
-            }
-            return Promise.reject(error);
-        }
-    );
 	/** Lấy danh sách sản phẩm */
 	const fetchProducts = useCallback(async () => {
 		//setLoading(true);
