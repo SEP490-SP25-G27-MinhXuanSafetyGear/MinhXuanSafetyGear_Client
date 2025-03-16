@@ -10,11 +10,11 @@ export default function TopDealProducts({ products = [] }) {
     const { addToCart } = useContext(CartContext);
 
     const scrollLeft = () => {
-        scrollRef.current.scrollBy({ left: -500, behavior: "smooth" });
+        scrollRef.current.scrollBy({ left: -350, behavior: "smooth" });
     };
 
     const scrollRight = () => {
-        scrollRef.current.scrollBy({ left: 500, behavior: "smooth" });
+        scrollRef.current.scrollBy({ left: 350, behavior: "smooth" });
     };
 
     const handleProductClick = (product) => {
@@ -55,9 +55,9 @@ export default function TopDealProducts({ products = [] }) {
                                 <h3 className="product-discounted-name">{product.name}</h3>
                                 <div className="product-discounted-prices">
                                     <p className="product-discount-price">
-                                        {product.price - product.discount}
+                                        {(product.price - product.discount).toLocaleString()}đ
                                     </p>
-                                    <p className="product-original-price">{product.price}</p>
+                                    <p className="product-original-price">{product.price.toLocaleString()}đ</p>
                                 </div>
                                 <p className="product-discount-percentage"> Giảm {product.discount} %</p>
                                 {product.productVariants && product.productVariants.length > 0 ? (

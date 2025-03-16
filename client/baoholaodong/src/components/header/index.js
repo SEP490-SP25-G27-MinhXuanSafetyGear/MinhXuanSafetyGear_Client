@@ -133,7 +133,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                                 </div>
                             </div>
                             <div
-                                className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                className="absolute right-0 mt-2 w-48 bg-white border  shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
                                 {user? (
                                     <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
                                         xuất</a>
