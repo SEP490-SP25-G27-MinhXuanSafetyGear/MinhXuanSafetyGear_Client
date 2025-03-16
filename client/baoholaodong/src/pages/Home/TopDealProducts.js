@@ -1,18 +1,20 @@
-﻿import React, { useRef, useState } from "react";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+﻿import React, { useRef, useState, useContext } from "react";
+import { FaArrowRight, FaArrowLeft, FaCog, FaCartPlus } from "react-icons/fa";
 import './TopDealProductsStyle.css';
 import ProductPopup from "../../components/productpopup";
+import { CartContext } from "../../contexts/CartContext";
 
-export default function TopDealProducts({products=[]}) {
+export default function TopDealProducts({ products = [] }) {
     const scrollRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const { addToCart } = useContext(CartContext);
 
     const scrollLeft = () => {
-        scrollRef.current.scrollBy({ left: -200, behavior: "smooth" });
+        scrollRef.current.scrollBy({ left: -500, behavior: "smooth" });
     };
 
     const scrollRight = () => {
-        scrollRef.current.scrollBy({ left: 200, behavior: "smooth" });
+        scrollRef.current.scrollBy({ left: 500, behavior: "smooth" });
     };
 
     const handleProductClick = (product) => {
@@ -21,6 +23,13 @@ export default function TopDealProducts({products=[]}) {
 
     const handleClosePopup = () => {
         setSelectedProduct(null);
+    };
+
+    const handleAddToCart = (product) => {
+        addToCart({
+            ...product,
+            quantity: 1
+        });
     };
 
     return (
@@ -45,11 +54,21 @@ export default function TopDealProducts({products=[]}) {
                             <div className="product-discounted-details">
                                 <h3 className="product-discounted-name">{product.name}</h3>
                                 <div className="product-discounted-prices">
-                                    <p className="product-discount-price">{product.priceDiscount}</p>
+                                    <p className="product-discount-price">
+                                        {product.price - product.discount}
+                                    </p>
                                     <p className="product-original-price">{product.price}</p>
                                 </div>
-                                <p className="product-discount-percentage">{product.discount}</p>
-                                <button className="option-button" onClick={() => handleProductClick(product)}>Tùy chọn</button>
+                                <p className="product-discount-percentage"> Giảm {product.discount} %</p>
+                                {product.productVariants && product.productVariants.length > 0 ? (
+                                    <button className="option-button" onClick={() => handleProductClick(product)}>
+                                        <FaCog className="icon" /> Tùy chọn
+                                    </button>
+                                ) : (
+                                    <button className="option-button" onClick={() => handleAddToCart(product)}>
+                                        <FaCartPlus className="icon" /> Thêm vào giỏ hàng
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))}
