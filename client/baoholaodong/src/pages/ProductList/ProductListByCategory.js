@@ -85,7 +85,7 @@ const ProductListCategory = () => {
         <div className="product-list-page">
             <h1 className="page-title">{}</h1>
             <div className="banner">
-                <img src="https://bhld.net/wp-content/uploads/2015/01/banner-mu-bhld-1.jpg" alt="Banner" />
+                <img src="https://img.freepik.com/premium-photo/personal-protective-equipment-safety-banner-with-place-text_106035-3441.jpg" alt="Banner" />
             </div>
             <div className="content">
                 <div className="filter-section">
