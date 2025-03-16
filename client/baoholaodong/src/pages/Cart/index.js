@@ -47,8 +47,8 @@ const Cart = () => {
                 quantity: item.quantity,
                 price: item.price,
                 image: item.image,
-                size: item.selectedVariant?.Size || null,
-                color: item.selectedVariant?.Color || null
+                size: item.selectedVariant?.size || null,
+                color: item.selectedVariant?.color || null
             }))
         };
         navigate('/confirm-order', {state: orderPayload});
@@ -91,8 +91,8 @@ const Cart = () => {
                                                 <p className="font-semibold">{item.name}</p>
                                                 {item.selectedVariant && (
                                                     <p className="text-gray-500 text-sm">
-                                                        {item.selectedVariant.Size && item.selectedVariant.Color && (
-                                                            <span>{item.selectedVariant.Size} / {item.selectedVariant.Color}</span>
+                                                        {item.selectedVariant.size && item.selectedVariant.color && (
+                                                            <span>{item.selectedVariant.size} / {item.selectedVariant.color}</span>
                                                         )}
                                                     </p>
                                                 )}

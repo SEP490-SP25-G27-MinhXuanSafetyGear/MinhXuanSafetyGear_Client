@@ -35,8 +35,8 @@ const CartDropdown = () => {
                                     <span className="cart-item-variant">
                                         {item.selectedVariant && (
                                             <p className="text-gray-500 text-sm">
-                                                {item.selectedVariant.Size && item.selectedVariant.Color && (
-                                                    <span>{item.selectedVariant.Size} / {item.selectedVariant.Color}</span>
+                                                {item.selectedVariant.size && item.selectedVariant.color && (
+                                                    <span>{item.selectedVariant.size} / {item.selectedVariant.color}</span>
                                                 )}
                                             </p>
                                         )}
