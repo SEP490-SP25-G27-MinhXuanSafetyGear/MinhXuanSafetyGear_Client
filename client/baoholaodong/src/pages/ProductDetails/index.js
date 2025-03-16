@@ -159,6 +159,8 @@ function ProductDetail() {
                 selectedVariant,
                 quantity
             });
+        } else {
+            alert("Không tìm thấy biến thể sản phẩm phù hợp");
         }
     };
 

@@ -20,8 +20,8 @@ const ProductPopup = ({ product, onClose }) => {
 
     const handleAddToCart = () => {
         const selectedVariant = {
-            Size: selectedSize,
-            Color: selectedColor
+            size: selectedSize,
+            color: selectedColor
         };
         addToCart({ ...product, selectedVariant, quantity });
         onClose();
