@@ -87,7 +87,9 @@ const Orders = () => {
 										{order.totalAmount}
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-										<button className="text-blue-600 hover:text-blue-900 mr-4">
+										<button
+											onClick={()=>navigate(`/manager/order-detail/${order.orderId}`)}
+											className="text-blue-600 hover:text-blue-900 mr-4">
 											<Eye  className="h-5 w-5" />
 										</button>
 										<button className="text-blue-600 hover:text-blue-900">

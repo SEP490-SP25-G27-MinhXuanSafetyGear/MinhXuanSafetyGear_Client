@@ -39,6 +39,8 @@ import Employees from "../pages/manager/EmployeeManager";
 import CreateEmployee from "../pages/manager/EmployeeManager/CreateEmployee";
 import UpdateEmployee from "../pages/manager/EmployeeManager/UpdateEmployee";
 import CreateOrder from "../pages/manager/OrderManager/CreateOrder";
+import OrderDetail from "../pages/manager/OrderManager/OrderDetail";
+import {ConfirmOrder} from "../pages/ConfirmOrder";
 
 const UserRouter = () => {
     return (
@@ -74,6 +76,7 @@ const UserRouter = () => {
                     <Route path="/customerInfo" element={<CustomerInfo />} />
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
                     <Route path="/category/:categoryId" element={<ProductListByCategory />} />
+                    <Route path="confirm-order" element={<ConfirmOrder />} />
                 </Route>
 
                 {/* Admin Routes */}
@@ -99,6 +102,7 @@ const UserRouter = () => {
                     <Route path="update-employee" element={<UpdateEmployee />} />
                     <Route path="orders" element={<Orders />} />
                     <Route path="create-order" element={<CreateOrder />} />
+                    <Route path="order-detail/:id" element={<OrderDetail/>} />
                     <Route path="products" element={<Products />} />
                     <Route path="blog-posts" element={<BlogPosts />} />
                     <Route path="create-blog" element={<CreateBlogs />} />

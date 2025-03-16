@@ -4,6 +4,7 @@ import noImage from "../../../images/no-image-product.jpg";
 import { formatVND } from "../../../utils/format";
 import {Trash2, Plus, Minus, ShoppingCart, Truck, Package, Shield} from "lucide-react";
 import Modal from "../../../components/Modal/Modal";
+import Loading from "../../../components/Loading/Loading";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
@@ -12,11 +13,14 @@ export default function CreateOrder() {
     const [searchText, setSearchText] = useState("");
     const [productSelected, setProductSelected] = useState(null);
     const [isOpenModal, setIsOpenModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [order, setOrder] = useState({
-        customerName: "",
-        address: "",
-        phone: "",
-        email: "",
+        customerId: null,
+        customerName: null,
+        customerPhone: null,
+        customerEmail: null,
+        customerAddress: null,
+        paymentMethod: null,
         orderDetails: []
     });
 
@@ -60,11 +64,49 @@ export default function CreateOrder() {
             return { ...prevOrder, orderDetails: newOrderDetails };
         });
     };
-
+    const handleInputChange =(e)=>{
+        const { name, value } = e.target;
+        setOrder((prevOrder) => ({
+            ...prevOrder,
+            [name]: value
+        }))
+    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if(!order.customerPhone || !order.customerEmail || !order.customerAddress || !order.customerAddress) {
+            return;
+        }
+        const newOrder = {
+            customerId: null,
+            customerName: order.customerName,
+            customerEmail: order.customerEmail,
+            customerPhone: order.customerPhone,
+            paymentMethod: order.paymentMethod,
+            customerAddress: order.customerAddress,
+            orderDetails: order.orderDetails.map(({ productId, quantity,size,color }) => ({
+                productId,
+                quantity,
+                size,
+                color,
+            }))
+        };
+        setIsLoading(true);
+        try{
+            const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder);
+            alert("Tạo đơn hàng thành công");
+            window.location.href = "orders";
+            console.log(newOrder);
+        }catch(err){
+            alert('Lỗi không đặt được hàng');
+        }finally{
+            setIsLoading(false);
+        }
+    }
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6 bg-white min-h-[800px]">
                 {/* Left Side: Product Search */}
+                <Loading isLoading={isLoading}/>
                 <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-lg">
                     <h2 className="text-2xl font-bold mb-4">Search Products</h2>
                     <div className="mb-4">
@@ -111,7 +153,59 @@ export default function CreateOrder() {
 
                 {/* Right Side: Order Items */}
                 <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-lg">
-                    <h2 className="text-2xl font-bold mb-4">Order Items</h2>
+                    <div className='flex flex-col md:flex-row items-center justify-between gap-6'>
+                        <h2 className="text-2xl font-bold">Customer Information</h2>
+                        <button
+                            onClick={(e)=>handleSubmit(e)}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">Tạo đơn hàng</button>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2">Customer Name</label>
+                        <input
+                            className="w-full p-2 border rounded"
+                            name="customerName"
+                            value={order.customerName}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                        <input
+                            className="w-full p-2 border rounded"
+                            name="customerPhone"
+                            value={order.customerPhone}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2">Email</label>
+                        <input
+                            className="w-full p-2 border rounded"
+                            name="customerEmail"
+                            value={order.customerEmail}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2">Address</label>
+                        <input
+                            className="w-full p-2 border rounded"
+                            name="customerAddress"
+                            value={order.customerAddress}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold mb-2">Payment Method</label>
+                        <input
+                            className="w-full p-2 border rounded"
+                            name="paymentMethod"
+                            value={order.paymentMethod}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+
                     <div className="space-y-4">
                         {order.orderDetails.length > 0 ? order.orderDetails.map((item, index) => (
                             <div key={item.productId} className="p-4 border rounded-lg flex items-center gap-4">
