@@ -1,11 +1,12 @@
 ﻿import React, { useContext, useState } from "react";
 import { CartContext } from "../../contexts/CartContext";
 import "./style.css";
+import {useNavigate} from "react-router-dom";
 
 const Cart = () => {
     const { cartItems, setCartItems } = useContext(CartContext);
     const [selectedItems, setSelectedItems] = useState([]);
-
+    const navigate = useNavigate();
     const handleQuantityChange = (id, selectedVariant, delta) => {
         setCartItems((prevItems) =>
             prevItems.map((item) =>
@@ -32,7 +33,26 @@ const Cart = () => {
     const totalPrice = cartItems
         .filter((item) => selectedItems.includes(`${item.id}-${JSON.stringify(item.selectedVariant)}`))
         .reduce((total, item) => total + item.price * item.quantity, 0);
-
+    const handelOrder =()=>{
+        const orderPayload = {
+            customerId: 0,
+            customerName: "",
+            customerPhone:  "",
+            customerEmail:  "",
+            customerAddress: "",
+            paymentMethod: "Cash",
+            orderDetails: cartItems.filter(item => selectedItems.includes(`${item.id}-${JSON.stringify(item.selectedVariant)}`)).map(item => ({
+                productId: item.id,
+                productName: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                image: item.image,
+                size: item.selectedVariant?.Size || null,
+                color: item.selectedVariant?.Color || null
+            }))
+        };
+        navigate('/confirm-order', {state: orderPayload});
+    }
     return (
         <div className="cart-page">
             <div className="cart-page-content">
@@ -132,7 +152,7 @@ const Cart = () => {
                                     <div className="small-light-text">Được tính tại trang thanh toán</div>
                                 </div>
                             </div>
-                            <a href="/checkout" className="cart-summary-button">Thanh toán</a>
+                            <button onClick={()=>handelOrder()} className="cart-summary-button">Thanh toán</button>
                             <a href="/" className="cart-summary-button continue">Tiếp tục mua hàng</a>
                         </div>
                     </div>
@@ -143,3 +163,4 @@ const Cart = () => {
 };
 
 export default Cart;
+
