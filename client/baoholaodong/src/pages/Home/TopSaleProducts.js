@@ -8,7 +8,6 @@ import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
 import slugify from "slugify";
 
-
 const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -97,11 +96,11 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                             <div className="product-price">
                                 {product.discount > 0 ? (
                                     <>
-                                        <span className="text-red-500">{product.price - product.discount}</span>
-                                        <span className="text-gray-400 line-through ml-2">{product.price}</span>
+                                        <span className="text-red-500">{(product.price - product.discount).toLocaleString()}đ</span>
+                                        <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
                                     </>
                                 ) : (
-                                    <span>{product.price}</span>
+                                    <span>{product.price.toLocaleString()}đ</span>
                                 )}
                             </div>
                             <div className="product-actions">
