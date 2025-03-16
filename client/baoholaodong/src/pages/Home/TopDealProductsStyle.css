@@ -177,6 +177,8 @@
     background-color: yellow; /* Change background color to yellow on hover */
 }
 
+
+
 .view-all-button {
     position: relative;
     width: 200px;
@@ -268,9 +270,15 @@
         scroll-behavior: smooth; /* Smooth scrolling */
     }
 
-    .product-card {
-        width: 80%; /* Adjust the width of product cards on mobile */
-        margin: 0 10px; /* Add margin between product cards */
+    .product-discounted-card {
+        width: 70%; /* Adjust the width of product cards on mobile */
+        margin-left: 15%; /* Center the product cards */
+    }
+
+    .product-discounted-name {
+        white-space: normal; /* Allow text to wrap */
+        font-size: 16px; /* Adjust font size for better balance */
+        text-align: center; /* Center align the text */
     }
 
     .navigate-button-container {
@@ -288,6 +296,5 @@
     .deal-title-text {
         font-size: 24px;
         line-height: 36px;
-
     }
 }

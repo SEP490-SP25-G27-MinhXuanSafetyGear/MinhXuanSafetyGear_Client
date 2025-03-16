@@ -4,12 +4,14 @@ import {CustomerProductContext} from "../contexts/CustomerProductContext";
 import {useNavigate, useParams} from "react-router-dom";
 import * as signalR from "@microsoft/signalr";
 import {toSlug} from "../utils/SlugUtils";
+import { CartContext } from "../contexts/CartContext"; // Import CartContext
 import noImage from "../images/no-image-product.jpg";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 function ProductDetail() {
     const { slug, id } = useParams();
+    const { addToCart } = useContext(CartContext); // Add addToCart function
     const { getProductById,fetchRelatedProducts,fetchReviewProduct } = useContext(CustomerProductContext);
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
@@ -223,6 +225,20 @@ function ProductDetail() {
         };
     }, [isLoading, product, slug, id, navigate]);
 
+
+    const handleAddToCart = () => {
+        const selectedVariant = product.productVariants.find(variant => variant.size === selectedSize && variant.color === selectedColor);
+        if (selectedVariant) {
+            addToCart({
+                ...product,
+                selectedVariant,
+                quantity
+            });
+        } else {
+            alert("Please select a valid size and color.");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -288,7 +304,7 @@ function ProductDetail() {
                                 </div>
 
                                 <div className="space-y-4">
-                                    {product.productVariants.length>0 &&(
+                                    {product.productVariants.length > 0 && (
                                         <div>
                                             <h3 className="text-sm font-medium text-gray-900">Kích thước</h3>
                                             <div className="mt-2 grid grid-cols-4 gap-2">
@@ -308,7 +324,7 @@ function ProductDetail() {
                                             </div>
                                         </div>
                                     )}
-                                    {product.productVariants.length>0 &&(
+                                    {product.productVariants.length > 0 && (
                                         <div>
                                             <h3 className="text-sm font-medium text-gray-900">Màu sắc</h3>
                                             <div className="mt-2 grid grid-cols-4 gap-2">
@@ -328,7 +344,6 @@ function ProductDetail() {
                                             </div>
                                         </div>
                                     )}
-
                                 </div>
 
                                 <div className="space-y-4">
@@ -357,7 +372,10 @@ function ProductDetail() {
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
-                                        <button className="flex items-center justify-center px-6 py-3 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50">
+                                        <button
+                                            className="flex items-center justify-center px-6 py-3 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50"
+                                            onClick={handleAddToCart} // Add onClick handler
+                                        >
                                             <ShoppingCart className="w-5 h-5 mr-2" />
                                             Thêm vào giỏ
                                         </button>
