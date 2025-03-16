@@ -18,7 +18,7 @@ import React from "react";
 import CustomerLayout from "../layouts/CustomerLayout";
 import Cart from "../pages/Cart";
 import ProductList from "../pages/ProductList";
-import ProductDetail from "../pages/ProductDetail";
+import ProductDetail from "../pages/ProductDetails";
 import { CustomerProductProvider } from "../contexts/CustomerProductContext";
 import { BlogPostProvider } from "../contexts/BlogPostContext";
 import { AdminProductProvider } from "../contexts/AdminProductContext";
