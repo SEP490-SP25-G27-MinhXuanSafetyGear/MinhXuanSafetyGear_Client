@@ -23,10 +23,6 @@ const Banner = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
     };
 
-    const prevSlide = () => {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
-    };
-
     useEffect(() => {
         const interval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
         return () => clearInterval(interval); // Clear interval on component unmount
@@ -34,7 +30,6 @@ const Banner = () => {
 
     return (
         <div className="banner-main">
-            <button className="prev" onClick={prevSlide}>❮</button>
             {banners.map((banner, index) => (
                 <a href={banner.link} key={index}>
                     <img
@@ -44,7 +39,6 @@ const Banner = () => {
                     />
                 </a>
             ))}
-            <button className="next" onClick={nextSlide}>❯</button>
         </div>
     );
 };
