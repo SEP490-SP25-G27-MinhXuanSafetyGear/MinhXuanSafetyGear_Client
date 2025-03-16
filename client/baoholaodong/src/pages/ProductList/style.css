@@ -174,33 +174,6 @@
     cursor: not-allowed;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .product-list {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 992px) {
-    .product-list {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .content {
-        flex-direction: column;
-    }
-
-    .filter-section {
-        margin-right: 0;
-        margin-bottom: 20px;
-    }
-
-    .product-list {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
 .group-container {
     position: relative;
     padding: 8px;
@@ -225,8 +198,87 @@
     color: #ff5722; /* Màu khi hover */
 }
 
-@media (max-width: 480px) {
+
+/* Mobile Styles */
+@media (max-width: 767px) {
+    .product-list-page {
+        padding: 10px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        text-align: center;
+    }
+
+    .banner {
+        height: 200px;
+    }
+
+    .filter-section {
+        display: none; /* Ẩn bộ lọc trên mobile */
+    }
+
+    .product-section {
+        flex: 1;
+    }
+
     .product-list {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+
+    }
+
+    .product-list-item {
+        display: block;
+        height: 100%;
+        padding-bottom: 20px;
+        position: relative;
+    }
+
+    .add-to-cart-button-product-list {
+        height: 35px;
     }
 }
+
+/* Tablet Styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .product-list-page {
+        padding: 15px;
+    }
+
+    .page-title {
+        font-size: 32px;
+        text-align: center;
+    }
+
+    .banner {
+        height: 250px;
+    }
+
+    .filter-section {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .product-section {
+        flex: 2;
+    }
+
+    .product-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .product-list-item {
+        padding: 8px;
+    }
+
+    .add-to-cart-button-product-list {
+        height: 38px;
+    }
+}
+
+
+
+
+
