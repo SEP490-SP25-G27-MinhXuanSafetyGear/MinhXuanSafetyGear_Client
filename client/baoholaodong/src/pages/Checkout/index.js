@@ -4,7 +4,8 @@ import { OrderContext } from '../../contexts/OrderContext';
 import Loading from "../../components/Loading/Loading";
 import './style.css';
 import { useNavigate } from "react-router-dom";
-
+import * as signalR from "@microsoft/signalr";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 const Checkout = () => {
     const navigate = useNavigate();
     const bankName = 'tpb';
@@ -16,6 +17,7 @@ const Checkout = () => {
     const [isRequired, setIsRequired] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [userId, setUserId] = useState(null);
+    const [hubConnection, setHubConnection] = useState(null);
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
@@ -47,7 +49,41 @@ const Checkout = () => {
             setUserId(null);
         }
     }, []);
+    useEffect(() => {
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl(`${BASE_URL}/invoiceHub`)
+            .withAutomaticReconnect()
+            .build();
 
+        newConnection.start().then(() => {
+                console.log("Kết nối đến SignalR thành công!");
+            }).catch((err) => console.error("Lỗi kết nối SignalR:", err));
+
+        setHubConnection(newConnection);
+
+        return () => {
+            if (newConnection) {
+                newConnection.stop();
+            }
+        };
+    }, []);
+
+    const handleConfirmOrder = async () => {
+        try {
+            setIsLoading(true);
+            if (hubConnection) {
+                await hubConnection.invoke("SendInvoiceUpdate", `Đơn hàng của ${userId} đã được xác nhận.`);
+            }
+            setTimeout(() => {
+                setIsLoading(false);
+                clearCart();
+                navigate("/order-success");
+            }, 2000);
+        } catch (error) {
+            console.error("Lỗi khi xác nhận đơn hàng:", error);
+            setIsLoading(false);
+        }
+    };
     return (
         <div className="checkout-page">
             <Loading isLoading={isLoading} />
@@ -97,6 +133,9 @@ const Checkout = () => {
                             />
                         </div>
                     </div>
+                    <button className="confirm-button" onClick={handleConfirmOrder}>
+                        Xác nhận đơn hàng
+                    </button>
                 </div>
             </div>
         </div>
