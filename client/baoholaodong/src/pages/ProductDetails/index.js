@@ -332,6 +332,8 @@ function ProductDetail() {
                 <span className="text-gray-700 font-medium">{product.name}</span>
             </div>
 
+
+
             {/* Main Product Card */}
             <div className="pd-card">
                 {isLoading ? (
