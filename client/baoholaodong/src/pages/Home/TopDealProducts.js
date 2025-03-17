@@ -3,11 +3,14 @@ import { FaArrowRight, FaArrowLeft, FaCog, FaCartPlus } from "react-icons/fa";
 import './TopDealProductsStyle.css';
 import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
+import { useNavigate } from "react-router-dom";
+import slugify from "slugify";
 
 export default function TopDealProducts({ products = [] }) {
     const scrollRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const { addToCart } = useContext(CartContext);
+    const navigate = useNavigate();
 
     const scrollLeft = () => {
         scrollRef.current.scrollBy({ left: -350, behavior: "smooth" });
@@ -32,6 +35,11 @@ export default function TopDealProducts({ products = [] }) {
         });
     };
 
+    const handleDetailProduct = (product) => {
+        const slug = slugify(product.name, { lower: true, strict: true });
+        navigate(`/product/${product.id}/${slug}`);
+    };
+
     return (
         <div className="deal">
             <div className="container flex">
@@ -50,7 +58,13 @@ export default function TopDealProducts({ products = [] }) {
                 <div ref={scrollRef} className="flex overflow-x-auto space-x-4 product-container">
                     {products.map((product) => (
                         <div key={product.id} className="product-discounted-card">
-                            <img src={product.image} alt={product.name} className="product-discounted-image" />
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                className="product-discounted-image"
+                                onClick={() => handleDetailProduct(product)}
+                                style={{ cursor: 'pointer' }}
+                            />
                             <div className="product-discounted-details">
                                 <h3 className="product-discounted-name">{product.name}</h3>
                                 <div className="product-discounted-prices">

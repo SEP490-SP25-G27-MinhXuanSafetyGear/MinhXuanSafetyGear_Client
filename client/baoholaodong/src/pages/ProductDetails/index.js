@@ -321,11 +321,11 @@ function ProductDetail() {
         <div className="pd-container">
             {/* Breadcrumb */}
             <div className="flex items-center text-sm text-gray-500 mb-4">
-                <a href="/" className="hover:text-blue-600">
+                <a href="/" className="hover:text-red-600">
                     Trang chủ
                 </a>
                 <ChevronRight className="w-4 h-4 mx-1" />
-                <a href="/products" className="hover:text-blue-600">
+                <a href="/products" className="hover:text-red-600">
                     Sản phẩm
                 </a>
                 <ChevronRight className="w-4 h-4 mx-1" />
