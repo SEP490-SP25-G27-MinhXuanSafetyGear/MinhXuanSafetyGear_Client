@@ -1,21 +1,53 @@
-﻿import React, {useState, useEffect, useContext, useCallback} from 'react';
-import {SquarePen, Eye, Plus} from 'lucide-react';
-import { OrderContext } from '../../../contexts/OrderContext';
+﻿import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { SquarePen, Eye, Plus } from 'lucide-react';
 import Modal from "../../../components/Modal/Modal";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+import { useNavigate } from "react-router-dom";
+import * as signalR from "@microsoft/signalr";
 
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 const Orders = () => {
 	const [isOpenImage, setIsOpenImage] = useState(false);
 	const [image, setImage] = useState('');
 	const [orders, setOrders] = useState([]);
 	const navigate = useNavigate();
+
+	const connectToHub = useCallback(() => {
+		const connection = new signalR.HubConnectionBuilder()
+			.withUrl(`${BASE_URL}/orderHub`)
+			.withAutomaticReconnect()
+			.build();
+
+		connection.start().then(() => {
+			console.log("Connected to SignalR Hub");
+		})
+			.catch((err) => console.error("SignalR Connection Error:", err));
+
+
+		connection.on("NewOrderCreated", (newOrder) => {
+			console.log("New Order Received:", newOrder);
+			setOrders((prevOrders) => [newOrder, ...prevOrders]);
+		});
+
+		connection.on("NewOrderReceived", (orderId) => {
+			console.log("Order Confirmed:", orderId);
+			getAllOrders();
+		});
+
+		return connection;
+	}, []);
 	useEffect(() => {
-		if(orders.length === 0){
+		if (orders.length === 0) {
 			getAllOrders();
 		}
-	},[orders.length] );
+
+		const hubConnection = connectToHub();
+
+		return () => {
+			hubConnection.stop();
+		};
+	}, [orders.length, connectToHub]);
+
 	const getAllOrders = async () => {
 		try {
 			const response = await axios.get(`${BASE_URL}/api/Order/getall-orders`);
@@ -24,7 +56,19 @@ const Orders = () => {
 			console.error("Lỗi khi lấy đơn hàng:", error.response?.data || error.message);
 		}
 	};
-	const handleCreate =()=>{
+	const formatDate = (dateString) => {
+		const date = new Date(dateString);
+		const hours = String(date.getHours()).padStart(2, '0');
+		const minutes = String(date.getMinutes()).padStart(2, '0');
+		const seconds = String(date.getSeconds()).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const year = date.getFullYear();
+
+		return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
+	};
+
+	const handleCreate = () => {
 		navigate("/manager/create-order");
 	}
 	return (
@@ -35,7 +79,7 @@ const Orders = () => {
 					<button
 						className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
 						onClick={handleCreate}>
-						<Plus className="w-5 h-5 mr-2"/>
+						<Plus className="w-5 h-5 mr-2" />
 						Tạo đơn hàng
 					</button>
 				</div>
@@ -66,7 +110,7 @@ const Orders = () => {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{ orders.length >0 && orders.map((order) => (
+							{orders.length > 0 && orders.map((order) => (
 								<tr key={order.orderId}>
 									<td className="px-6 py-4 whitespace-nowrap">
 										<div className="text-sm text-gray-900">{order.orderId}</div>
@@ -76,7 +120,7 @@ const Orders = () => {
 										<div className="text-sm text-gray-500">{order.email}</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="text-sm text-gray-900">{order.orderDate}</div>
+										<div className="text-sm text-gray-900">{formatDate(order.orderDate)}</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
 										<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -88,12 +132,12 @@ const Orders = () => {
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<button
-											onClick={()=>navigate(`/manager/order-detail/${order.orderId}`)}
+											onClick={() => navigate(`/manager/order-detail/${order.orderId}`)}
 											className="text-blue-600 hover:text-blue-900 mr-4">
-											<Eye  className="h-5 w-5" />
+											<Eye className="h-5 w-5" />
 										</button>
 										<button className="text-blue-600 hover:text-blue-900">
-											<SquarePen  className="h-5 w-5" />
+											<SquarePen className="h-5 w-5" />
 										</button>
 									</td>
 								</tr>
