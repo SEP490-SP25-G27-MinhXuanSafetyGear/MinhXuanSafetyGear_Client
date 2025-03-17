@@ -23,6 +23,7 @@ import { toSlug } from "../../utils/SlugUtils"
 import "./style.css"
 import axios from "axios";
 import { marked } from "marked";
+import {Markdown} from "../../components/Markdown/markdown-editor";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
 function ProductDetail() {
@@ -520,7 +521,9 @@ function ProductDetail() {
                                     <div className="pd-description-content">
                                         <div className="pd-description-column">
                                             <h3 className="pd-subtitle">Mô tả sản phẩm</h3>
-                                            <div className="pd-text-content" dangerouslySetInnerHTML={{ __html: marked(product.description) }} />
+                                            <div className="pd-text-content" >
+                                                <Markdown content={product.description} />
+                                            </div>
 
                                             <h3 className="pd-subtitle mt-6">Chất liệu</h3>
                                             <div className="pd-text-content">
@@ -535,10 +538,8 @@ function ProductDetail() {
                                             </div>
 
                                             <h3 className="pd-subtitle mt-6">Chứng nhận chất lượng</h3>
-                                            <div className="pd-text-content">
-                                                {product.qualityCertificate.split("\n").map((cert, index) => (
-                                                    <p key={index}>{cert}</p>
-                                                ))}
+                                            <div className="pd-text-content" >
+                                                <Markdown content={product.qualityCertificate} />
                                             </div>
                                         </div>
                                     </div>

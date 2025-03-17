@@ -1,5 +1,4 @@
 ﻿import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Cookies from "js-cookie";
 import {useNavigate} from "react-router-dom";

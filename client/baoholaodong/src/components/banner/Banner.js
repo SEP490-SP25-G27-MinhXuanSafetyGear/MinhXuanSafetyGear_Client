@@ -26,7 +26,7 @@ const Banner = () => {
     useEffect(() => {
         const interval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
         return () => clearInterval(interval); // Clear interval on component unmount
-    }, []);
+    }, [nextSlide]);
 
     return (
         <div className="banner-main">
