@@ -1,11 +1,12 @@
 ﻿import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export default function OrderDetail() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -92,9 +93,14 @@ export default function OrderDetail() {
                         >
                             {updating ? "Đang xử lý..." : "Hủy đơn hàng"}
                         </button>
+                        <button
+                            onClick={() => navigate("/manager/orders")}
+                            className="px-5 py-2 font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition"
+                        >
+                            Trở về danh sách
+                        </button>
                     </div>
                 </div>
-
                 {/* Bên phải - Danh sách sản phẩm */}
                 <div className="bg-gray-50 p-6 rounded-lg shadow">
                     <h3 className="text-xl font-semibold mb-4">Chi tiết sản phẩm</h3>

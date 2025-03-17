@@ -1,67 +1,37 @@
-﻿import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SquarePen, Eye, Plus } from 'lucide-react';
 import Modal from "../../../components/Modal/Modal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import * as signalR from "@microsoft/signalr";
-
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+
 const Orders = () => {
 	const [isOpenImage, setIsOpenImage] = useState(false);
 	const [image, setImage] = useState('');
 	const [orders, setOrders] = useState([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
 	const navigate = useNavigate();
-
-	const connectToHub = useCallback(() => {
-		const connection = new signalR.HubConnectionBuilder()
-			.withUrl(`${BASE_URL}/orderHub`)
-			.withAutomaticReconnect()
-			.build();
-		connection.start().then(() => {
-			console.log("Connected to SignalR Hub");
-		})
-			.catch((err) => console.error("SignalR Connection Error:", err));
-		connection.on("NewOrderCreated", (newOrder) => {
-			console.log("New Order Received:", newOrder);
-			setOrders((prevOrders) => [newOrder, ...prevOrders]);
-		});
-		connection.on("NewOrderReceived", (orderId) => {
-			console.log("Order Confirmed:", orderId);
-			getAllOrders();
-		});
-		return connection;
-	}, []);
 	useEffect(() => {
-		if (orders.length === 0) {
-			getAllOrders();
-		}
-	}, [orders.length, connectToHub]);
-
-	useEffect(() => {
-		const hubConnection = connectToHub();
-		return () => {
-			hubConnection.stop();
+		const fetchOrders = async () => {
+			try {
+				const response = await axios.get(`${BASE_URL}/api/Order/get-page-orders`, {
+					params: {
+						page: currentPage,
+						pageSize: 10
+					}
+				});
+				console.log(response.data.items || []);
+				
+				setOrders(response.data.items || []);
+				setTotalPages(response.data.totalPages);
+			} catch (error) {
+				console.error("Error fetching orders:", error);
+			}
 		};
-	}, [connectToHub]);
-	const getAllOrders = async () => {
-		try {
-			const response = await axios.get(`${BASE_URL}/api/Order/getall-orders`);
-			setOrders(response.data);
-		} catch (error) {
-			console.error("Lỗi khi lấy đơn hàng:", error.response?.data || error.message);
-		}
-	};
-	const formatDate = (dateString) => {
-		const date = new Date(dateString);
-		const hours = String(date.getHours()).padStart(2, '0');
-		const minutes = String(date.getMinutes()).padStart(2, '0');
-		const seconds = String(date.getSeconds()).padStart(2, '0');
-		const day = String(date.getDate()).padStart(2, '0');
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const year = date.getFullYear();
-
-		return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
-	};
+	
+		fetchOrders();
+	}, [currentPage]);
 
 	const handleCreate = () => {
 		navigate("/manager/create-order");
@@ -115,7 +85,7 @@ const Orders = () => {
 										<div className="text-sm text-gray-500">{order.email}</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="text-sm text-gray-900">{formatDate(order.orderDate)}</div>
+										<div className="text-sm text-gray-900">{new Date(order.orderDate).toLocaleString()}</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
 										<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -139,6 +109,38 @@ const Orders = () => {
 							))}
 						</tbody>
 					</table>
+					<div className="p-6 flex justify-center mt-4">
+						{orders.length !== 0 ? (
+							<nav className="flex items-center space-x-1">
+								<button
+									onClick={() => setCurrentPage(prevPage => Math.max(prevPage - 1, 1))}
+									disabled={currentPage === 1}
+									className="px-3 py-1 border rounded-md text-gray-700 hover:bg-gray-200"><i
+										className="fas fa-angle-left"></i></button>
+								{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+									<button
+										key={page}
+										onClick={() => setCurrentPage(() => Number(page))} // Đảm bảo React cập nhật state chính xác
+										className={`px-3 py-1 border rounded-md ${currentPage === page
+												? "bg-blue-500 text-white"
+												: "text-gray-700 hover:bg-gray-200"
+											}`}
+									>
+										{page}
+									</button>
+
+								))}
+								<button
+									onClick={() => setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages))}
+									disabled={currentPage === totalPages}
+									className="px-3 py-1 border rounded-md text-gray-700 hover:bg-gray-200"><i
+										className="fas fa-angle-right"></i></button>
+							</nav>
+						) : (
+							""
+						)}
+					</div>
+
 				</div>
 				<Modal isOpen={isOpenImage} onClose={() => setIsOpenImage(false)} title={"Hình ảnh chuyển khoản"}>
 					<div className="p-6">
