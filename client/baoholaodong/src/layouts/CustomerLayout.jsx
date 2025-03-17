@@ -32,7 +32,7 @@ const CustomerLayout = () => {
     return (
         <div className="main-container">
             {!isCheckoutPage && <Header cartCount={cartCount} cartItems={cartItems} showToast={showToast} />}
-            {!isCheckoutPage && location.pathname !== "/" && <Breadcrumb />}
+            {/*{!isCheckoutPage && location.pathname !== "/" && <Breadcrumb />}*/}
             <main className="main-content">
                 <Outlet context={{ addToCart }} />
             </main>

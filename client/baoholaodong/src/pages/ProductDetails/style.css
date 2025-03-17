@@ -30,8 +30,6 @@
     align-self: flex-start;
 }
 
-
-
 /* Common card styles */
 .pd-card,
 .pd-related-products-card,
@@ -39,9 +37,16 @@
 .pd-review-card {
     background-color: #fff;
     border-radius: 10px;
-    box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 20px;
+    min-height: 200px; /* Ensure minimum height for containers */
+    position: relative;
+}
+
+/* Add this class to loaded content */
+.content-loaded {
+    animation: fadeIn 0.5s ease-in;
 }
 
 /* Product details grid */
@@ -49,6 +54,7 @@
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
+    min-height: 600px;
 }
 
 /* Product images */
@@ -64,6 +70,10 @@
     border-radius: 8px;
     background-color: #eee;
     margin-bottom: 10px;
+    min-height: 560px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pd-main-image img {
@@ -76,7 +86,6 @@
     gap: 10px;
 }
 
-
 .pd-thumbnail {
     width: 128px;
     height: 128px;
@@ -85,6 +94,10 @@
     border-radius: 4px;
     background-color: #eee;
     position: relative;
+    min-height: 128px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pd-thumbnail img {
@@ -213,8 +226,6 @@
     color: #ffd700; /* Gold text color for selected size */
 }
 
-
-
 /* Quantity and cart */
 .pd-quantity-cart {
     margin-bottom: 20px;
@@ -251,8 +262,6 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-
-
 }
 
 .pd-cart-btn,
@@ -366,7 +375,7 @@
 }
 
 .pd-description-column p::before {
-    content: '•';
+    content: "•";
     position: absolute;
     left: 0;
     color: #000;
@@ -534,10 +543,12 @@
 .pd-related-products-card {
     background-color: #fff;
     border-radius: 10px;
-    box-shadow: 0 1px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 20px;
     flex: 1;
+    min-height: 200px; /* Ensure minimum height for containers */
+    position: relative;
 }
 
 .pd-related-products-title {
@@ -609,7 +620,6 @@
     text-decoration: line-through;
     color: #777;
 }
-
 
 /* General styles for mobile and tablet */
 @media (max-width: 768px) {
@@ -785,5 +795,36 @@
 
     .pd-related-product-original-price {
         font-size: 10px;
+    }
+}
+
+/* Add these styles to the CSS file for smooth transitions */
+
+/* Add fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Ensure consistent heights for product images */
+
+/* Ensure grid containers maintain size during loading */
+
+/* Ensure related products grid maintains height */
+.grid-cols-5 {
+    min-height: 300px;
+}
+
+/* Improve skeleton animation */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
     }
 }

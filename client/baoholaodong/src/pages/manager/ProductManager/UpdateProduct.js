@@ -439,6 +439,7 @@ const UpdateProduct = () => {
 					onClose={() => setIsOpenUpdateInformation(false)}
 					isOpen={isOpenUpdateInformation}
 					title={"Cập nhật thông tin"}
+					noFull={false}
 				>
 					<UpdateInformationProductForm
 						product={product}
