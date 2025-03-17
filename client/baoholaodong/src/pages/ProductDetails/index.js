@@ -414,10 +414,9 @@ function ProductDetail() {
                                                 <button
                                                     key={index}
                                                     onClick={() => setSelectedColor(color)}
-                                                    className={`pd-variant-button square ${selectedColor === color ? "selected" : ""}`}
-                                                >
-                                                    {color}
-                                                </button>
+                                                    className={`pd-variant-button circle ${selectedColor === color ? "selected" : ""}`}
+                                                    style={{ backgroundColor: color }}
+                                                ></button>
                                             ))}
                                         </div>
                                     </div>
