@@ -1,19 +1,20 @@
-﻿import React, { useContext, useEffect, useState, useCallback } from 'react';
+﻿import React, { useContext, useEffect, useState } from 'react';
 import { ProductContext } from "../../../contexts/AdminProductContext";
 import {useNavigate, useParams} from "react-router-dom";
-import { Edit, Plus, Trash2, Image, Package, Tag, CheckCircle ,XCircle,Eye} from "lucide-react";
+import { Edit, Image, Package, Tag, CheckCircle ,XCircle,Eye} from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
-import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imageUtils";
 import {toSlug} from "../../../utils/SlugUtils";
 import ErrorList from "../../../components/ErrorList/ErrorList";
-import {formatPrice, formatVND, parseVND} from "../../../utils/format";
+import { formatVND} from "../../../utils/format";
 import UpdateInformationProductForm from "./form/UpdateInformationProductForm";
 import AddProductTaxForm from "./form/AddProductTaxForm";
 import UpdateImageForm from "./form/UpdateImageForm";
 import CreateVariantForm from "./form/CreateVariantForm";
 import UpdateVariantForm from "./form/UpdateVariantForm";
 import AddMoreImageForm from "./form/AddMoreImageForm";
+import {Markdown} from "../../../components/Markdown/markdown-editor";
+
 const LoadingSkeleton = () => {
 	return (
 		<div >
@@ -40,7 +41,6 @@ const LoadingSkeleton = () => {
 					))}
 				</div>
 			</div>
-
 			{/* Product Variants Skeleton */}
 			<div className="p-6">
 				<div className="h-6 w-48 bg-gray-200 rounded mb-4"></div>
@@ -57,8 +57,6 @@ const LoadingSkeleton = () => {
 		</div>
 	);
 };
-
-
 const UpdateProduct = () => {
 	const { id,slug } = useParams();
 	const { getProductById, categories, updateProduct, uploadImage, updateImage, deleteImage, updateVariant, createVariant, addProductTax, taxes, deleteProductTax } = useContext(ProductContext);
@@ -271,13 +269,11 @@ const UpdateProduct = () => {
 									</div>
 									<div className="col-span-2">
 										<span className="text-gray-500 block mb-1">Mô tả:</span>
-										{product.description.split("\n").map((line, index) => (
-											<p className="text-gray-800 bg-gray-50 rounded-lg" key={index}>{line}</p>
-										))}
+										<Markdown content={product.description} />
 									</div>
 									<div className="col-span-2">
 										<span className="text-gray-500 block mb-1">Chứng nhận chất lượng:</span>
-										<p className="text-gray-800 bg-gray-50 p-3 rounded-lg">{product.qualityCertificate}</p>
+										<Markdown content={product.qualityCertificate} />
 									</div>
 									<div className="col-span-2">
 										<span className="text-gray-500 block mb-1">Thuế: <span className="font-medium text-gray-800">{product.totalTax}%</span></span>
@@ -439,6 +435,7 @@ const UpdateProduct = () => {
 					onClose={() => setIsOpenUpdateInformation(false)}
 					isOpen={isOpenUpdateInformation}
 					title={"Cập nhật thông tin"}
+					noFull={false}
 				>
 					<UpdateInformationProductForm
 						product={product}

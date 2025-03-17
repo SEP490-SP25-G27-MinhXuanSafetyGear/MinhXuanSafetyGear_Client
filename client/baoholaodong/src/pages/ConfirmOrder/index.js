@@ -39,12 +39,12 @@ export function ConfirmOrder() {
 
         try {
             const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder);
-            if (response.data && response.data.invoice) {
+            if (response.data && response.data.order.invoice) {
                 alert('Order successfully!');
-                if (response.data.invoice.paymentMethod === 'Cash') {
+                if (response.data.order.invoice.paymentMethod === 'Cash') {
                     window.location.href = "/";
                 } else {
-                    window.location.href = `/checkout?invoiceNumber=${response.data.invoice.invoiceNumber}`;
+                    window.location.href = `/checkout?invoiceNumber=${response.data.order.invoice.invoiceNumber}`;
                 }
             } else {
                 alert("Unexpected response from server.");

@@ -1,4 +1,4 @@
-﻿import React, {useContext, useEffect, useState} from 'react';
+﻿import React, {useContext} from 'react';
 import { User, Edit, Trash2 } from 'lucide-react';
 import {UserContext} from "../../../contexts/AdminUserContext";
 

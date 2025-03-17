@@ -5,11 +5,13 @@ import Feedbacks from "../../components/feedbacks";
 import NewBlog from "../../components/newblog";
 import TopSaleProducts from "./TopSaleProducts";
 import TopDealProducts from "./TopDealProducts";
-import "./home.css"; // Import the CSS file
-
+import "./home.css";
+import axios from "axios"; // Import the CSS file
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 function Index() {
-    const { topSaleProducts, topDealProducts } = useContext(CustomerProductContext);
-    const [showWelcome, setShowWelcome] = useState(false);
+    const [showWelcome, setShowWelcome] = useState(false)
+    const [topSaleProducts, setTopSaleProducts] = useState([])
+    const [topDealProducts, setTopDealProducts] = useState([])
 
     useEffect(() => {
         if (localStorage.getItem("welcomeBack") === "true") {
@@ -17,7 +19,38 @@ function Index() {
             localStorage.removeItem("welcomeBack"); // Remove after showing once
             setTimeout(() => setShowWelcome(false), 3000); // Auto-hide after 3s
         }
-    }, []);
+    }, [])
+    const fetchTopSaleProducts = async (size) => {
+        try{
+            const response = await axios.get(`${BASE_URL}/api/Product/top-sale-product`,{
+                params: {
+                    size: size
+                }
+            });
+            console.log(response.data.length);
+            setTopSaleProducts(response.data || []);
+        }catch(error){
+            return [];
+        }
+    }
+    const fetchTopDealProducts = async (size,minDiscount) => {
+        try{
+            const response = await axios.get(`${BASE_URL}/api/Product/top-deal`,{
+                params: {
+                    size: size,
+                    minDiscountPercent: minDiscount,
+                }
+            });
+            setTopDealProducts(response.data || []);
+        }catch(error){
+            return [];
+        }
+    }
+
+    useEffect(() => {
+        fetchTopDealProducts()
+        fetchTopSaleProducts()
+    },[])
 
     return (
         <div className="home-container">

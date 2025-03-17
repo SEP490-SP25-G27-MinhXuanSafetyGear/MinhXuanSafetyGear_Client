@@ -1,5 +1,4 @@
-﻿import Compressor from "compressorjs";
-
+﻿import Compressor from "compressorjs"
 /**
  * Kiểm tra dung lượng ảnh có vượt quá giới hạn không.
  * @param {File} image - Tệp ảnh cần kiểm tra.

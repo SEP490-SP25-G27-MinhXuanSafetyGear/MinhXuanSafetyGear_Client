@@ -5,8 +5,6 @@ import Sidebar from "./Sidebar";
 import CartDropdown from "../Cartdropdown/CartDropdown";
 import "./style.css";
 import { AuthContext } from "../../contexts/AuthContext";
-import {ProductContext} from "../../contexts/AdminProductContext";
-import {CustomerProductContext} from "../../contexts/CustomerProductContext";
 
 function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,7 +22,9 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
         }
     }
     useEffect(() => {
-        updateCartCount();
+        if(cartItems){
+            updateCartCount();
+        }
     }, [cartItems]);
 
     useEffect(() => {

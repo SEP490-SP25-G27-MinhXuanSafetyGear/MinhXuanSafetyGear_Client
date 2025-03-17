@@ -1,10 +1,8 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SquarePen, Eye, Plus } from 'lucide-react';
 import Modal from "../../../components/Modal/Modal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import * as signalR from "@microsoft/signalr";
-
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const Orders = () => {
@@ -14,50 +12,26 @@ const Orders = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
 	const navigate = useNavigate();
-
-	// Hàm fetch orders
-	const fetchOrders = useCallback(async () => {
-		try {
-			const response = await axios.get(`${BASE_URL}/api/Order/get-page-orders`, {
-				params: { page: currentPage, pageSize: 10 }
-			});
-			setOrders(response.data.items || []);
-			setTotalPages(response.data.totalPages);
-		} catch (error) {
-			console.error("Error fetching orders:", error);
-		}
-	}, [currentPage]);
-
-	// Kết nối với SignalR
 	useEffect(() => {
-		const connection = new signalR.HubConnectionBuilder()
-			.withUrl(`${BASE_URL}/orderHub`)
-			.withAutomaticReconnect()
-			.build();
-
-		connection
-			.start()
-			.then(() => console.log("Connected to SignalR Hub"))
-			.catch((err) => console.error("SignalR Connection Error:", err));
-
-		connection.on("NewOrderCreated", (newOrder) => {
-			console.log("📩 New Order Received:", newOrder);
-			setOrders((prevOrders) => [newOrder, ...prevOrders]);
-		});
-
-		connection.on("NewOrderReceived", (orderId) => {
-			console.log("Order Confirmed:", orderId);
-			fetchOrders(); 
-		});
-
-		return () => {
-			connection.stop().then(() => console.log("SignalR Disconnected"));
+		const fetchOrders = async () => {
+			try {
+				const response = await axios.get(`${BASE_URL}/api/Order/get-page-orders`, {
+					params: {
+						page: currentPage,
+						pageSize: 10
+					}
+				});
+				console.log(response.data.items || []);
+				
+				setOrders(response.data.items || []);
+				setTotalPages(response.data.totalPages);
+			} catch (error) {
+				console.error("Error fetching orders:", error);
+			}
 		};
-	}, [fetchOrders]); 
-
-	useEffect(() => {
+	
 		fetchOrders();
-	}, [fetchOrders]);
+	}, [currentPage]);
 
 	const handleCreate = () => {
 		navigate("/manager/create-order");
@@ -146,7 +120,7 @@ const Orders = () => {
 								{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
 									<button
 										key={page}
-										onClick={() => setCurrentPage(() => Number(page))} 
+										onClick={() => setCurrentPage(() => Number(page))} // Đảm bảo React cập nhật state chính xác
 										className={`px-3 py-1 border rounded-md ${currentPage === page
 												? "bg-blue-500 text-white"
 												: "text-gray-700 hover:bg-gray-200"
