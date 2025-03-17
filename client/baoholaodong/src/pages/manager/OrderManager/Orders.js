@@ -17,37 +17,32 @@ const Orders = () => {
 			.withUrl(`${BASE_URL}/orderHub`)
 			.withAutomaticReconnect()
 			.build();
-
 		connection.start().then(() => {
 			console.log("Connected to SignalR Hub");
 		})
 			.catch((err) => console.error("SignalR Connection Error:", err));
-
-
 		connection.on("NewOrderCreated", (newOrder) => {
 			console.log("New Order Received:", newOrder);
 			setOrders((prevOrders) => [newOrder, ...prevOrders]);
 		});
-
 		connection.on("NewOrderReceived", (orderId) => {
 			console.log("Order Confirmed:", orderId);
 			getAllOrders();
 		});
-
 		return connection;
 	}, []);
 	useEffect(() => {
 		if (orders.length === 0) {
 			getAllOrders();
 		}
+	}, [orders.length, connectToHub]);
 
+	useEffect(() => {
 		const hubConnection = connectToHub();
-
 		return () => {
 			hubConnection.stop();
 		};
-	}, [orders.length, connectToHub]);
-
+	}, [connectToHub]);
 	const getAllOrders = async () => {
 		try {
 			const response = await axios.get(`${BASE_URL}/api/Order/getall-orders`);

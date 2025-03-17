@@ -4,15 +4,7 @@ import { useEffect, useState } from "react"
 import { formatPrice, parseVND } from "../../../../utils/format"
 import { Markdown } from "../../../../components/Markdown/markdown-editor"
 
-export default function UpdateInformationProductForm({
-                                                         product,
-                                                         categories,
-                                                         onUpdate,
-                                                         setProduct,
-                                                         setLoading,
-                                                         close,
-                                                         setErrors,
-                                                     }) {
+export default function UpdateInformationProductForm({product, categories, onUpdate, setProduct, setLoading, close, setErrors,}) {
     const [productUpdate, setProductUpdate] = useState({
         id: product?.id || "",
         name: product?.name || "",

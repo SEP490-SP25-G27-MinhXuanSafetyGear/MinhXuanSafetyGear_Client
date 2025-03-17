@@ -1,6 +1,5 @@
 import React, {createContext, useState, useEffect, useCallback} from "react";
 import axios from "axios";
-import * as signalR from "@microsoft/signalr";
 import {useNavigate} from "react-router-dom";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
@@ -15,13 +14,12 @@ export const AdminProductProvider = ({ children }) => {
 	const [size, setSize] = useState(10);
 	const [totalPages,setTotalPages] = useState(0);
 	const [groupCategories, setGroupCategories] = useState([]);
-	const [hubConnection, setHubConnection] = useState(null);
 	const [search, setSearch] = useState("");
 	const [taxes, setTaxes] = useState([]);
 	const [categories, setCategories] = useState([]);
-    const navigate = useNavigate();
 	const [reports, setReports] = useState(null);
 	/** Lấy danh sách sản phẩm */
+
 	const fetchProducts = useCallback(async () => {
 		//setLoading(true);
 		try {
@@ -61,6 +59,7 @@ export const AdminProductProvider = ({ children }) => {
 	/**
 	 * lấy danh sách thuế
 	 * */
+
 	const fetchTaxes = async () => {
 		try{
 			const response = await axios.get(`${BASE_URL}/api/tax/getall`);
