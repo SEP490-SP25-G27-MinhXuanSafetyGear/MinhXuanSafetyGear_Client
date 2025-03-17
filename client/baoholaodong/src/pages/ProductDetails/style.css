@@ -49,6 +49,8 @@
     animation: fadeIn 0.5s ease-in;
 }
 
+
+
 /* Product details grid */
 .pd-grid {
     display: flex;
@@ -208,11 +210,21 @@
 }
 
 .pd-variant-button.circle {
-    width: 30px;
-    height: 30px;
-    border: 1px solid #ccc;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    display: inline-block;
+    margin: 5px;
 }
+
+.pd-variant-button.circle.selected {
+    border: 2px solid #f1f1f1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+
 
 .pd-variant-button:hover {
     transform: scale(1.1);
@@ -221,7 +233,8 @@
 
 .pd-variant-button.selected {
     transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid #f1f1f1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     background-color: #b50a00; /* Red background for selected size */
     color: #ffd700; /* Gold text color for selected size */
 }
