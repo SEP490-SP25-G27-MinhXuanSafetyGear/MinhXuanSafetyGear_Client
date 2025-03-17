@@ -8,7 +8,7 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 const BlogPosts = () => {
-  const { blogPosts,setBlogPosts, loading, categories,fetchCategories } = useContext(BlogPostContext);
+  const { blogPosts,setBlogPosts, loading, categories,fetchCategories,search, setSearch } = useContext(BlogPostContext);
   const memoizedBlogPosts = useMemo(() => blogPosts, [blogPosts]);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(8);
@@ -39,6 +39,7 @@ const BlogPosts = () => {
   const handelUpdate =(id)=>{
     navigate('/manager/update-blog/'+id);
   }
+  
   return (
       <div className="space-y-6">
         <div className="bg-white min-h-[800px] rounded-lg shadow">
@@ -46,11 +47,13 @@ const BlogPosts = () => {
           <div className="p-6 border-b flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-800">Danh sách blog</h3>
             <div className="flex space-x-4">
-              <input
-                  type="text"
-                  placeholder="Tìm kiếm sản phẩm..."
-                  className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            type="text"
+            placeholder="Tìm kiếm bài viết..."
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
               <select
                   className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   value={categorySelected}
@@ -84,7 +87,7 @@ const BlogPosts = () => {
             ) : memoizedBlogPosts.length === 0 ? (
                 <div className="flex justify-center items-center">
                   <FaRegFrown className="text-gray-500 w-12 h-12"/>
-                  <span className="text-gray-500 ml-4">Không có sản phẩm nào</span>
+                  <span className="text-gray-500 ml-4">Không có bài viết nào</span>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
@@ -103,7 +106,7 @@ const BlogPostTable = React.memo(({ blogPosts=[],handelUpdate }) => {
               <motion.thead>
                 <tr >
                   <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
-                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên đề tài</th>
+                  <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiêu đề</th>
                   <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nội dung</th>
                 </tr>
               </motion.thead>

@@ -2,7 +2,7 @@
 import { BlogPostContext } from "../../../contexts/BlogPostContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import { FaRegFrown } from "react-icons/fa";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const CreateBlogs = () => {
@@ -20,12 +20,11 @@ const CreateBlogs = () => {
     console.log("Categories:", categories);
   }, [categories]);
 
-  // Xử lý chọn file
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setPreviewUrl(URL.createObjectURL(selectedFile)); // Tạo URL xem trước
+      setPreviewUrl(URL.createObjectURL(selectedFile));
     }
   };
 
@@ -46,7 +45,7 @@ const CreateBlogs = () => {
     try {
       await axios.post(`${BASE_URL}/api/BlogPost/create-blog`, formData);
       alert("Bài viết đã được tạo thành công!");
-      window.location.href=("/manager/blog-posts");
+      navigate("/manager/blog-posts");
     } catch (error) {
       console.error("Lỗi khi tạo bài viết:", error);
       setMessage({ type: "error", text: "Không thể tạo bài viết!" });
@@ -54,119 +53,67 @@ const CreateBlogs = () => {
   };
 
   return (
-      <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800">Tạo bài viết mới</h3>
+    <div className="space-y-6">
+      <div className="max-w-3xl mx-auto p-8 border rounded-lg shadow-lg bg-white">
+        <h3 className="text-2xl font-semibold text-gray-800 mb-6">Tạo bài viết mới</h3>
 
-          {message.text && (
-              <div
-                  className={`p-3 rounded-lg mb-4 ${
-                      message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}
-              >
-                {message.text}
+        {message.text && (
+          <div
+            className={`p-4 rounded-lg mb-6 ${message.type === "success"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+              }`}
+          >
+            {message.text}
+          </div>
+        )}
+
+        <form onSubmit={handleCreate} className="space-y-6">
+          <input type="text" placeholder="Tiêu đề" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full px-3 py-2 border rounded-md" />
+          <textarea placeholder="Nội dung" value={content} onChange={(e) => setContent(e.target.value)} rows={5} required className="w-full px-3 py-2 border rounded-md" />
+
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full px-3 py-2 border rounded-md">
+            <option value="Draft">Bản nháp</option>
+            <option value="Published">Công khai</option>
+          </select>
+
+          <select value={category} onChange={(e) => setCategory(e.target.value)} required className="w-full px-3 py-2 border rounded-md">
+            <option value={0}>Chọn danh mục</option>
+            {categories.length > 0 ? (
+              categories.map(({ id, name }) => (
+                <option key={id} value={id}>{name}</option>
+              ))
+            ) : (
+              <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                <div className="text-center">
+                  <FaRegFrown className="mx-auto text-gray-400 text-2xl mb-2" />
+                  <p className="text-gray-500">Không có danh mục nào.</p>
+                </div>
               </div>
+            )}
+          </select>
+
+          <input type="file" accept="image/*" onChange={handleFileChange} required className="w-full px-3 py-2 border rounded-md" />
+
+          {previewUrl && (
+            <div className="mt-4">
+              <p className="text-sm text-gray-500">Ảnh xem trước:</p>
+              <img src={previewUrl} alt="Preview" className="w-40 h-40 object-cover rounded-lg mt-2 shadow-md border-2 border-gray-300" />
+            </div>
           )}
 
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div>
-              <label className="block text-gray-700 font-medium">Tiêu đề</label>
-              <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-medium">Nội dung</label>
-              <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  rows="5"
-                  required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-medium">Trạng thái</label>
-              <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-              >
-                <option value="Draft">Bản nháp</option>
-                <option value="Published">Công khai</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-medium">Danh mục</label>
-              <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-              >
-                <option value={0}>Chọn danh mục</option>
-                {categories?.length > 0 ? (
-                    categories.map(({id,name}, index) => (
-                        <option key={index} value={id}>
-                          {name}
-                        </option>
-                    ))
-                ) : (
-                    <option disabled>Không có danh mục nào</option>
-                )}
-              </select>
-            </div>
-
-            {/* Input file thay thế cho nhập URL */}
-            <div>
-              <label className="block text-gray-700 font-medium">Chọn hình ảnh</label>
-              <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-              />
-            </div>
-
-            {/* Hiển thị ảnh xem trước nếu có */}
-            {previewUrl && (
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">Ảnh xem trước:</p>
-                  <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-40 h-40 object-cover rounded-lg"
-                  />
-                </div>
-            )}
-
-            <div className="flex justify-end space-x-4">
-              <button
-                  type="button"
-                  onClick={() => navigate("/manager/blogs")}
-                  className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100"
-              >
-                Hủy
-              </button>
-              <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                Tạo bài viết
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-end space-x-6 mt-6">
+            <button type="button" onClick={() => navigate("/manager/blog-posts")}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+              Hủy
+            </button>
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
+              Tạo bài viết
+            </button>
+          </div>
+        </form>
       </div>
+    </div>
   );
 };
 
