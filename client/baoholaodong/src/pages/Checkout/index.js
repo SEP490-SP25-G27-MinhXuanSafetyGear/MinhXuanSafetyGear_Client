@@ -4,8 +4,10 @@ import { OrderContext } from '../../contexts/OrderContext';
 import Loading from "../../components/Loading/Loading";
 import './style.css';
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+
 const Checkout = () => {
     const navigate = useNavigate();
     const bankName = 'tpb';
@@ -25,39 +27,27 @@ const Checkout = () => {
         }
     };
 
-    const getCookie = (name) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-    };
+    const [invoiceNumber, setInvoiceNumber] = useState("");
 
     useEffect(() => {
-        try {
-            const cookieValue = getCookie("user");
-            if (!cookieValue) setUserId(null);
-            const decodedValue = decodeURIComponent(cookieValue);
-            let parsedValue;
-            try {
-                parsedValue = JSON.parse(decodedValue);
-            } catch (e) {
-                const trimmedValue = decodedValue.replace(/^"|"$/g, '');
-                parsedValue = JSON.parse(trimmedValue);
-            }
-            setUserId(parsedValue.userId);
-        } catch (e) {
-            setUserId(null);
-        }
+        const params = new URLSearchParams(window.location.search);
+        const invoice = params.get("invoiceNumber");
+        setInvoiceNumber(invoice);
     }, []);
+
     useEffect(() => {
+        // Khởi tạo kết nối SignalR
         const newConnection = new signalR.HubConnectionBuilder()
-            .withUrl(`${BASE_URL}/invoiceHub`)
+            .withUrl(`${BASE_URL}/orderHub`) 
             .withAutomaticReconnect()
             .build();
 
-        newConnection.start().then(() => {
+        newConnection
+            .start()
+            .then(() => {
                 console.log("Kết nối đến SignalR thành công!");
-            }).catch((err) => console.error("Lỗi kết nối SignalR:", err));
+            })
+            .catch((err) => console.error("Lỗi kết nối SignalR:", err));
 
         setHubConnection(newConnection);
 
@@ -68,22 +58,28 @@ const Checkout = () => {
         };
     }, []);
 
-    const handleConfirmOrder = async () => {
+    const handleConfirmPayment = async () => {
         try {
-            setIsLoading(true);
-            if (hubConnection) {
-                await hubConnection.invoke("SendInvoiceUpdate", `Đơn hàng của ${userId} đã được xác nhận.`);
+            if (!file) {
+                alert("Vui lòng tải lên ảnh xác nhận thanh toán trước.");
+                return;
             }
-            setTimeout(() => {
-                setIsLoading(false);
-                clearCart();
-                navigate("/order-success");
-            }, 2000);
+            setIsLoading(true);
+            const formData = new FormData();
+            formData.append("File", file);
+            formData.append("InvoiceNumber", invoiceNumber);
+            formData.append("Status", "pending");
+            console.log("formData:", formData);
+            const response = await axios.put(`${BASE_URL}/api/Invoice/confirm-invoice-by-customer`,formData);
+            setIsLoading(false);
+            alert("Xác nhận thanh toán thành công!");
+            navigate("/");
         } catch (error) {
-            console.error("Lỗi khi xác nhận đơn hàng:", error);
+            console.log("Error:", error);
             setIsLoading(false);
         }
     };
+
     return (
         <div className="checkout-page">
             <Loading isLoading={isLoading} />
@@ -114,7 +110,7 @@ const Checkout = () => {
                         <div style={{ overflow: 'hidden', width: '100%', height: '500px', display: 'flex', justifyContent: 'center', alignItems: 'center' }} >
                             <img
                                 id="previewImage"
-                                src={`https://vietqr.co/api/generate/` + bankName + `/` + accountNumber + `/VIETQR.CO/` + totalPrice + `/hello`}
+                                src={`https://vietqr.co/api/generate/${bankName}/${accountNumber}/VIETQR.CO/${totalPrice + 30000}/chuyenkhoan`}
                                 alt="Xem trước hình ảnh"
                                 className="preview-image"
                                 style={{ clipPath: 'inset(33% 25% 33% 25%)' }}
@@ -132,10 +128,18 @@ const Checkout = () => {
                                 required={isRequired}
                             />
                         </div>
+                        <button
+                            className="confirm-payment-btn"
+                            onClick={handleConfirmPayment}
+                            disabled={!file}
+                            style={{
+                                backgroundColor: file ? '#007bff' : '#cccccc',
+                                cursor: file ? 'pointer' : 'not-allowed',
+                            }}
+                        >
+                            Xác nhận thanh toán
+                        </button>
                     </div>
-                    <button className="confirm-button" onClick={handleConfirmOrder}>
-                        Xác nhận đơn hàng
-                    </button>
                 </div>
             </div>
         </div>
