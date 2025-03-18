@@ -154,8 +154,18 @@ const UpdateProduct = () => {
 		setVariantSelected(variant);
 		setIsOpenUpdateVariant(true);
 	}
+	const previewProduct =()=>{
+		const url = `/products/${product.slug}`;
+		const popup = window.open(
+			url,
+			"ProductPreview",
+			"width=600,height=700,left=300,top=100,toolbar=no,menubar=no,scrollbars=yes,resizable=yes"
+		);
+		if (popup) {
+			popup.focus();
+		}
+	}
 	// get product by id
-
 	if (!product) return <div className="text-center mt-10">Loading...</div>;
 
 	return (
@@ -176,17 +186,7 @@ const UpdateProduct = () => {
 							<Tag size={18} className="mr-2" /> Cập nhật thuế
 						</button>
                         <button
-                            onClick={() => {
-                                const url = `/product/${product.id}/${toSlug(product.name)}`;
-                                const popup = window.open(
-                                    url,
-                                    "ProductPreview",
-                                    "width=600,height=700,left=300,top=100,toolbar=no,menubar=no,scrollbars=yes,resizable=yes"
-                                );
-                                if (popup) {
-                                    popup.focus();
-                                }
-                            }}
+                            onClick={() => previewProduct()}
                             className="flex items-center px-4 py-2 bg-white text-gray-600 rounded-lg hover:bg-gray-50 transition-all shadow-md"
                         >
                             <Eye size={18} className="mr-2" /> Xem trước sản phẩm

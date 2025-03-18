@@ -38,8 +38,7 @@ export default function  TopProductOfGroup({products=[] ,title=""}){
     );
 
     const handleDetailProduct = (product) => {
-        const slug = slugify(product.name, { lower: true, strict: true });
-        window.location.href = `/product/${product.id}/${slug}`;
+        window.location.href = `/products/${product.slug}`;
     };
 
     const handleProductClick = (product) => {

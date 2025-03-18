@@ -41,6 +41,7 @@ import UpdateEmployee from "../pages/manager/EmployeeManager/UpdateEmployee";
 import CreateOrder from "../pages/manager/OrderManager/CreateOrder";
 import OrderDetail from "../pages/manager/OrderManager/OrderDetail";
 import {ConfirmOrder} from "../pages/ConfirmOrder";
+import ProductVariantSelector from "../pages/ProductDetails/ProductVariantSelector";
 
 const UserRouter = () => {
     return (
@@ -66,7 +67,7 @@ const UserRouter = () => {
                     <Route path="/login" element={<Signin />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/products" element={<ProductList />} />
-                    <Route path="/product/:id/:slug" element={<ProductDetail />} />
+                    <Route path="/products/:slug" element={<ProductDetail />} />
                     <Route path="/blog" element={<BlogList />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/checkout" element={<Checkout />} />
@@ -77,8 +78,9 @@ const UserRouter = () => {
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
                     <Route path="/category/:categoryId" element={<ProductListByCategory />} />
                     <Route path="confirm-order" element={<ConfirmOrder />} />
-                </Route>
 
+                </Route>
+                <Route path="/demo" element={<ProductVariantSelector/>}/>
                 {/* Admin Routes */}
                 <Route
                     path="/manager"

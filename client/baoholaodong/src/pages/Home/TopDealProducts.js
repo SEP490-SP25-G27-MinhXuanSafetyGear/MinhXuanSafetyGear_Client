@@ -36,8 +36,7 @@ export default function TopDealProducts({ products = [] }) {
     };
 
     const handleDetailProduct = (product) => {
-        const slug = slugify(product.name, { lower: true, strict: true });
-        navigate(`/product/${product.id}/${slug}`);
+        navigate(`/products/${product.slug}`);
     };
 
     return (
