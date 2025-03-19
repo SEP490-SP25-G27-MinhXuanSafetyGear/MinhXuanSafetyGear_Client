@@ -201,7 +201,7 @@ const AdminLayout = () => {
                     </div>
                 </header>
 
-                <main className=" transition-all duration-300 pt-20 p-6">
+                <main className=" transition-all duration-300 pt-20">
                     <Outlet />
                 </main>
 

@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useContext, useState } from "react"
+import {useContext, useEffect, useState} from "react"
 import { ProductContext } from "../../../contexts/AdminProductContext"
 import { useNavigate } from "react-router-dom"
 import Loading from "../../../components/Loading/Loading"
@@ -14,7 +14,7 @@ const TARGET_IMAGE_SIZE_KB = 0.1 * 1024
 
 const CreateProduct = () => {
 	const navigate = useNavigate()
-	const { categories, createProduct } = useContext(ProductContext)
+	const { categories, createProduct,productState,setProductState } = useContext(ProductContext)
 	const [product, setProduct] = useState({
 		name: "",
 		category: "",

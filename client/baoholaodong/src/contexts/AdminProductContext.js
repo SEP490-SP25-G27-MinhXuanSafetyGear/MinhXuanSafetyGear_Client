@@ -18,6 +18,7 @@ export const AdminProductProvider = ({ children }) => {
 	const [taxes, setTaxes] = useState([]);
 	const [categories, setCategories] = useState([]);
 	const [reports, setReports] = useState(null);
+	const [productState,setProductState] = useState(null);
 	/** Lấy danh sách sản phẩm */
 
 	const fetchProducts = useCallback(async () => {
@@ -369,6 +370,7 @@ export const AdminProductProvider = ({ children }) => {
 				createTax,
 				updateTax,
 				fetchReport,
+				productState,setProductState,
 			}}
 		>
 			{children}
