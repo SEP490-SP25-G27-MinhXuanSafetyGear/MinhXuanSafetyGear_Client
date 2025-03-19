@@ -8,35 +8,35 @@ import TopDealProducts from "./TopDealProducts";
 import "./home.css";
 import axios from "axios"; // Import the CSS file
 
-const BlogCategories = ({ blogs }) => {
-    return (
-        <div className="blog-categories-container">
-            <h2 className="section-title">BLOG LAO ĐỘNG MỚI NHẤT</h2>
-            <div className="blog-list">
-                {blogs.map((blog) => (
-                    <div key={blog.id} className="blog-item">
-                        <img src={blog.image} alt={blog.title} className="blog-image" />
-                        <div className="blog-content">
-                            <h3 className="blog-title">{blog.title}</h3>
-                            <p className="blog-date">{blog.date}</p>
-                            <p className="blog-preview">{blog.preview}</p>
-                            <div className="blog-actions">
-                                <div className="blog-tags">
-                                    {blog.tags.map((tag, index) => (
-                                        <span key={index} className="blog-tag">#{tag}</span>
-                                    ))}
-                                </div>
-                                <a href={blog.link} className="read-more">
-                                    Đọc thêm →
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
+// const BlogCategories = ({ blogs }) => {
+//     return (
+//         <div className="blog-categories-container">
+//             <h2 className="section-title">BLOG LAO ĐỘNG MỚI NHẤT</h2>
+//             <div className="blog-list">
+//                 {blogs.map((blog) => (
+//                     <div key={blog.id} className="blog-item">
+//                         <img src={blog.image} alt={blog.title} className="blog-image" />
+//                         <div className="blog-content">
+//                             <h3 className="blog-title">{blog.title}</h3>
+//                             <p className="blog-date">{blog.date}</p>
+//                             <p className="blog-preview">{blog.preview}</p>
+//                             <div className="blog-actions">
+//                                 <div className="blog-tags">
+//                                     {blog.tags.map((tag, index) => (
+//                                         <span key={index} className="blog-tag">#{tag}</span>
+//                                     ))}
+//                                 </div>
+//                                 <a href={blog.link} className="read-more">
+//                                     Đọc thêm →
+//                                 </a>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 ))}
+//             </div>
+//         </div>
+//     );
+// };
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 function Index() {
@@ -123,9 +123,8 @@ function Index() {
             <TopDealProducts products={topDealProducts} />
             <TopSaleProducts products={topSaleProducts} title="TOP SẢN PHẨM BÁN CHẠY" />
             <Feedbacks />
-            <NewBlog />
-            <BlogCategories blogs={blogs} />
-        </div>
+            <NewBlog /></div>
+
     );
 }
 
