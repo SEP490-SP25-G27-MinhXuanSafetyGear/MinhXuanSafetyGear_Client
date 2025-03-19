@@ -21,16 +21,15 @@ import noImage from "../../images/no-image-product.jpg"
 import { CartContext } from "../../contexts/CartContext"
 import { toSlug } from "../../utils/SlugUtils"
 import "./style.css"
-import axios from "axios";
-import { marked } from "marked";
-import {Markdown} from "../../components/Markdown/markdown-editor";
+import axios from "axios"
+import { Markdown } from "../../components/Markdown/markdown-editor"
+import ProductVariantSelector from "./ProductVariantSelector";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
 function ProductDetail() {
-    const { slug, id } = useParams()
+    const { slug } = useParams()
     const { addToCart } = useContext(CartContext)
-    const [selectedSize, setSelectedSize] = useState("")
-    const [selectedColor, setSelectedColor] = useState("")
+    const [selectedVariant, setSelectedVariant] = useState(null)
     const [quantity, setQuantity] = useState(1)
     const [imageIndex, setImageIndex] = useState(0)
     const [isLoading, setIsLoading] = useState(true)
@@ -130,11 +129,11 @@ function ProductDetail() {
     )
 
     const [product, setProduct] = useState({
-        id: Number.parseInt(id),
+        id: 0,
         name: "",
         description: "",
-        material: "oke nha",
-        origin: "han quoc",
+        material: "",
+        origin: "",
         categoryId: 1,
         categoryName: "",
         quantity: 0,
@@ -172,53 +171,58 @@ function ProductDetail() {
             },
         ],
     })
+
     const fetchTopSaleProducts = async (sizeTopSale) => {
-        try{
-            const response = await axios.get(`${BASE_URL}/api/Product/top-sale-product`,{
+        try {
+            const response = await axios.get(`${BASE_URL}/api/Product/top-sale-product`, {
                 params: {
-                    size: sizeTopSale
-                }
-            });
-            console.log(response.data.length);
-            setTopSaleProducts(response.data || []);
-        }catch(error){
-            return [];
+                    size: sizeTopSale,
+                },
+            })
+            console.log(response.data.length)
+            setTopSaleProducts(response.data || [])
+        } catch (error) {
+            return []
         }
     }
-    const getProductById = async (id) => {
+
+    const getProductBySlug = async (slug) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/Product/get-product-by-id/${id}`);
-            setProduct(response.data);
+            const response = await axios.get(`${BASE_URL}/api/Product/get-product-by-slug/${slug}`)
+            setProduct(response.data)
         } catch (error) {
-            console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message);
+            console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message)
         }
-    };
-    const fetchRelatedProducts = async (id,size) => {
-        try{
+    }
+
+    const fetchRelatedProducts = async (id, size) => {
+        try {
             const response = await axios.get(`${BASE_URL}/api/Product/related`, {
                 params: {
-                    size:size,
-                    id:id,
-                }
+                    size: size,
+                    id: id,
+                },
             })
-            setRelatedProducts(response.data);
-        }catch (error){
-            return [];
+            setRelatedProducts(response.data)
+        } catch (error) {
+            return []
         }
     }
-    const fetchReviewProduct= async (id,size) => {
-        try{
-            const response = await axios.get(`${BASE_URL}/api/Product/reviews`,{
+
+    const fetchReviewProduct = async (id, size) => {
+        try {
+            const response = await axios.get(`${BASE_URL}/api/Product/reviews`, {
                 params: {
-                    size:size,
-                    id:id
-                }
+                    size: size,
+                    id: id,
+                },
             })
-            setReview(response.data);
-        }catch(error){
-            return null;
+            setReview(response.data)
+        } catch (error) {
+            return null
         }
     }
+
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -245,7 +249,7 @@ function ProductDetail() {
 
         const handleProductChange = (updatedProduct) => {
             console.log(`Received update for product ID: ${updatedProduct}`)
-            if (updatedProduct.id === Number.parseInt(id)) {
+            if (updatedProduct.slug === slug) {
                 setProduct(updatedProduct)
             }
         }
@@ -255,16 +259,13 @@ function ProductDetail() {
                 hubConnection.off("ProductUpdated", handleProductChange)
             }
         }
-    }, [hubConnection, id])
+    }, [hubConnection, slug])
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true)
             try {
-                await getProductById(id)
-                await fetchRelatedProducts(Number.parseInt(id), 10)
-                await fetchReviewProduct(Number.parseInt(id), 10)
-                await fetchTopSaleProducts(10)
+                await getProductBySlug(slug)
             } catch (error) {
                 console.error("Error fetching product:", error)
             } finally {
@@ -272,27 +273,15 @@ function ProductDetail() {
             }
         }
         fetchData()
-    }, [id])
+    }, [slug])
 
     useEffect(() => {
-        if (!isLoading && product?.name) {
-            const correctSlug = toSlug(product.name)
-            if (slug !== correctSlug) {
-                navigate(`/product/${id}/${correctSlug}`, { replace: true })
-            }
-            document.title = `${product.name} | Chi tiết sản phẩm`
-        }
-        return () => {
-            document.title = "BaoHoLaoDongMinhXuan"
-        }
-    }, [isLoading, product, slug, id, navigate])
-
-    // Add a useEffect to handle smooth transitions when data loads
-    // Add this near your other useEffect hooks:
+        fetchRelatedProducts(Number.parseInt(product.id), 10)
+        fetchReviewProduct(Number.parseInt(product.id), 10)
+        fetchTopSaleProducts(10)
+    }, [product])
 
     useEffect(() => {
-        // This ensures the loading state stays visible for at least 500ms
-        // to prevent flickering on fast connections
         if (!isLoading) {
             const elements = document.querySelectorAll(".content-loaded")
             elements.forEach((el) => {
@@ -304,13 +293,11 @@ function ProductDetail() {
     }, [isLoading])
 
     const handleAddToCart = () => {
-        const selectedVariant = product.productVariants.find(
-            (variant) => variant.size === selectedSize && variant.color === selectedColor,
-        )
         if (selectedVariant) {
             addToCart({
                 ...product,
-                selectedVariant,
+                product:product,
+                variant: selectedVariant,
                 quantity,
             })
         } else {
@@ -332,8 +319,6 @@ function ProductDetail() {
                 <ChevronRight className="w-4 h-4 mx-1" />
                 <span className="text-gray-700 font-medium">{product.name}</span>
             </div>
-
-
 
             {/* Main Product Card */}
             <div className="pd-card">
@@ -391,40 +376,7 @@ function ProductDetail() {
                                 {product.discount > 0 && <span className="pd-discount">-{product.discount}%</span>}
                             </div>
 
-                            <div className="pd-variants">
-                                {product.productVariants.length > 0 && (
-                                    <div className="pd-variant-group">
-                                        <span className="pd-variant-label">Kích thước</span>
-                                        <div className="pd-variant-options">
-                                            {[...new Set(product.productVariants.map(({ size }) => size))].map((size, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => setSelectedSize(size)}
-                                                    className={`pd-variant-button square ${selectedSize === size ? "selected" : ""}`}
-                                                >
-                                                    {size}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {product.productVariants.length > 0 && (
-                                    <div className="pd-variant-group">
-                                        <span className="pd-variant-label">Màu sắc</span>
-                                        <div className="pd-variant-options">
-                                            {[...new Set(product.productVariants.map(({ color }) => color))].map((color, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => setSelectedColor(color)}
-                                                    className={`pd-variant-button circle ${selectedColor === color ? "selected" : ""}`}
-                                                    style={{ backgroundColor: color }}
-                                                ></button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            <ProductVariantSelector product={product} setSelectedVariant={setSelectedVariant} />
 
                             <div className="pd-quantity-cart">
                                 <div className="pd-quantity">
@@ -440,7 +392,9 @@ function ProductDetail() {
                                     <button onClick={() => setQuantity(quantity + 1)} className="pd-quantity-btn">
                                         +
                                     </button>
-                                    <span className="pd-stock">Còn {product.quantity} sản phẩm</span>
+                                    <span className="pd-stock">
+                    Còn {selectedVariant ? selectedVariant.quantity : product.quantity} sản phẩm
+                  </span>
                                 </div>
 
                                 <div className="pd-cart-buttons">
@@ -521,7 +475,7 @@ function ProductDetail() {
                                     <div className="pd-description-content">
                                         <div className="pd-description-column">
                                             <h3 className="pd-subtitle">Mô tả sản phẩm</h3>
-                                            <div className="pd-text-content" >
+                                            <div className="pd-text-content">
                                                 <Markdown content={product.description} />
                                             </div>
 
@@ -538,7 +492,7 @@ function ProductDetail() {
                                             </div>
 
                                             <h3 className="pd-subtitle mt-6">Chứng nhận chất lượng</h3>
-                                            <div className="pd-text-content" >
+                                            <div className="pd-text-content">
                                                 <Markdown content={product.qualityCertificate} />
                                             </div>
                                         </div>
@@ -800,4 +754,5 @@ function ProductDetail() {
 }
 
 export default ProductDetail
+
 

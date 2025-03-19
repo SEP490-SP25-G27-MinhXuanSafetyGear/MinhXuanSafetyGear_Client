@@ -1,10 +1,13 @@
-﻿import React, { useState, useEffect } from 'react';
+
+import React, {useState, useEffect, useCallback} from 'react';
 import { SquarePen, Eye, Plus } from 'lucide-react';
 import Modal from "../../../components/Modal/Modal";
 import axios from "axios";
+import * as signalR from "@microsoft/signalr"
 import { useNavigate } from "react-router-dom";
 import { formatVND } from "../../../utils/format";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+
 
 const Orders = () => {
 	const [isOpenImage, setIsOpenImage] = useState(false);
@@ -19,7 +22,6 @@ const Orders = () => {
 	const [endDate, setEndDate] = useState('');
 	const [searchInput, setSearchInput] = useState("");
 	const navigate = useNavigate();
-
 	useEffect(() => {
 		const fetchOrders = async () => {
 			try {
@@ -45,12 +47,49 @@ const Orders = () => {
 		fetchOrders();
 	}, [currentPage, searchName, startDateString, endDateString]);
 
-	// const handleKeyDown = (e) => {
-	// 	if (e.key === "Enter") {
-	// 		setSearchName(searchInput);
-	// 	}
-	// };
 
+const connectToHub = useCallback(() => {
+		const connection = new signalR.HubConnectionBuilder()
+			.withUrl(`${BASE_URL}/orderHub`)
+			.withAutomaticReconnect()
+			.build();
+		connection.start().then(() => {
+
+		}).catch((err) => console.error("SignalR Connection Error:", err));
+		connection.on("NewOrderCreated", (newOrder) => {
+			setOrders((prevOrders) => [newOrder, ...prevOrders]);
+		});
+		// connection.on("NewOrderReceived", (orderId) => {
+		// 	getAllOrders();
+		// });
+		return connection;
+	}, []);
+	useEffect(() => {
+		const hubConnection = connectToHub();
+		return () => {
+			hubConnection.stop();
+		};
+	}, [connectToHub]);
+	useEffect(() => {
+		if(currentPage){
+			fetchOrders();
+		}
+	}, [currentPage]);
+	const fetchOrders = async () => {
+		try {
+			const response = await axios.get(`${BASE_URL}/api/Order/get-page-orders`, {
+				params: {
+					page: currentPage,
+					pageSize: 10
+				}
+			});
+			console.log(response.data.items || []);
+			setOrders(response.data.items || []);
+			setTotalPages(response.data.totalPages);
+		} catch (error) {
+			console.error("Error fetching orders:", error);
+		}
+	};
 	const handleCreate = () => {
 		navigate("/manager/create-order");
 	}

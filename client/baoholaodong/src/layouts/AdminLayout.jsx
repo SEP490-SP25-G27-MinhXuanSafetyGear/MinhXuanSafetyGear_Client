@@ -70,6 +70,7 @@ const AdminLayout = () => {
                 isRead: notification.isRead,
                 createdAt: new Date(notification.createdAt).toLocaleString(),
                 recipientId: notification.recipientId,
+                orderId: notification.orderId,
             }));
             console.log(formattedNotifications);
 
@@ -81,37 +82,29 @@ const AdminLayout = () => {
     };
 
     useEffect(() => {
-        const newConnection = new HubConnectionBuilder()
-            .withUrl(`${BASE_URL}/notificationHub`)
-            .withAutomaticReconnect()
-            .build();
+        if (!connection) {
+            const newConnection = new HubConnectionBuilder()
+                .withUrl(`${BASE_URL}/notificationHub`)
+                .withAutomaticReconnect()
+                .build();
 
-        setConnection(newConnection);
-    }, []);
+            setConnection(newConnection);
+        }
+    }, [connection]);
 
     useEffect(() => {
-        if (connection) {
+        if (connection && connection.state === 'Disconnected') {
             connection.start()
                 .then(() => {
                     console.log('Connected to SignalR hub!');
-
                     connection.invoke('JoinEmployeeGroup')
-                        .catch(err => console.error('Error joining admin group: ', err));
+                        .catch(err => console.error('Error joining group:', err));
 
                     connection.on('ReceiveNotification', (notification) => {
-                        const newNotification = {
-                            id: notification.id,
-                            title: notification.title,
-                            message: notification.message,
-                            isRead: notification.isRead,
-                            createdAt: new Date(notification.createdAt).toLocaleString(),
-                            recipientId: notification.recipientId,
-                        };
-                        console.log('New notification: ', newNotification);
-                        setNotifications(prev => [newNotification, ...prev]);
+                        setNotifications(prev => [notification, ...prev]);
                     });
                 })
-                .catch(e => console.log('Connection failed: ', e));
+                .catch(err => console.log('Connection failed:', err));
         }
 
         return () => {
@@ -120,8 +113,9 @@ const AdminLayout = () => {
             }
         };
     }, [connection]);
-   
-    const markAsRead =async (id) => {
+
+
+    const markAsRead =async (id,orderId) => {
         setNotifications((prevNotifications) =>
           prevNotifications.map((notif) =>
             notif.id === id ? { ...notif, isRead: true } : notif
@@ -134,6 +128,7 @@ const AdminLayout = () => {
                     readAll: false,
                 }
             });
+            navigate(`/manager/order-detail/${orderId}`)
         } catch (error) {
             console.error("Error marking notification as read:", error);
         }
@@ -191,7 +186,7 @@ const AdminLayout = () => {
                             {navItems.find((item) => location.pathname.includes(item.path))?.label}
                         </h2>
                         <div className="flex items-center space-x-4">
-                            <button className="p-2 text-gray-500 hover:text-gray-700">
+                            <button className="p-2 text-while hover:text-gray-700">
                                 <NotificationBell notifications={notifications} onMarkAsRead={markAsRead}/>
                             </button>
                             <div className="flex items-center space-x-2">

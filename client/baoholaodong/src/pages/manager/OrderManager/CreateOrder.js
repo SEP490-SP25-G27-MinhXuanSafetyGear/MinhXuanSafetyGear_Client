@@ -5,6 +5,7 @@ import { formatVND } from "../../../utils/format";
 import {Trash2, Plus, Minus, ShoppingCart, Truck, Package, Shield} from "lucide-react";
 import Modal from "../../../components/Modal/Modal";
 import Loading from "../../../components/Loading/Loading";
+import ProductVariantSelector from "../../ProductDetails/ProductVariantSelector";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
@@ -77,17 +78,15 @@ export default function CreateOrder() {
             return;
         }
         const newOrder = {
-            customerId: null,
             customerName: order.customerName,
             customerEmail: order.customerEmail,
             customerPhone: order.customerPhone,
             paymentMethod: order.paymentMethod,
             customerAddress: order.customerAddress,
-            orderDetails: order.orderDetails.map(({ productId, quantity,size,color }) => ({
+            orderDetails: order.orderDetails.map(({ productId, quantity,variantId }) => ({
                 productId,
                 quantity,
-                size,
-                color,
+                variantId
             }))
         };
         setIsLoading(true);
@@ -232,45 +231,9 @@ export default function CreateOrder() {
     );
 }
 const FormSelectProductVariant = ({ product, setOrder,onClose }) => {
-    const [selectedSize, setSelectedSize] = useState(null);
-    const [selectedColor, setSelectedColor] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
-
-    // Lọc kích thước có sẵn
-    const availableSizes = [...new Set(product.productVariants.map(({ size }) => size))];
-
-    // Lọc màu sắc có sẵn dựa trên kích thước đã chọn
-    const availableColors = selectedSize
-        ? [...new Set(product.productVariants.filter(v => v.size === selectedSize).map(({ color }) => color))]
-        : [...new Set(product.productVariants.map(({ color }) => color))];
-
-    // Tự động cập nhật kích thước hoặc màu khi có lựa chọn mới
-    useEffect(() => {
-        if (selectedSize) {
-            const colorsForSize = availableColors;
-            if (!colorsForSize.includes(selectedColor)) {
-                setSelectedColor(null);
-            }
-        }
-    }, [selectedSize]);
-
-    useEffect(() => {
-        if (selectedColor) {
-            const sizesForColor = product.productVariants
-                .filter(v => v.color === selectedColor)
-                .map(({ size }) => size);
-            if (!sizesForColor.includes(selectedSize)) {
-                setSelectedSize(null);
-            }
-        }
-    }, [selectedColor]);
-
-    // Lấy biến thể phù hợp với kích thước và màu sắc đã chọn
-    const selectedVariant = product.productVariants.find(
-        v => v.size === selectedSize && v.color === selectedColor
-    );
-
+    const [selectedVariant,setSelectedVariant] = useState(null);
     const addToOrder = () => {
         let newItem;
 
@@ -280,19 +243,21 @@ const FormSelectProductVariant = ({ product, setOrder,onClose }) => {
                 return;
             }
             newItem = {
-                productId: selectedVariant.id,
+                productId: product.id,
+                variantId : selectedVariant.variantId,
                 productPrice: selectedVariant.price,
                 quantity,
                 totalPrice: selectedVariant.price * quantity,
                 name: product.name,
-                size: selectedSize || null,
-                color: selectedColor || null,
+                size: selectedVariant.size || null,
+                color: selectedVariant.size || null,
                 image: product.image || noImage
             };
         } else {
             // Trường hợp sản phẩm không có biến thể
             newItem = {
                 productId: product.id,
+                variantId : selectedVariant.variantId,
                 productPrice: product.price,
                 quantity,
                 totalPrice: product.price * quantity,
@@ -309,8 +274,7 @@ const FormSelectProductVariant = ({ product, setOrder,onClose }) => {
             // Kiểm tra xem sản phẩm với cùng productId, size và color đã tồn tại chưa
             const existingIndex = newOrderDetails.findIndex(item =>
                 item.productId === newItem.productId &&
-                item.size === newItem.size &&
-                item.color === newItem.color
+                item.variantId === newItem.variantId
             );
 
             if (existingIndex >= 0) {
@@ -367,46 +331,7 @@ const FormSelectProductVariant = ({ product, setOrder,onClose }) => {
                         <span className="px-3 py-1 bg-red-100 text-red-600 text-sm font-semibold rounded-full">-{product.discount}%</span>
                     )}
                 </div>
-
-                {/* Chọn kích thước */}
-                {availableSizes.length > 0 && (
-                    <div>
-                        <h3 className="text-sm font-medium text-gray-900">Kích thước</h3>
-                        <div className="mt-2 grid grid-cols-4 gap-2">
-                            {availableSizes.map((size, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedSize(size)}
-                                    className={`px-4 py-2 text-sm font-medium rounded-md ${
-                                        selectedSize === size ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
-                                    }`}
-                                >
-                                    {size}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Chọn màu sắc */}
-                {availableColors.length > 0 && (
-                    <div>
-                        <h3 className="text-sm font-medium text-gray-900">Màu sắc</h3>
-                        <div className="mt-2 grid grid-cols-4 gap-2">
-                            {availableColors.map((color, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedColor(color)}
-                                    className={`px-4 py-2 text-sm font-medium rounded-md ${
-                                        selectedColor === color ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
-                                    }`}
-                                >
-                                    {color}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                <ProductVariantSelector product={product} setSelectedVariant={setSelectedVariant} />
 
                 {/* Điều chỉnh số lượng */}
                 <div className="flex items-center space-x-4">

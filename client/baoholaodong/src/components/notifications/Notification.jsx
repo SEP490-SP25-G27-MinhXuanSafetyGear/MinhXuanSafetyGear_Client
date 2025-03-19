@@ -24,7 +24,7 @@ export default function Notification({ notifications, onMarkAsRead }) {
     <div className="relative inline-block" ref={dropdownRef}>
       <button
         onClick={() => setShowNotifications(!showNotifications)}
-        className="relative p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition"
+        className="relative p-2 rounded-full bg-gray-100 hover:bg-gray-300 transition"
       >
         <Bell className="w-6 h-6 text-gray-700" />
         {notifications.some((n) => !n.isRead) && (
@@ -46,7 +46,10 @@ export default function Notification({ notifications, onMarkAsRead }) {
                   key={notif.id}
                   className={`p-3 border-b text-sm ${notif.isRead ? "bg-gray-100 text-gray-600" : "bg-blue-50 text-blue-900"
                     }`}
-                    onClick={() => onMarkAsRead(notif.id)}
+                    onClick={() => {
+                      onMarkAsRead(notif.id,notif.orderId)
+                      setShowNotifications(!showNotifications)
+                    } }
                 >
                   <p className="font-semibold">{notif.title}</p>
                   <p className="text-xs">{notif.message}</p>
