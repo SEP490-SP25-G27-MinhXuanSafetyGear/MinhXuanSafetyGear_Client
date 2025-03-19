@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { SquarePen, Eye, Plus } from 'lucide-react';
 import Modal from "../../../components/Modal/Modal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { formatVND } from "../../../utils/format";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const Orders = () => {
@@ -11,36 +12,103 @@ const Orders = () => {
 	const [orders, setOrders] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
+	const [searchName, setSearchName] = useState('');
+	const [startDateString, setStartDateString] = useState('');
+	const [startDate, setStartDate] = useState(null);
+	const [endDateString, setEndDateString] = useState('');
+	const [endDate, setEndDate] = useState('');
+	const [searchInput, setSearchInput] = useState("");
 	const navigate = useNavigate();
+
 	useEffect(() => {
 		const fetchOrders = async () => {
 			try {
 				const response = await axios.get(`${BASE_URL}/api/Order/get-page-orders`, {
 					params: {
+						customerName: searchName,
+						startDate: startDateString,
+						endDate: endDateString,
 						page: currentPage,
 						pageSize: 10
 					}
 				});
 				console.log(response.data.items || []);
-				
+
 				setOrders(response.data.items || []);
 				setTotalPages(response.data.totalPages);
 			} catch (error) {
 				console.error("Error fetching orders:", error);
+				setOrders([]);
 			}
 		};
-	
+
 		fetchOrders();
-	}, [currentPage]);
+	}, [currentPage, searchName, startDateString, endDateString]);
+
+	// const handleKeyDown = (e) => {
+	// 	if (e.key === "Enter") {
+	// 		setSearchName(searchInput);
+	// 	}
+	// };
 
 	const handleCreate = () => {
 		navigate("/manager/create-order");
 	}
+	const handleStartDateChange = (e) => {
+		if (!e.target.value) {
+			setStartDate(null);
+			setStartDateString('');
+			return;
+		}
+		const formattedDate = formatDate(e.target.value);
+		setStartDate(e.target.value);
+		setStartDateString(formattedDate);
+	};
+
+	const handleEndDateChange = (e) => {
+		if (!e.target.value) {
+			setEndDate(null);
+			setEndDateString('');
+			return;
+		}
+		const formattedDate = formatDate(e.target.value);
+		setEndDate(e.target.value);
+		setEndDateString(formattedDate);
+	};
+
+	const formatDate = (date) => {
+		const [day, month, year] = new Date(date).toLocaleDateString("en-GB").split("/");
+		return `${day}${month}${year}`;
+	};
+
 	return (
 		<div className="bg-white rounded-lg shadow">
 			<div className="flex p-6 border-b justify-between">
-				<h3 className="text-lg font-semibold text-gray-800">Orders Management</h3>
+				<h3 className="text-lg font-semibold text-gray-800">Quản lý đặt hàng</h3>
 				<div className="flex space-x-4">
+					<input
+						type="text"
+						value={searchName}
+						onChange={(e) => setSearchName(e.target.value)}
+						placeholder="Tên khách hàng..."
+						className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+					/>
+
+					<input
+						type="date"
+						value={startDate}
+						onChange={handleStartDateChange}
+						className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+						placeholder="Từ ngày"
+					/>
+					<input
+						type="date"
+						value={endDate}
+						onChange={handleEndDateChange}
+						placeholder="Đến ngày"
+						className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+						min={startDate}
+					/>
 					<button
 						className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
 						onClick={handleCreate}>
@@ -55,22 +123,22 @@ const Orders = () => {
 						<thead>
 							<tr>
 								<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Order ID
+									Mã đơn hàng
 								</th>
 								<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Customer
+									Tên khách hàng
 								</th>
 								<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Date
+									Ngày đặt hàng
 								</th>
 								<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Status
+									Trạng thái
 								</th>
 								<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Total
+									Tổng thành tiền
 								</th>
 								<th className="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Actions
+									Hành động
 								</th>
 							</tr>
 						</thead>
@@ -88,12 +156,18 @@ const Orders = () => {
 										<div className="text-sm text-gray-900">{new Date(order.orderDate).toLocaleString()}</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
-										<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+										<span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+        										${order.status === "Processing" ? "bg-blue-200 text-blue-800" :
+												order.status === "Cancelled" ? "bg-red-300 text-red-800" :
+												order.status === "Completed" ? "bg-green-300 text-green-800" :
+														"bg-yellow-200 text-yellow-800"}`}>
 											{order.status}
 										</span>
 									</td>
+
 									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-										{order.totalAmount}
+										{/* {order.totalAmount.toLocaleString("vi-VN")} VNĐ */}
+										{formatVND(order.totalAmount)}
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<button
@@ -122,8 +196,8 @@ const Orders = () => {
 										key={page}
 										onClick={() => setCurrentPage(() => Number(page))} // Đảm bảo React cập nhật state chính xác
 										className={`px-3 py-1 border rounded-md ${currentPage === page
-												? "bg-blue-500 text-white"
-												: "text-gray-700 hover:bg-gray-200"
+											? "bg-blue-500 text-white"
+											: "text-gray-700 hover:bg-gray-200"
 											}`}
 									>
 										{page}
