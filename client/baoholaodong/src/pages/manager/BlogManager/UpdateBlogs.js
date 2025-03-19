@@ -1,25 +1,28 @@
-import React, { useContext, useState, useEffect } from "react";
-import { BlogPostContext } from "../../../contexts/BlogPostContext";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import blogPosts from "./BlogPosts";
+"use client"
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+import { useState, useEffect, useContext } from "react"
+import {useNavigate, useParams} from "react-router-dom"
+import axios from "axios"
+import { FaImage, FaMarkdown, FaQuestionCircle } from "react-icons/fa"
+import { Markdown, MarkdownToolbar, MarkdownHelp } from "../../../components/Markdown/markdown-editor"
+import "./create-blog.css"
+import { BlogPostContext } from "../../../contexts/BlogPostContext"
 
-const Loading = ({ isLoading }) => {
-	if (!isLoading) return null;
-	return (
-		<div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-50">
-			<div className="p-6 bg-white rounded-lg shadow-lg flex items-center gap-3">
-				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-				<span className="text-lg font-semibold">Saving post...</span>
-			</div>
-		</div>
-	);
-};
+const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
-const UpdateBlogs = () => {
-	const { categories } = useContext(BlogPostContext);
+export default function UpdateBlog() {
+	const navigate = useNavigate()
+	const [title, setTitle] = useState("")
+	const [content, setContent] = useState("")
+	const [status, setStatus] = useState("Draft")
+	const [category, setCategory] = useState(0)
+	const [file, setFile] = useState(null)
+	const [previewUrl, setPreviewUrl] = useState("")
+	const [message, setMessage] = useState({ type: "", text: "" })
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [activeTab, setActiveTab] = useState("edit")
+	const [showHelp, setShowHelp] = useState(false)
+	const { categories } = useContext(BlogPostContext)
 	const { id } = useParams();
 	const [post, setPost] = useState({
 		id: 0,
@@ -29,8 +32,6 @@ const UpdateBlogs = () => {
 		imageUrl: "",
 		categoryId: 0,
 	});
-	const [file, setFile] = useState(null);
-	const [isLoading, setIsLoading] = useState(false);
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -44,19 +45,31 @@ const UpdateBlogs = () => {
 			fetchData();
 		}
 	}, [id]);
-
-	const handleChange = (e) => {
-		const { id, value } = e.target;
-		setPost((prev) => ({ ...prev, [id]: value }));
-	};
-
+	useEffect(()=>{
+		if(post){
+			setTitle(post.title)
+			setContent(post.content)
+			setStatus(post.status)
+			setCategory(post.categoryId)
+			if(post.imageUrl !== null){
+				setPreviewUrl(post.imageUrl);
+			}
+		}
+	},[post])
 	const handleFileChange = (e) => {
-		setFile(e.target.files[0]);
-	};
+		const selectedFile = e.target.files[0]
+		if (selectedFile) {
+			setFile(selectedFile)
+			setPreviewUrl(URL.createObjectURL(selectedFile))
+		}
+	}
+
+	const handleContentChange = (newContent) => {
+		setContent(newContent)
+	}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
 		if (!post.title || !post.content || !post.categoryId) {
 			alert("Please fill in all required fields!");
 			return;
@@ -64,86 +77,216 @@ const UpdateBlogs = () => {
 
 		const formData = new FormData();
 		formData.append("id", parseInt(id));
-		formData.append("title", post.title);
-		formData.append("content", post.content);
-		formData.append("status", post.status);
-		formData.append("category", post.categoryId);
+		formData.append("title", title);
+		formData.append("content", content);
+		formData.append("status", status);
+		formData.append("category", category);
 		formData.append("file", file);
 
 		try {
-			setIsLoading(true);
-			await axios.put(`${BASE_URL}/api/BlogPost/update-blog`, formData, {
+			setIsSubmitting(true);
+		    const response = await axios.put(`${BASE_URL}/api/BlogPost/update-blog`, formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
+			setPost(response.data);
 			alert("Bài viết đã được cập nhật thành công!");
 		} catch (err) {
 			console.error("Error updating post", err);
 			alert("Đã xảy ra lỗi, vui lòng thử lại!");
 		} finally {
-			setIsLoading(false);
+			setIsSubmitting(false);
 		}
 	};
-	const handleDelete = (e) => {
-		e.preventDefault();
 
-	}
+	// Clean up object URLs when component unmounts
+	useEffect(() => {
+		return () => {
+			if (previewUrl) {
+				URL.revokeObjectURL(previewUrl)
+			}
+		}
+	}, [previewUrl])
+
 	return (
-		<div className="w-full min-h-screen p-10 bg-gray-100 flex justify-center items-center">
-			<Loading isLoading={isLoading} />
-			<div className="w-full max-w-5xl bg-white p-10 rounded-lg shadow-lg">
-				<h2 className="text-3xl font-bold mb-6 text-center">Update Blog Post</h2>
-				<form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-					<div className="col-span-2">
-						<label className="block text-gray-700 font-semibold mb-2" htmlFor="title">Title</label>
-						<input className="w-full p-3 border rounded-lg" id="title" type="text" value={post.title} onChange={handleChange} required />
-					</div>
+		<div className="blog-editor-container">
+			<div className="blog-editor-card">
+				<div className="blog-editor-header">
+					<h1 className="blog-editor-title">Cập nhật bài viết</h1>
+				</div>
 
-					<div className="col-span-2">
-						<label className="block text-gray-700 font-semibold mb-2" htmlFor="content">Content</label>
-						<textarea className="w-full p-3 border rounded-lg" id="content" rows="6" value={post.content} onChange={handleChange} required />
-					</div>
+				{message.text && (
+					<div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"}`}>{message.text}</div>
+				)}
 
-					<div className="col-span-2">
-						<label className="block text-gray-700 font-semibold mb-2" htmlFor="status">Status</label>
-						<select id="status" value={post.status} onChange={handleChange} className="w-full p-3 border rounded-lg">
-							<option value="draft">Draft</option>
-							<option value="published">Published</option>
-						</select>
-					</div>
+				<form>
+					<div className="blog-editor-content">
+						<div className="form-group">
+							<label htmlFor="title" className="form-label">
+								Tiêu đề bài viết
+							</label>
+							<input
+								type="text"
+								id="title"
+								className="form-input"
+								placeholder="Nhập tiêu đề bài viết"
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
+								required
+							/>
+						</div>
 
-					<div className="col-span-2">
-						<label className="block text-gray-700 font-semibold mb-2" htmlFor="categoryId">Category</label>
-						<select id="categoryId" value={post.categoryId} onChange={handleChange} className="w-full p-3 border rounded-lg" required>
-							<option value="">-- Select a Category --</option>
-							{categories.map((category) => (
-								<option key={category.id} value={category.id}>{category.name}</option>
-							))}
-						</select>
-					</div>
+						<div className="form-group">
+							<label htmlFor="content" className="form-label">
+								Nội dung
+								<button
+									type="button"
+									className="markdown-toolbar-button"
+									style={{ marginLeft: "0.5rem" }}
+									onClick={() => setShowHelp(!showHelp)}
+									title={showHelp ? "Ẩn hướng dẫn" : "Hiện hướng dẫn"}
+								>
+									<FaQuestionCircle />
+								</button>
+							</label>
 
-					<div className="col-span-2">
-						<label className="block text-gray-700 font-semibold mb-2">Upload Image</label>
-						<input type="file" onChange={handleFileChange} className="w-full p-3 border rounded-lg" accept="image/*" />
-						{file ? (
-							<div className="mt-3">
-								<img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-32 object-cover rounded-lg" />
+							{showHelp && <MarkdownHelp />}
+
+							<div className="tabs">
+								<div className="tabs-list">
+									<div
+										className={`tab-trigger ${activeTab === "edit" ? "active" : ""}`}
+										onClick={() => setActiveTab("edit")}
+									>
+										<FaMarkdown style={{ display: "inline", marginRight: "6px" }} />
+										Soạn thảo
+									</div>
+									<div
+										className={`tab-trigger ${activeTab === "preview" ? "active" : ""}`}
+										onClick={() => setActiveTab("preview")}
+									>
+										Xem trước
+									</div>
+								</div>
+
+								<div className={`tab-content ${activeTab === "edit" ? "active" : ""}`}>
+									<MarkdownToolbar textareaId="content" onContentChange={handleContentChange} />
+									<textarea
+										id="content"
+										className="form-input form-textarea"
+										placeholder="Nhập nội dung bài viết (hỗ trợ Markdown)"
+										value={content}
+										onChange={(e) => setContent(e.target.value)}
+										required
+									/>
+								</div>
+
+								<div className={`tab-content ${activeTab === "preview" ? "active" : ""}`}>
+									<div className="markdown-preview">
+										{content ? (
+											<Markdown content={content} />
+										) : (
+											<div className="markdown-preview-empty">Chưa có nội dung để hiển thị</div>
+										)}
+									</div>
+								</div>
 							</div>
-						):(
-							<div className="mt-3">
-								<img src={post.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-lg" />
+						</div>
+
+						<div className="form-row">
+							<div className="form-col">
+								<div className="form-group">
+									<label htmlFor="status" className="form-label">
+										Trạng thái
+									</label>
+									<select
+										id="status"
+										className="form-input form-select"
+										value={status}
+										onChange={(e) => setStatus(e.target.value)}
+									>
+										<option value="Draft">Bản nháp</option>
+										<option value="Published">Công khai</option>
+									</select>
+								</div>
 							</div>
-						)}
+
+							<div className="form-col">
+								<div className="form-group">
+									<label htmlFor="category" className="form-label">
+										Danh mục
+									</label>
+									<select
+										id="category"
+										className="form-input form-select"
+										value={category}
+										onChange={(e) => setCategory(Number.parseInt(e.target.value))}
+										required
+									>
+										<option value={0}>Chọn danh mục</option>
+										{categories.length > 0 ? (
+											categories.map(({ id, name }) => (
+												<option key={id} value={id}>
+													{name}
+												</option>
+											))
+										) : (
+											<option disabled>Không có danh mục nào</option>
+										)}
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<div className="form-group">
+							<label htmlFor="thumbnail" className="form-label">
+								Ảnh
+							</label>
+							<div className="form-row">
+								<div className="form-col">
+									<div className="file-upload-container">
+										<input
+											type="file"
+											id="thumbnail"
+											accept="image/*"
+											onChange={handleFileChange}
+											style={{ display: "none" }}
+											required
+										/>
+										<label htmlFor="thumbnail" style={{ cursor: "pointer", display: "block" }}>
+											<FaImage className="file-upload-icon" />
+											<p className="file-upload-text">Kéo thả hoặc nhấp để tải lên</p>
+											<p className="file-upload-hint">SVG, PNG, JPG hoặc GIF (tối đa 2MB)</p>
+										</label>
+									</div>
+								</div>
+								{previewUrl && (
+									<div className="form-col">
+										<div className="file-preview-container">
+											<p className="form-label">Ảnh xem trước:</p>
+											<img src={previewUrl || "/placeholder.svg"} alt="Preview" className="file-preview-image" />
+										</div>
+									</div>
+								)}
+							</div>
+						</div>
 					</div>
 
-					<div className="col-span-2 text-center">
-						<button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
-							Submit
+					<div className="blog-editor-footer">
+						<button
+							type="button"
+							className="btn btn-secondary"
+							onClick={() => navigate("/manager/blog-posts")}
+							disabled={isSubmitting}
+						>
+							Hủy
+						</button>
+						<button onClick={(e)=>!isSubmitting? handleSubmit(e):()=>{return}} type="submit" className="btn btn-primary" disabled={isSubmitting}>
+							{isSubmitting ? "Đang xử lý..." : "Cập nhât bài viết"}
 						</button>
 					</div>
 				</form>
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export default UpdateBlogs;
