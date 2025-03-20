@@ -80,11 +80,21 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: index * 0.1 }}
                     >
-                        <img onClick={() => { handleDetailProduct(product) }}
-                             className="product-image"
-                             src={product.image || noImage}
-                             alt={product.name}
-                        />
+                        <div className="product-sale-image-container">
+                            <img onClick={() => { handleDetailProduct(product) }}
+                                 className="product-sale-image"
+                                 src={product.image || noImage}
+                                 alt={product.name}
+                            />
+                            <div className="product-sale-image-overlay">
+                                <button
+                                    className="product-sale-view-details-button"
+                                    onClick={() => handleDetailProduct(product)}
+                                >
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
                         <div className="product-info">
                             <div className="product-rating">
                                 {Array.from({ length: product.averageRating }, (_, i) => (
@@ -122,5 +132,6 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
         </main>
     );
 };
+
 
 export default TopSaleProducts;

@@ -57,13 +57,23 @@ export default function TopDealProducts({ products = [] }) {
                 <div ref={scrollRef} className="flex overflow-x-auto space-x-5 product-container">
                     {products.map((product) => (
                         <div key={product.id} className="product-discounted-card">
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                className="product-discounted-image"
-                                onClick={() => handleDetailProduct(product)}
-                                style={{ cursor: 'pointer' }}
-                            />
+                            <div className="product-discounted-image-container">
+                                <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="product-discounted-image"
+                                    onClick={() => handleDetailProduct(product)}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                                <div className="product-discounted-image-overlay">
+                                    <button
+                                        className="product-discounted-view-details-button"
+                                        onClick={() => handleDetailProduct(product)}
+                                    >
+                                        Xem chi tiết
+                                    </button>
+                                </div>
+                            </div>
                             <div className="product-discounted-details">
                                 <h3 className="product-discounted-name">{product.name}</h3>
                                 <div className="product-discounted-prices">
