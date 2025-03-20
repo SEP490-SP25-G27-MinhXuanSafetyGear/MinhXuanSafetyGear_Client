@@ -54,7 +54,7 @@ export default function TopDealProducts({ products = [] }) {
                     </div>
                     <button className="view-all-button mt-4">Xem tất cả <FaArrowRight className="inline" /></button>
                 </div>
-                <div ref={scrollRef} className="flex overflow-x-auto space-x-4 product-container">
+                <div ref={scrollRef} className="flex overflow-x-auto space-x-5 product-container">
                     {products.map((product) => (
                         <div key={product.id} className="product-discounted-card">
                             <img

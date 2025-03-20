@@ -1,4 +1,4 @@
-﻿
+﻿/* Base Styles (unchanged where possible, with minor improvements) */
 .deal {
     display: flex;
     justify-content: center;
@@ -8,20 +8,20 @@
     background-position: 50% 50%;
     background-size: 40%;
     background-repeat: repeat;
-
 }
 
 .deal .container {
     display: flex;
-    align-items: center; /* Center items vertically within the container */
-    width: 100%; /* Adjust this value to increase the width */
-    margin: 0 auto; /* Center the container horizontally */
+    align-items: center;
+    width: 100%;
+    max-width: 1400px; /* Match your header’s max-width for consistency */
+    margin: 0 auto;
 }
 
 .deal .container .flex {
-    height: auto; /* Ensure the height of the discounted products is not affected */
+    height: auto;
     display: flex;
-    overflow-x: hidden; /* Hide horizontal scrollbar */
+    overflow-x: hidden;
 }
 
 .product-container {
@@ -29,6 +29,7 @@
     overflow-x: auto;
     gap: 20px;
     padding: 20px 0;
+    scroll-behavior: smooth; /* Smooth scrolling for all devices */
 }
 
 .product-discounted-card {
@@ -39,11 +40,11 @@
     border-radius: 10px;
     padding: 20px;
     text-align: center;
-    transition: transform 0.3s ease; /* Add transition for smooth effect */
+    transition: transform 0.3s ease;
 }
 
 .product-discounted-card:hover {
-    transform: translateY(-10px); /* Move the card up on hover */
+    transform: translateY(-10px);
 }
 
 .product-discounted-image {
@@ -110,25 +111,25 @@
 .deal-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align to the start (left) */
-    margin-left: -100px; /* Remove left margin */
-    margin-right: auto; /* Push the section to the left */
-    white-space: nowrap; /* Prevent text from wrapping */
-    flex-shrink: 0; /* Prevent shrinking */
+    align-items: flex-start;
+    margin-left: -100px;
+    margin-right: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .product-container {
-    margin-top: 20px; /* Adjust this value if needed */
-    margin-left: 40px; /* Add left margin to shift products to the right */
+    margin-top: 20px;
+    margin-left: 40px;
     display: flex;
-    flex-wrap: nowrap; /* Prevent wrapping to a new line */
-    width: calc(100% - 80px); /* Adjust width to fit within the container */
-    overflow-x: hidden; /* Hide horizontal scrollbar */
+    flex-wrap: nowrap;
+    width: calc(100% - 80px);
+    overflow-x: hidden;
 }
 
 .deal h2 {
     color: white;
-    white-space: nowrap; /* Prevent text from wrapping */
+    white-space: nowrap;
 }
 
 .deal-title-text {
@@ -139,7 +140,7 @@
     text-transform: uppercase;
     line-height: 42px;
     margin-bottom: 20px;
-    position: relative; /* Ensure the pseudo-element is positioned relative to the text */
+    position: relative;
 }
 
 .highlight {
@@ -149,40 +150,38 @@
 .highlight::after {
     content: '';
     position: absolute;
-    bottom: -5px; /* Adjust this value to position the underline */
+    bottom: -5px;
     left: 0;
-    width: 140%; /* Extend the underline further to the right */
-    height: 3px; /* Adjust the height of the underline */
-    background-color: gold; /* Gold color for the underline */
+    width: 140%;
+    height: 3px;
+    background-color: gold;
     clip-path: polygon(0% 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
 }
 
 .navigate-button-container {
     display: flex;
     justify-content: center;
-    gap: 10px; /* Add space between the buttons */
-    margin-top: 20px; /* Add margin to position below product cards */
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .navigate-button {
-    width: 40px; /* Set the width of the square */
-    height: 40px; /* Set the height of the square */
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: white; /* White background */
-    color: red; /* Red icons */
-    border: 2px solid gold; /* Yellow border */
+    background-color: white;
+    color: red;
+    border: 2px solid gold;
     cursor: pointer;
-    font-size: 1.2rem; /* Reduce the font size */
-    line-height: 1; /* Adjust line height to make icons thinner */
+    font-size: 1.2rem;
+    line-height: 1;
 }
 
 .navigate-button:hover {
-    background-color: yellow; /* Change background color to yellow on hover */
+    background-color: yellow;
 }
-
-
 
 .view-all-button {
     position: relative;
@@ -193,30 +192,22 @@
     cursor: pointer;
     font-size: 1rem;
     text-align: center;
-    line-height: 50px; /* Center text vertically */
+    line-height: 50px;
     display: inline-block;
     text-transform: uppercase;
     font-weight: bold;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); /* Parallelogram shape */
-    overflow: hidden; /* Hide overflow to prevent scrollbars */
-    border-top: 2px solid #b50a00; /* Red top border */
-    border-bottom: 2px solid #b50a00; /* Red bottom border */
-    border-left: none; /* Remove left border */
-    border-right: none; /* Remove right border */
-    transition: color 0.5s ease; /* Smooth transition for text color */
-    margin-top: 20px; /* Add margin to position below navigation buttons */
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    overflow: hidden;
+    border-top: 2px solid #b50a00;
+    border-bottom: 2px solid #b50a00;
+    border-left: none;
+    border-right: none;
+    transition: color 0.5s ease;
+    margin-top: 20px;
 }
 
 .view-all-button:hover {
-    color: red; /* Change text color to red on hover */
-}
-
-.view-all-button::before,
-.view-all-button::after {
-    content: '';
-    position: absolute;
-    background-color: gold;
-    height: 100%;
+    color: red;
 }
 
 .view-all-button::before {
@@ -226,37 +217,121 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background-color: gold; /* Yellow background */
-    transition: left 0.5s ease; /* Smooth transition for background */
-    z-index: -1; /* Place behind the text */
+    background-color: gold;
+    transition: left 0.5s ease;
+    z-index: -1;
 }
 
 .view-all-button:hover::before {
-    left: 0; /* Move background to cover the button */
+    left: 0;
 }
 
 .view-all-button::after {
+    content: '';
+    position: absolute;
     top: 0;
     right: 0;
     width: 10%;
+    height: 100%;
+    background-color: gold;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 100%);
 }
 
-.text-gold {
-    color: goldenrod;
+/* Tablet Styles (769px–1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .deal {
+        height: 500px; /* Slightly shorter for tablets */
+        background-size: 50%; /* Adjust background size for better visibility */
+    }
+
+    .deal .container {
+        flex-direction: row; /* Keep horizontal layout */
+        align-items: center;
+        padding: 0 15px; /* Add padding for better spacing */
+    }
+
+    .deal-info {
+        margin-left: 0; /* Remove negative margin */
+        margin-right: 20px; /* Add spacing between deal-info and products */
+        align-items: flex-start;
+        flex-shrink: 0;
+    }
+
+    .deal-title-text {
+        font-size: 26px; /* Slightly smaller title */
+        line-height: 36px;
+    }
+
+    .navigate-button-container {
+        gap: 8px; /* Slightly smaller gap */
+        margin-top: 15px;
+    }
+
+    .navigate-button {
+        width: 35px; /* Smaller buttons */
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .view-all-button {
+        width: 180px; /* Slightly smaller button */
+        height: 45px;
+        line-height: 45px;
+        font-size: 0.9rem;
+        margin-top: 15px;
+    }
+
+    .product-container {
+        margin-left: 0; /* Remove margin to use full width */
+        width: 100%; /* Full width for product container */
+        gap: 15px; /* Smaller gap between cards */
+        padding: 15px 0;
+    }
+
+    .product-discounted-card {
+        width: 280px; /* Smaller cards for tablet */
+        padding: 15px;
+    }
+
+    .product-discounted-image {
+        height: 220px; /* Smaller image height */
+    }
+
+    .product-discounted-name {
+        font-size: 18px; /* Smaller name */
+    }
+
+    .product-discount-price {
+        font-size: 20px; /* Slightly smaller price */
+    }
+
+    .product-original-price {
+        font-size: 14px;
+    }
+
+    .product-discount-percentage {
+        font-size: 16px;
+    }
+
+    .option-button {
+        padding: 8px 15px; /* Smaller button */
+        font-size: 0.9rem;
+    }
 }
 
-/* Responsive styles for discounted products */
+/* Mobile Styles (≤768px) */
 @media (max-width: 768px) {
     .deal {
-        height: auto; /* Adjust height for smaller screens */
-        background-size: cover; /* Cover the background image */
+        height: auto; /* Allow height to adjust */
+        background-size: 60%; /* Adjust background size for mobile */
+        padding: 20px 0; /* Add padding for better spacing */
     }
 
     .deal .container {
         flex-direction: column;
         align-items: center;
         width: 100%;
+        padding: 0 10px; /* Add padding for better spacing */
     }
 
     .deal-info {
@@ -264,42 +339,111 @@
         margin-right: 0;
         align-items: center;
         text-align: center;
-        margin-top: 65px; /* Move down slightly on mobile */
-    }
-
-    .product-container {
-        flex-wrap: nowrap; /* Prevent wrapping to a new line */
-        margin-left: 0;
-        width: 100%;
-        overflow-x: auto; /* Enable horizontal scrolling */
-        scroll-behavior: smooth; /* Smooth scrolling */
-    }
-
-    .product-discounted-card {
-        width: 70%; /* Adjust the width of product cards on mobile */
-        margin-left: 15%; /* Center the product cards */
-    }
-
-    .product-discounted-name {
-        white-space: normal; /* Allow text to wrap */
-        font-size: 16px; /* Adjust font size for better balance */
-        text-align: center; /* Center align the text */
-    }
-
-    .navigate-button-container {
-        display: flex; /* Show navigation buttons */
-        justify-content: center;
-        gap: 10px; /* Add space between the buttons */
-        margin-top: -9px; /* Add margin to position below product cards */
-    }
-
-    .view-all-button {
-        width: 100%;
-        margin-top: 20px; /* Add margin to position below navigation buttons */
+        margin-top: 20px; /* Reduced margin for better spacing */
+        margin-bottom: 20px;
     }
 
     .deal-title-text {
-        font-size: 24px;
-        line-height: 36px;
+        font-size: 22px; /* Smaller title */
+        line-height: 32px;
+    }
+
+    .highlight::after {
+        width: 100%; /* Adjust underline width for mobile */
+    }
+
+    .navigate-button-container {
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .navigate-button {
+        width: 30px; /* Smaller buttons */
+        height: 30px;
+        font-size: 0.9rem;
+    }
+
+    .view-all-button {
+        width: 160px; /* Smaller button */
+        height: 40px;
+        line-height: 40px;
+        font-size: 0.85rem;
+        margin-top: 10px;
+    }
+
+    .product-container {
+        flex-wrap: nowrap;
+        margin-left: 0;
+        width: 100%;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        gap: 10px; /* Smaller gap between cards */
+        padding: 10px 0;
+    }
+
+    .product-discounted-card {
+        width: 250px; /* Smaller cards for mobile */
+        padding: 10px;
+        margin: 0 auto; /* Center cards */
+    }
+
+    .product-discounted-image {
+        height: 180px; /* Smaller image height */
+    }
+
+    .product-discounted-name {
+        white-space: normal;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .product-discount-price {
+        font-size: 18px; /* Smaller price */
+    }
+
+    .product-original-price {
+        font-size: 12px;
+    }
+
+    .product-discount-percentage {
+        font-size: 14px;
+    }
+
+    .option-button {
+        padding: 6px 10px; /* Smaller button */
+        font-size: 0.85rem;
+    }
+}
+
+/* Desktop Styles (>1024px) */
+@media (min-width: 1025px) {
+    .deal {
+        height: 600px;
+        background-size: 40%;
+    }
+
+    .deal .container {
+        padding: 0 20px;
+    }
+
+    .deal-info {
+        margin-left: -100px; /* Keep original negative margin */
+        margin-right: 40px;
+    }
+
+    .product-container {
+        margin-left: 40px;
+        width: calc(100% - 80px);
+        gap: 20px;
+        padding: 20px 0;
+    }
+
+    .product-discounted-card {
+        width: 350px;
+        padding: 20px;
+    }
+
+    .product-discounted-image {
+        height: 300px;
     }
 }
