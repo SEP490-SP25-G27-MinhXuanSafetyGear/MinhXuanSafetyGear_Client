@@ -2,29 +2,44 @@ import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight, FaHome, FaFilter, FaClock, FaArrowRight } from "react-icons/fa";
 import { ChevronRight } from "lucide-react";
 import axios from "axios";
+import { translateText } from "../../utils/translate";
+import getUserLanguage from "../../utils/getUserLanguage";
 import "./style.css";
 
 const BlogList = () => {
     const [blogs, setBlogs] = useState([]);
+    const [translatedBlogs, setTranslatedBlogs] = useState([]);
     const [filters, setFilters] = useState([]); // Lưu danh mục blog từ API
+    const [translatedFilters, setTranslatedFilters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [categoryId, setCategoryId] = useState(0);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [language, setLanguage] = useState("vi");
     const pageSize = 10;
+
+    // Lấy ngôn ngữ của người dùng từ IP
+    useEffect(() => {
+        const detectLanguage = async () => {
+            const lang = await getUserLanguage();
+            setLanguage(lang);
+            console.log("🌍 Ngôn ngữ phát hiện:", lang);
+        };
+        detectLanguage();
+    }, []);
 
     // Gọi API để lấy danh mục blog
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const response = await axios.get("http://localhost:5000/api/BlogPost/get-blog-categories");
-                setFilters([{ id: 0, name: "Tất cả" }, ...response.data]); // Thêm "Tất cả" vào danh sách
+                const categories = [{ id: 0, name: "Tất cả" }, ...response.data];
+                setFilters(categories);
             } catch (err) {
                 console.error("Lỗi khi tải danh mục blog", err);
             }
         };
-
         fetchCategories();
     }, []);
 
@@ -45,9 +60,47 @@ const BlogList = () => {
                 setLoading(false);
             }
         };
-
         fetchBlogs();
     }, [categoryId, page]);
+
+    // 📝 Dịch nội dung blog & danh mục blog
+    const translateContent = async () => {
+        if (language === "vi") {
+            console.log("✅ Ngôn ngữ là tiếng Việt, không cần dịch.");
+            return;
+        }
+
+        console.log(`🔄 Dịch nội dung từ tiếng Việt sang ${language}...`);
+
+        if (blogs.length > 0) {
+            const translatedBlogsData = await Promise.all(
+                blogs.map(async (blog) => ({
+                    ...blog,
+                    title: await translateText(blog.title, language),
+                    content: await translateText(blog.content, language),
+                }))
+            );
+            setTranslatedBlogs(translatedBlogsData);
+        }
+
+        if (filters.length > 0) {
+            const translatedFiltersData = await Promise.all(
+                filters.map(async (filter) => ({
+                    ...filter,
+                    name: await translateText(filter.name, language),
+                }))
+            );
+            setTranslatedFilters(translatedFiltersData);
+        }
+    };
+
+    // Khi dữ liệu thay đổi, kiểm tra xem có cần dịch hay không
+    useEffect(() => {
+        if (blogs.length > 0 || filters.length > 0) {
+            console.log("📢 Bắt đầu dịch nội dung blog...");
+            translateContent();
+        }
+    }, [blogs, filters, language]);
 
     return (
         <div className="blog-container">
@@ -68,7 +121,7 @@ const BlogList = () => {
                         <span className="filter-title">BỘ LỌC TIN TỨC</span>
                     </div>
                     <div className="filter-options">
-                        {filters.map((filter) => (
+                        {(translatedFilters.length > 0 ? translatedFilters : filters).map((filter) => (
                             <label key={filter.id} className="filter-label">
                                 <input
                                     type="radio"
@@ -92,7 +145,7 @@ const BlogList = () => {
                         <p className="text-red-500">{error}</p>
                     ) : blogs.length > 0 ? (
                         <div className="all-blog-list">
-                            {blogs.map((blog) => (
+                            {(translatedBlogs.length > 0 ? translatedBlogs : blogs).map((blog) => (
                                 <div key={blog.postId} className="all-blog-item">
                                     <div className="new-blog-image-container">
                                         <img
@@ -113,7 +166,6 @@ const BlogList = () => {
                                         <p className="new-blog-description">{blog.content}</p>
                                     </div>
 
-                                    {/* Giữ thiết kế cũ của nút "Xem Chi Tiết" */}
                                     <div className="new-blog-read-more">
                                         <button className="new-blog-read-more-button">
                                             <div className="new-blog-read-more-text">
@@ -128,46 +180,6 @@ const BlogList = () => {
                     ) : (
                         <p>Không có bài viết nào.</p>
                     )}
-
-                    {/* PHÂN TRANG - CĂN GIỮA */}
-                    <div className="flex justify-center mt-6">
-                        <div className="flex items-center space-x-2">
-                            <button
-                                disabled={page === 1}
-                                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                                className={`px-4 py-2 rounded-md border ${
-                                    page === 1 ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
-                                } flex items-center`}
-                            >
-                                <FaChevronLeft className="mr-1" />
-                                Trước
-                            </button>
-
-                            {[...Array(totalPages)].map((_, index) => (
-                                <button
-                                    key={index + 1}
-                                    onClick={() => setPage(index + 1)}
-                                    className={`px-4 py-2 rounded-md border ${
-                                        page === index + 1 ? "bg-red-600 text-white" : "hover:bg-gray-100"
-                                    }`}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
-
-                            <button
-                                disabled={page === totalPages}
-                                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                                className={`px-4 py-2 rounded-md border ${
-                                    page === totalPages ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
-                                } flex items-center`}
-                            >
-                                Sau
-                                <FaChevronRight className="ml-1" />
-                            </button>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
