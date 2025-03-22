@@ -49,6 +49,7 @@ const BlogList = () => {
         fetchBlogs();
     }, [categoryId, page]);
 
+
     return (
         <div className="blog-container">
             <nav className="breadcrumb-blog-list">
@@ -130,44 +131,45 @@ const BlogList = () => {
                     )}
 
                     {/* PHÂN TRANG - CĂN GIỮA */}
-                    <div className="flex justify-center mt-6">
-                        <div className="flex items-center space-x-2">
-                            <button
-                                disabled={page === 1}
-                                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                                className={`px-4 py-2 rounded-md border ${
-                                    page === 1 ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
-                                } flex items-center`}
-                            >
-                                <FaChevronLeft className="mr-1" />
-                                Trước
-                            </button>
-
-                            {[...Array(totalPages)].map((_, index) => (
+                    {blogs.length > 0 && (
+                        <div className="flex justify-center mt-6">
+                            <div className="flex items-center space-x-2">
                                 <button
-                                    key={index + 1}
-                                    onClick={() => setPage(index + 1)}
+                                    disabled={page === 1}
+                                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                                     className={`px-4 py-2 rounded-md border ${
-                                        page === index + 1 ? "bg-red-600 text-white" : "hover:bg-gray-100"
-                                    }`}
+                                        page === 1 ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
+                                    } flex items-center`}
                                 >
-                                    {index + 1}
+                                    <FaChevronLeft className="mr-1" />
+                                    Trước
                                 </button>
-                            ))}
 
-                            <button
-                                disabled={page === totalPages}
-                                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                                className={`px-4 py-2 rounded-md border ${
-                                    page === totalPages ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
-                                } flex items-center`}
-                            >
-                                Sau
-                                <FaChevronRight className="ml-1" />
-                            </button>
+                                {[...Array(totalPages)].map((_, index) => (
+                                    <button
+                                        key={index + 1}
+                                        onClick={() => setPage(index + 1)}
+                                        className={`px-4 py-2 rounded-md border ${
+                                            page === index + 1 ? "bg-red-600 text-white" : "hover:bg-gray-100"
+                                        }`}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                ))}
+
+                                <button
+                                    disabled={page === totalPages}
+                                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                                    className={`px-4 py-2 rounded-md border ${
+                                        page === totalPages ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
+                                    } flex items-center`}
+                                >
+                                    Sau
+                                    <FaChevronRight className="ml-1" />
+                                </button>
+                            </div>
                         </div>
-                    </div>
-
+                    )}
                 </div>
             </div>
         </div>

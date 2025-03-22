@@ -17,7 +17,7 @@ import { CustomerProductContext } from "../../contexts/CustomerProductContext"
 import { CartContext } from "../../contexts/CartContext"
 import { toSlug } from "../../utils/SlugUtils"
 import ProductPopup from "../../components/productpopup"
-import "./ProductListCategory.css" // Import the new CSS file
+import "./ProductListCategory.css"
 
 const useQuery = () => new URLSearchParams(useLocation().search)
 
