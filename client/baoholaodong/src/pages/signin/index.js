@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import './style.css';
 import { AuthContext } from "../../contexts/AuthContext";
 import Loading from "../../components/Loading/Loading";
+
 const Signin = () => {
+
     const [formSignin, setFormSignin] = useState({
         email: '',
         password: ''

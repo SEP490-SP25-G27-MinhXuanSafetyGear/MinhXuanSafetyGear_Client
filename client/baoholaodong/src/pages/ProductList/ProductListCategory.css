@@ -139,7 +139,7 @@
 }
 
 .product-list-category-filter-header {
-    background-color: #b50a00;
+    background: linear-gradient(to top, #4a0403, #a50d0b);
     color: gold;
     padding: 1rem;
     display: flex;
