@@ -5,6 +5,9 @@ import { FaArrowRight, FaArrowLeft, FaClock } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import {DisplayContent} from "../TextEditor";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 const NewBlog = () => {
     const [blogs, setBlogs] = useState([]);
@@ -94,7 +97,7 @@ const NewBlog = () => {
                             </div>
                             <div className="new-blog-content">
                                 <h3 className="new-blog-item-title">{blog.title}</h3>
-                                <p className="new-blog-description">{blog.content}</p>
+                                <DisplayContent content={blog.content} />
                             </div>
                             <div className="new-blog-read-more">
                                 <button className="new-blog-read-more-button">

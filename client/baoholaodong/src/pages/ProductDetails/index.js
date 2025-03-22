@@ -78,6 +78,9 @@ function ProductDetail() {
         }
         return stars
     }
+    const handleDetailProduct= (product)=>{
+        navigate(`/products/${product.slug}`,{replace:true});
+    }
 
     const LoadingSkeleton = () => (
         <div>
@@ -642,7 +645,7 @@ function ProductDetail() {
                                         <div
                                             key={product.id}
                                             className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                                            onClick={() => (window.location.href = `/product/${product.id}/${toSlug(product.name)}`)}
+                                            onClick={() => handleDetailProduct(product)}
                                         >
                                             <div className="aspect-square overflow-hidden">
                                                 <img
@@ -693,7 +696,7 @@ function ProductDetail() {
                                         <div
                                             key={product.id}
                                             className="pd-related-product-item"
-                                            onClick={() => (window.location.href = `/product/${product.id}/${toSlug(product.name)}`)}
+                                            onClick={() => handleDetailProduct(product)}
                                         >
                                             <div className="pd-related-product-image">
                                                 <img
