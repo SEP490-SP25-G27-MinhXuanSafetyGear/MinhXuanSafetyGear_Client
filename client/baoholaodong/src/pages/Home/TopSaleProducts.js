@@ -107,6 +107,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                                     <>
                                         <span className="text-red-500">{(product.price - product.discount).toLocaleString()}đ</span>
                                         <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                        <p className="product-discount-percentage"> Giảm {product.discount} %</p>
                                     </>
                                 ) : (
                                     <span>{product.price.toLocaleString()}đ</span>

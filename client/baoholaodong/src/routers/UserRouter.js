@@ -44,6 +44,7 @@ import {ConfirmOrder} from "../pages/ConfirmOrder";
 import ProductVariantSelector from "../pages/ProductDetails/ProductVariantSelector";
 import BlogDetail from "../pages/BlogDetail";
 
+
 const UserRouter = () => {
     return (
         <Router>
@@ -71,6 +72,7 @@ const UserRouter = () => {
                     <Route path="/products" element={<ProductList />} />
                     <Route path="/products/:slug" element={<ProductDetail />} />
                     <Route path="/blog" element={<BlogList />} />
+                    <Route path="/blog/:slug" element={<BlogList />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/verification" element={<VerificationPage />} />
@@ -80,7 +82,7 @@ const UserRouter = () => {
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
                     <Route path="/category/:categoryId" element={<ProductListByCategory />} />
                     <Route path="confirm-order" element={<ConfirmOrder />} />
-                    <Route path="/blogdetails" element={<BlogDetail />} />
+                    <Route path="/blog-detail/:slug" element={<BlogDetail />} />
                 </Route>
                 <Route path="/demo" element={<ProductVariantSelector/>}/>
                 {/* Admin Routes */}
