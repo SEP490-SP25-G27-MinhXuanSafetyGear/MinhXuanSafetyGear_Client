@@ -52,6 +52,7 @@ const UserRouter = () => {
                 <Route path="/403" element={<Error403 />} />
                 <Route path="/503" element={<Error503 />} />
                 <Route path="/404" element={<Error404 />} />
+
                 <Route path="*" element={<Error404 />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />

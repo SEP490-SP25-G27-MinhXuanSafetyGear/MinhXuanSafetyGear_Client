@@ -4,9 +4,10 @@ import { useState, useEffect, useContext } from "react"
 import {useNavigate, useParams} from "react-router-dom"
 import axios from "axios"
 import { FaImage, FaMarkdown, FaQuestionCircle } from "react-icons/fa"
-import { Markdown, MarkdownToolbar, MarkdownHelp } from "../../../components/Markdown/markdown-editor"
 import "./create-blog.css"
 import { BlogPostContext } from "../../../contexts/BlogPostContext"
+import {TextEditor} from "../../../components/TextEditor";
+import type React from "react";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
@@ -138,60 +139,9 @@ export default function UpdateBlog() {
 						<div className="form-group">
 							<label htmlFor="content" className="form-label">
 								Nội dung
-								<button
-									type="button"
-									className="markdown-toolbar-button"
-									style={{ marginLeft: "0.5rem" }}
-									onClick={() => setShowHelp(!showHelp)}
-									title={showHelp ? "Ẩn hướng dẫn" : "Hiện hướng dẫn"}
-								>
-									<FaQuestionCircle />
-								</button>
 							</label>
-
-							{showHelp && <MarkdownHelp />}
-
-							<div className="tabs">
-								<div className="tabs-list">
-									<div
-										className={`tab-trigger ${activeTab === "edit" ? "active" : ""}`}
-										onClick={() => setActiveTab("edit")}
-									>
-										<FaMarkdown style={{ display: "inline", marginRight: "6px" }} />
-										Soạn thảo
-									</div>
-									<div
-										className={`tab-trigger ${activeTab === "preview" ? "active" : ""}`}
-										onClick={() => setActiveTab("preview")}
-									>
-										Xem trước
-									</div>
-								</div>
-
-								<div className={`tab-content ${activeTab === "edit" ? "active" : ""}`}>
-									<MarkdownToolbar textareaId="content" onContentChange={handleContentChange} />
-									<textarea
-										id="content"
-										className="form-input form-textarea"
-										placeholder="Nhập nội dung bài viết (hỗ trợ Markdown)"
-										value={content}
-										onChange={(e) => setContent(e.target.value)}
-										required
-									/>
-								</div>
-
-								<div className={`tab-content ${activeTab === "preview" ? "active" : ""}`}>
-									<div className="markdown-preview">
-										{content ? (
-											<Markdown content={content} />
-										) : (
-											<div className="markdown-preview-empty">Chưa có nội dung để hiển thị</div>
-										)}
-									</div>
-								</div>
-							</div>
+							<TextEditor width={"100%"} height={"300px"} value={content} setValue={setContent} />
 						</div>
-
 						<div className="form-row">
 							<div className="form-col">
 								<div className="form-group">

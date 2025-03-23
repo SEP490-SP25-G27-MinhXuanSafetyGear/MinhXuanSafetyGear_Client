@@ -13,10 +13,17 @@ const ProductPopup = ({ product, onClose }) => {
     if (!product) return null;
 
     const handleAddToCart = () => {
-        addToCart({ ...product,
-            product:product,
-            variant:selectedVariant,
-            quantity });
+        if(selectedVariant !== null){
+            addToCart({ ...product,
+                product:product,
+                variant:selectedVariant,
+                quantity });
+        }else{
+            addToCart({ ...product,
+                product:product,
+                variant:{},
+                quantity });
+        }
         onClose();
     };
 
