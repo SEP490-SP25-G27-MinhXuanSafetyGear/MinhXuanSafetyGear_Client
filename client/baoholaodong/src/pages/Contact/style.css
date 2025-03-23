@@ -53,7 +53,6 @@
 
 .contact-page .contact-form-container {
     background-color: #F9FAFB;
-    padding: 1.5rem;
     border-radius: 0.5rem;
 }
 
@@ -134,10 +133,10 @@
 }
 
 .contact-page .map-container {
-    height: 500px; /* Điều chỉnh chiều cao của map container */
+    height: 500px;
     border-radius: 0.5rem;
     overflow: hidden;
-    margin-top: 2rem; /* Thêm khoảng cách phía trên nếu cần */
+    margin-top: 2rem;
 }
 
 .contact-page .google-map {

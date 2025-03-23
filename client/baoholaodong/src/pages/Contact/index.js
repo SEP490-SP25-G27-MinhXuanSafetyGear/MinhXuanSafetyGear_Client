@@ -1,16 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import './style.css';
 
 const Contact = () => {
+    const [contactInfo, setContactInfo] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         phone: "",
         message: ""
     });
-
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [submissionStatus, setSubmissionStatus] = useState(null);
+
+    useEffect(() => {
+        const fetchContactInfo = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_BASE_URL_API}/api/Contact/get-contact-info`);
+                setContactInfo(response.data);
+            } catch (err) {
+                setError("Không thể tải thông tin liên hệ");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchContactInfo();
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -20,42 +41,64 @@ const Contact = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Xử lý dữ liệu form ở đây (ví dụ: gửi dữ liệu đến API)
-        console.log("Form Data Submitted:", formData);
-        setSubmissionStatus("Form submitted successfully!");
-        setFormData({
-            name: "",
-            email: "",
-            phone: "",
-            message: ""
-        });
+        setLoading(true);
+        setError(null);
+        setSubmissionStatus(null);
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_BASE_URL_API}/api/Contact/submit`, formData);
+            console.log("API Response:", response.data);
+            setSubmissionStatus("Tin nhắn của bạn đã được gửi thành công!");
+            setFormData({
+                name: "",
+                email: "",
+                phone: "",
+                message: ""
+            });
+        } catch (err) {
+            console.error("Error submitting form:", err);
+            setError("Đã xảy ra lỗi khi gửi tin nhắn. Vui lòng thử lại!");
+        } finally {
+            setLoading(false);
+        }
     };
+
+    if (loading) {
+        return <div className="contact-page"><p>Đang tải dữ liệu...</p></div>;
+    }
+
+    if (error) {
+        return <div className="contact-page"><p className="text-red-500">{error}</p></div>;
+    }
+
+    if (!contactInfo) {
+        return <div className="contact-page"><p>Không tìm thấy thông tin liên hệ.</p></div>;
+    }
 
     return (
         <div className="contact-page" id="yourElementId">
             <div className="contact-container">
                 <div className="contact-grid">
-                    {/* Left Column - Contact Form */}
                     <div className="contact-info">
-                        <h2 className="company-title">CỬA HÀNG BẢO HỘ MINH XUÂN</h2>
+                        <h2 className="company-title">{contactInfo.companyName || "CỬA HÀNG BẢO HỘ MINH XUÂN"}</h2>
                         <p className="company-description">
-                            Hiện nay, Minh Xuân là một trong những Công ty lớn cung cấp và sản xuất tất cả các trang thiết bị bảo hộ, an toàn cho người lao động trên toàn quốc.
+                            {contactInfo.description || "Hiện nay, Minh Xuân là một trong những Công ty lớn cung cấp và sản xuất tất cả các trang thiết bị bảo hộ, an toàn cho người lao động trên toàn quốc."}
                         </p>
 
                         <div className="contact-details">
                             <div className="contact-item">
                                 <MapPin className="contact-icon" size={20} />
-                                <span>Địa chỉ: 4A, Hai Bà Trưng, Hà Nội</span>
+                                <span>{contactInfo.address || "Địa chỉ: 4A, Hai Bà Trưng, Hà Nội"}</span>
                             </div>
                             <div className="contact-item">
                                 <Phone className="contact-icon" size={20} />
-                                <span>Hotline: 043.987.5343 - 0912.423.042 - 0912.201.309</span>
+                                <span>{contactInfo.hotline || "Hotline: 043.987.5343 - 0912.423.042 - 0912.201.309"}</span>
                             </div>
                             <div className="contact-item">
                                 <Mail className="contact-icon" size={20} />
-                                <span>Email: minhxuanbh365@gmail.com</span>
+                                <span>{contactInfo.email || "Email: minhxuanbh365@gmail.com"}</span>
                             </div>
                         </div>
 
@@ -101,15 +144,16 @@ const Contact = () => {
                                 <button
                                     type="submit"
                                     className="submit-button"
+                                    disabled={loading}
                                 >
-                                    Gửi tin nhắn
+                                    {loading ? "Đang gửi..." : "Gửi tin nhắn"}
                                 </button>
                             </form>
-                            {submissionStatus && <p className="submission-status">{submissionStatus}</p>}
+                            {submissionStatus && <p className="submission-status text-green-500">{submissionStatus}</p>}
+                            {error && <p className="submission-status text-red-500">{error}</p>}
                         </div>
                     </div>
 
-                    {/* Right Column - Map */}
                     <div className="map-container">
                         <iframe
                             title="Minh Xuan Location"
