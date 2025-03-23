@@ -13,7 +13,7 @@ import UpdateImageForm from "./form/UpdateImageForm";
 import CreateVariantForm from "./form/CreateVariantForm";
 import UpdateVariantForm from "./form/UpdateVariantForm";
 import AddMoreImageForm from "./form/AddMoreImageForm";
-import {Markdown} from "../../../components/Markdown/markdown-editor";
+import {DisplayContent} from "../../../components/TextEditor";
 
 const LoadingSkeleton = () => {
 	return (
@@ -269,11 +269,11 @@ const UpdateProduct = () => {
 									</div>
 									<div className="col-span-2">
 										<span className="text-gray-500 block mb-1">Mô tả:</span>
-										<Markdown content={product.description} />
+										<DisplayContent content={product.description} />
 									</div>
 									<div className="col-span-2">
 										<span className="text-gray-500 block mb-1">Chứng nhận chất lượng:</span>
-										<Markdown content={product.qualityCertificate} />
+										<DisplayContent content={product.qualityCertificate} />
 									</div>
 									<div className="col-span-2">
 										<span className="text-gray-500 block mb-1">Thuế: <span className="font-medium text-gray-800">{product.totalTax}%</span></span>
