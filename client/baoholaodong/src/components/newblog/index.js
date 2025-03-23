@@ -12,7 +12,7 @@ const NewBlog = () => {
     const [error, setError] = useState(null);
     const sliderRef = useRef(null);
 
-    // 🔧 Hàm xử lý loại bỏ HTML và rút gọn nội dung
+    //  Hàm xử lý loại bỏ HTML và rút gọn nội dung
     const stripHtmlTags = (html) => {
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = html;
@@ -27,7 +27,7 @@ const NewBlog = () => {
         return plainText.substring(0, maxLength) + "...";
     };
 
-    // 📦 Gọi API lấy danh sách bài blog
+    //  Gọi API lấy danh sách bài blog
     useEffect(() => {
         const fetchBlogs = async () => {
             setLoading(true);
