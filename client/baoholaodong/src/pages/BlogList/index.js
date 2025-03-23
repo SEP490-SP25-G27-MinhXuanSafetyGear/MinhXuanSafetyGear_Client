@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight, FaHome, FaFilter, FaClock, FaArrowRight } from "react-icons/fa";
 import { ChevronRight } from "lucide-react";
 import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { toSlug } from "../../utils/SlugUtils"
 import "./style.css";
 
 const BlogList = () => {
     const [blogs, setBlogs] = useState([]);
-    const [filters, setFilters] = useState([]); // Lưu danh mục blog từ API
+    const [filters, setFilters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [categoryId, setCategoryId] = useState(0);
@@ -14,12 +16,18 @@ const BlogList = () => {
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 10;
 
-    // Gọi API để lấy danh mục blog
+    const navigate = useNavigate();
+    const { slug } = useParams();
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const response = await axios.get("http://localhost:5000/api/BlogPost/get-blog-categories");
-                setFilters([{ id: 0, name: "Tất cả" }, ...response.data]); // Thêm "Tất cả" vào danh sách
+                const categoriesWithSlug = response.data.map(category => ({
+                    ...category,
+                    slug: toSlug(category.name), // Dùng toSlug từ SlugUtils
+                }));
+                setFilters([{ id: 0, name: "Tất cả", slug: "" }, ...categoriesWithSlug]);
             } catch (err) {
                 console.error("Lỗi khi tải danh mục blog", err);
             }
@@ -28,7 +36,18 @@ const BlogList = () => {
         fetchCategories();
     }, []);
 
-    // Gọi API để lấy danh sách blog theo danh mục
+    useEffect(() => {
+        if (filters.length > 0 && slug) {
+            const selectedFilter = filters.find(f => f.slug === slug);
+            if (selectedFilter && selectedFilter.id !== categoryId) {
+                setCategoryId(selectedFilter.id);
+                setPage(1);
+            }
+        } else if (!slug && categoryId !== 0) {
+            setCategoryId(0);
+        }
+    }, [slug, filters]);
+
     useEffect(() => {
         const fetchBlogs = async () => {
             setLoading(true);
@@ -49,6 +68,17 @@ const BlogList = () => {
         fetchBlogs();
     }, [categoryId, page]);
 
+    const handleCategoryChange = (filter) => {
+        setCategoryId(filter.id);
+        setPage(1);
+        const newSlug = filter.slug || "";
+        navigate(newSlug ? `/blog/${newSlug}` : "/blog");
+    };
+
+    const handleViewDetail = (blog) => {
+        const blogSlug = blog.slug || toSlug(blog.title); // Dùng toSlug từ SlugUtils
+        navigate(`/blog-detail/${blogSlug}`);
+    };
 
     return (
         <div className="blog-container">
@@ -62,7 +92,6 @@ const BlogList = () => {
             </nav>
 
             <div className="blog-list-container">
-                {/* Bộ lọc danh mục - Dữ liệu từ API */}
                 <div className="blog-filter">
                     <div className="filter-header">
                         <FaFilter className="filter-icon" />
@@ -75,7 +104,7 @@ const BlogList = () => {
                                     type="radio"
                                     name="category"
                                     checked={categoryId === filter.id}
-                                    onChange={() => setCategoryId(filter.id)}
+                                    onChange={() => handleCategoryChange(filter)}
                                     className="filter-radio"
                                 />
                                 <span>{filter.name}</span>
@@ -86,7 +115,6 @@ const BlogList = () => {
 
                 <div className="blog-list">
                     <h2 className="all-blog-title">Danh sách bài viết</h2>
-
                     {loading ? (
                         <p>Đang tải dữ liệu...</p>
                     ) : error ? (
@@ -108,21 +136,20 @@ const BlogList = () => {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div className="new-blog-content">
                                         <h3 className="new-blog-item-title">{blog.title}</h3>
                                         <p className="new-blog-description">{blog.content}</p>
                                     </div>
-
-                                    {/* Giữ thiết kế cũ của nút "Xem Chi Tiết" */}
                                     <div className="new-blog-read-more">
-                                        <button className="new-blog-read-more-button">
+                                        <button
+                                            className="new-blog-read-more-button"
+                                            onClick={() => handleViewDetail(blog)}
+                                        >
                                             <div className="new-blog-read-more-text">
                                                 Xem chi tiết <FaArrowRight className="inline" />
                                             </div>
                                         </button>
                                     </div>
-
                                 </div>
                             ))}
                         </div>
@@ -130,7 +157,6 @@ const BlogList = () => {
                         <p>Không có bài viết nào.</p>
                     )}
 
-                    {/* PHÂN TRANG - CĂN GIỮA */}
                     {blogs.length > 0 && (
                         <div className="flex justify-center mt-6">
                             <div className="flex items-center space-x-2">
@@ -144,7 +170,6 @@ const BlogList = () => {
                                     <FaChevronLeft className="mr-1" />
                                     Trước
                                 </button>
-
                                 {[...Array(totalPages)].map((_, index) => (
                                     <button
                                         key={index + 1}
@@ -156,7 +181,6 @@ const BlogList = () => {
                                         {index + 1}
                                     </button>
                                 ))}
-
                                 <button
                                     disabled={page === totalPages}
                                     onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
