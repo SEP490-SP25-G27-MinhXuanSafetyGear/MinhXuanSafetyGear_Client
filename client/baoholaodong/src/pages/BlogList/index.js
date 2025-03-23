@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight, FaHome, FaFilter, FaClock, FaArrowRight } from "react-icons/fa";
 import { ChevronRight } from "lucide-react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import { toSlug } from "../../utils/SlugUtils"
+import { useNavigate, useLocation } from "react-router-dom";
+import { toSlug } from "../../utils/SlugUtils";
 import "./style.css";
 
 const BlogList = () => {
@@ -17,7 +17,12 @@ const BlogList = () => {
     const pageSize = 10;
 
     const navigate = useNavigate();
-    const { slug } = useParams();
+    const location = useLocation();
+
+    const getCategorySlugFromQuery = () => {
+        const searchParams = new URLSearchParams(location.search);
+        return searchParams.get("cate") || "";
+    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -25,7 +30,7 @@ const BlogList = () => {
                 const response = await axios.get("http://localhost:5000/api/BlogPost/get-blog-categories");
                 const categoriesWithSlug = response.data.map(category => ({
                     ...category,
-                    slug: toSlug(category.name), // Dùng toSlug từ SlugUtils
+                    slug: toSlug(category.name),
                 }));
                 setFilters([{ id: 0, name: "Tất cả", slug: "" }, ...categoriesWithSlug]);
             } catch (err) {
@@ -37,16 +42,17 @@ const BlogList = () => {
     }, []);
 
     useEffect(() => {
-        if (filters.length > 0 && slug) {
-            const selectedFilter = filters.find(f => f.slug === slug);
+        const currentSlug = getCategorySlugFromQuery();
+        if (filters.length > 0 && currentSlug) {
+            const selectedFilter = filters.find(f => f.slug === currentSlug);
             if (selectedFilter && selectedFilter.id !== categoryId) {
                 setCategoryId(selectedFilter.id);
                 setPage(1);
             }
-        } else if (!slug && categoryId !== 0) {
+        } else if (!currentSlug && categoryId !== 0) {
             setCategoryId(0);
         }
-    }, [slug, filters]);
+    }, [location.search, filters]);
 
     useEffect(() => {
         const fetchBlogs = async () => {
@@ -72,12 +78,26 @@ const BlogList = () => {
         setCategoryId(filter.id);
         setPage(1);
         const newSlug = filter.slug || "";
-        navigate(newSlug ? `/blog/${newSlug}` : "/blog");
+        navigate(newSlug ? `/blogs?cate=${newSlug}` : "/blogs");
     };
 
     const handleViewDetail = (blog) => {
-        const blogSlug = blog.slug || toSlug(blog.title); // Dùng toSlug từ SlugUtils
-        navigate(`/blog-detail/${blogSlug}`);
+        const blogSlug = blog.slug || toSlug(blog.title);
+        navigate(`/blogs/${blogSlug}`);
+    };
+
+    const stripHtmlTags = (html) => {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        return tempDiv.textContent || tempDiv.innerText || "";
+    };
+
+    const truncateText = (html, maxLength) => {
+        const plainText = stripHtmlTags(html);
+        if (plainText.length <= maxLength) {
+            return plainText;
+        }
+        return plainText.substring(0, maxLength) + "...";
     };
 
     return (
@@ -138,7 +158,7 @@ const BlogList = () => {
                                     </div>
                                     <div className="new-blog-content">
                                         <h3 className="new-blog-item-title">{blog.title}</h3>
-                                        <p className="new-blog-description">{blog.content}</p>
+                                        <p className="new-blog-description">{truncateText(blog.content, 100)}</p>
                                     </div>
                                     <div className="new-blog-read-more">
                                         <button

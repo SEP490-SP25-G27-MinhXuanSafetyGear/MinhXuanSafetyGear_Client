@@ -137,7 +137,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                     <a href="/about" className="cursor-pointer hover:underline block mb-2">
                         Về Bảo hộ lao động Minh Xuân
                     </a>
-                    <a href="/blog" className="cursor-pointer hover:underline block mb-2">
+                    <a href="/blogs" className="cursor-pointer hover:underline block mb-2">
                         Kiến thức an toàn lao động
                     </a>
                     <a href="/contact" className="cursor-pointer hover:underline block">
