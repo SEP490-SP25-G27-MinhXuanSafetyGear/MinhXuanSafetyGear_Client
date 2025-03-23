@@ -2,8 +2,8 @@
 
 import React from "react"
 import { Star, StarHalf, ShoppingCart, Truck, Package, Shield, X } from "lucide-react"
-import { Markdown } from "../../../components/Markdown/markdown-editor"
 import noImage from "../../../images/no-image-product.jpg"
+import {DisplayContent} from "../../../components/TextEditor";
 
 const ProductPreview = ({ product, images, onClose }) => {
     const [imageIndex, setImageIndex] = React.useState(0)
@@ -197,7 +197,7 @@ const ProductPreview = ({ product, images, onClose }) => {
                                 <div>
                                     <h3 className="text-lg font-medium text-gray-900 mb-4">Product Description</h3>
                                     <div className="prose prose-sm max-w-none">
-                                        <Markdown content={product.description || "No description provided."} />
+                                        <DisplayContent content={product.description || "No description provided."} />
                                     </div>
                                 </div>
 
@@ -215,7 +215,7 @@ const ProductPreview = ({ product, images, onClose }) => {
                                     <div>
                                         <h3 className="text-lg font-medium text-gray-900 mb-4">Quality Certificate</h3>
                                         <div className="prose prose-sm max-w-none">
-                                            <Markdown content={product.qualityCertificate || "No certificate information provided."} />
+                                            <DisplayContent content={product.qualityCertificate || "No certificate information provided."} />
                                         </div>
                                     </div>
                                 </div>

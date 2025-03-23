@@ -19,11 +19,10 @@ import { useNavigate, useParams } from "react-router-dom"
 import * as signalR from "@microsoft/signalr"
 import noImage from "../../images/no-image-product.jpg"
 import { CartContext } from "../../contexts/CartContext"
-import { toSlug } from "../../utils/SlugUtils"
 import "./style.css"
 import axios from "axios"
-import { Markdown } from "../../components/Markdown/markdown-editor"
 import ProductVariantSelector from "./ProductVariantSelector";
+import {DisplayContent} from "../../components/TextEditor";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
 function ProductDetail() {
@@ -476,11 +475,9 @@ function ProductDetail() {
                             <div className="content-loaded">
                                 {activeTab === "description" && (
                                     <div className="pd-description-content">
-                                        <div className="pd-description-column">
+                                        <div >
                                             <h3 className="pd-subtitle">Mô tả sản phẩm</h3>
-                                            <div className="pd-text-content">
-                                                <Markdown content={product.description} />
-                                            </div>
+                                            <DisplayContent content={product.description}/>
 
                                             <h3 className="pd-subtitle mt-6">Chất liệu</h3>
                                             <div className="pd-text-content">
@@ -488,16 +485,14 @@ function ProductDetail() {
                                             </div>
                                         </div>
 
-                                        <div className="pd-description-column">
+                                        <div >
                                             <h3 className="pd-subtitle">Xuất xứ</h3>
                                             <div className="pd-text-content">
                                                 <p>Sản xuất tại: {product.origin}</p>
                                             </div>
 
                                             <h3 className="pd-subtitle mt-6">Chứng nhận chất lượng</h3>
-                                            <div className="pd-text-content">
-                                                <Markdown content={product.qualityCertificate} />
-                                            </div>
+                                            <DisplayContent content={product.qualityCertificate} />
                                         </div>
                                     </div>
                                 )}
