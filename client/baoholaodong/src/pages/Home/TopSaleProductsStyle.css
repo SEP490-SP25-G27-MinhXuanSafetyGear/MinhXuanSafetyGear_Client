@@ -112,6 +112,7 @@
     font-weight: 600;
     line-height: 22.40px;
     word-wrap: break-word;
+    min-height: 50px;
 }
 
 .product-rating-price {

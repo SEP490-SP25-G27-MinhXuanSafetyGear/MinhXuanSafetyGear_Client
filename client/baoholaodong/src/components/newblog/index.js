@@ -5,9 +5,6 @@ import { FaArrowRight, FaArrowLeft, FaClock } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import {DisplayContent} from "../TextEditor";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
 
 const NewBlog = () => {
     const [blogs, setBlogs] = useState([]);
@@ -15,7 +12,22 @@ const NewBlog = () => {
     const [error, setError] = useState(null);
     const sliderRef = useRef(null);
 
-    // Gọi API lấy danh sách bài blog
+    // 🔧 Hàm xử lý loại bỏ HTML và rút gọn nội dung
+    const stripHtmlTags = (html) => {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        return tempDiv.textContent || tempDiv.innerText || "";
+    };
+
+    const truncateText = (html, maxLength) => {
+        const plainText = stripHtmlTags(html);
+        if (plainText.length <= maxLength) {
+            return plainText;
+        }
+        return plainText.substring(0, maxLength) + "...";
+    };
+
+    // 📦 Gọi API lấy danh sách bài blog
     useEffect(() => {
         const fetchBlogs = async () => {
             setLoading(true);
@@ -52,18 +64,12 @@ const NewBlog = () => {
         ),
         responsive: [
             {
-                breakpoint: 1024, // Tablet (≤1024px)
-                settings: {
-                    slidesToShow: 2, // Hiển thị 2 bài trên tablet
-                    slidesToScroll: 1,
-                },
+                breakpoint: 1024,
+                settings: { slidesToShow: 2, slidesToScroll: 1 },
             },
             {
-                breakpoint: 768, // Mobile (≤768px)
-                settings: {
-                    slidesToShow: 1, // Hiển thị 1 bài trên mobile
-                    slidesToScroll: 1,
-                },
+                breakpoint: 768,
+                settings: { slidesToShow: 1, slidesToScroll: 1 },
             },
         ],
     };
@@ -97,7 +103,9 @@ const NewBlog = () => {
                             </div>
                             <div className="new-blog-content">
                                 <h3 className="new-blog-item-title">{blog.title}</h3>
-                                <DisplayContent content={blog.content} />
+                                <p className="new-blog-description">
+                                    {truncateText(blog.content, 100)}
+                                </p>
                             </div>
                             <div className="new-blog-read-more">
                                 <button className="new-blog-read-more-button">
