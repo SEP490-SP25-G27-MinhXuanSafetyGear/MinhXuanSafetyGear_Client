@@ -12,6 +12,7 @@ export default function UpdateInformationProductForm({
                                                          setLoading,
                                                          close,
                                                          setErrors,
+                                                         showToast, // Thêm prop showToast
                                                      }) {
     const [productUpdate, setProductUpdate] = useState({
         id: product?.id || "",
@@ -81,6 +82,7 @@ export default function UpdateInformationProductForm({
             setLoading(true)
             const updatedProduct = await onUpdate(productUpdate)
             setProduct(updatedProduct)
+            showToast("Cập nhật thông tin sản phẩm thành công!") // Gọi toast khi thành công
             close()
         } catch (err) {
             if (err.errors) {
@@ -337,4 +339,3 @@ export default function UpdateInformationProductForm({
         </div>
     )
 }
-
