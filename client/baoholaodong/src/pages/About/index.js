@@ -30,7 +30,7 @@ const sections = [
         title: "Cam kết của chúng tôi",
         content:
             "Cam kết cung cấp sản phẩm chất lượng và dịch vụ khách hàng tốt nhất.",
-        img: "https://files.oaiusercontent.com/file-CoQrPvr9tcsqoWLAoHPjG3?se=2025-03-22T05%3A46%3A19Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D0457f2d9-0530-4e74-ac7d-d48753ce9591.webp&sig=Ez%2BbCiN5Yw0QvOruA3bxOnxo8Qji71LL5qksZ7erNOM%3D",
+        img: "https://bizweb.dktcdn.net/100/067/565/files/chung-toi-cam-ket-chong-set-thu-do.jpg?v=1476327137025",
     },
 ];
 

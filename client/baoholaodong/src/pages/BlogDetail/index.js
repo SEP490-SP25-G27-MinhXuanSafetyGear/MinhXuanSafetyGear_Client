@@ -31,23 +31,6 @@ const BlogDetail = () => {
         fetchBlogDetail();
     }, [slug]);
 
-    // Dữ liệu mẫu cho relatedPosts (giữ tĩnh vì API không cung cấp)
-    const relatedPosts = [
-        {
-            title: "Lợi ích của An Sạch Khi Tập Gym Ở Hồ Tấp Hiệu Quá",
-            image: "https://via.placeholder.com/300x200",
-            date: "06/09/2024",
-            link: "#",
-            description: "Thức ăn nào phù hợp với bạn để có được vòng eo thon gọn..."
-        },
-        {
-            title: "Phục Hồi Sau Chạy Bộ; Giãn Cơ Sau Khi Chạy Trail",
-            image: "https://via.placeholder.com/300x200",
-            date: "06/09/2024",
-            link: "#",
-            description: "Bạn với hoàn toàn chạy bộ trail đúng cách và có sức khỏe..."
-        }
-    ];
 
     if (loading) {
         return <div className="blog-detail-wrapper"><p>Đang tải dữ liệu...</p></div>;
