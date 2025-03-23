@@ -1,23 +1,24 @@
 ﻿import React, { useContext, useEffect, useState } from 'react';
 import { ProductContext } from "../../../contexts/AdminProductContext";
-import {useNavigate, useParams} from "react-router-dom";
-import { Edit, Image, Package, Tag, CheckCircle ,XCircle,Eye} from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Edit, Image, Package, Tag, CheckCircle, XCircle, Eye } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
 import Modal from "../../../components/Modal/Modal";
-import {toSlug} from "../../../utils/SlugUtils";
+import { toSlug } from "../../../utils/SlugUtils";
 import ErrorList from "../../../components/ErrorList/ErrorList";
-import { formatVND} from "../../../utils/format";
+import { formatVND } from "../../../utils/format";
 import UpdateInformationProductForm from "./form/UpdateInformationProductForm";
 import AddProductTaxForm from "./form/AddProductTaxForm";
 import UpdateImageForm from "./form/UpdateImageForm";
 import CreateVariantForm from "./form/CreateVariantForm";
 import UpdateVariantForm from "./form/UpdateVariantForm";
 import AddMoreImageForm from "./form/AddMoreImageForm";
-import {DisplayContent} from "../../../components/TextEditor";
+import { DisplayContent } from "../../../components/TextEditor";
+import ManagerToast from "../../../components/managerToast/ManagerToast";
 
 const LoadingSkeleton = () => {
 	return (
-		<div >
+		<div>
 			{/* Product Information Skeleton */}
 			<div className="p-6 space-y-4">
 				<div className="h-6 w-32 bg-gray-200 rounded"></div>
@@ -57,9 +58,12 @@ const LoadingSkeleton = () => {
 		</div>
 	);
 };
+
 const UpdateProduct = () => {
-	const { id,slug } = useParams();
+	const { id, slug } = useParams();
 	const { getProductById, categories, updateProduct, uploadImage, updateImage, deleteImage, updateVariant, createVariant, addProductTax, taxes, deleteProductTax } = useContext(ProductContext);
+
+	// Tất cả Hook phải được gọi ở đây, trước bất kỳ return nào
 	const [product, setProduct] = useState({
 		id: parseInt(id),
 		name: "",
@@ -75,8 +79,8 @@ const UpdateProduct = () => {
 		createdAt: "",
 		updatedAt: "",
 		status: true,
-		freeShip:false,
-		guarantee :0,
+		freeShip: false,
+		guarantee: 0,
 		averageRating: 0,
 		qualityCertificate: "",
 		totalTax: 0,
@@ -119,22 +123,35 @@ const UpdateProduct = () => {
 	const [variantSelected, setVariantSelected] = useState(null);
 	const [isLoading, setLoading] = useState(false);
 	const [isOpenAddTax, setIsOpenAddTax] = useState(false);
-	const navigate = useNavigate();
 	const [errors, setErrors] = useState([]);
+	const [toastMessage, setToastMessage] = useState(null); // Di chuyển lên đầu
+	const navigate = useNavigate();
+
+	// Hàm hiển thị toast
+	const showToast = (message) => {
+		setToastMessage(message);
+	};
+
+	// Đóng toast
+	const closeToast = () => {
+		setToastMessage(null);
+	};
+
 	useEffect(() => {
-		const fetchProduct =async ()=>{
+		const fetchProduct = async () => {
 			setLoading(true);
 			try {
 				const data = await getProductById(id);
 				setProduct(data);
 			} catch (error) {
 				console.error("Error fetching product:", error);
-			}finally {
+			} finally {
 				setLoading(false);
 			}
-		}
+		};
 		fetchProduct();
 	}, [id]);
+
 	useEffect(() => {
 		if (!isLoading && product.name) {
 			const correctSlug = toSlug(product.name);
@@ -143,18 +160,20 @@ const UpdateProduct = () => {
 			}
 		}
 	}, [isLoading, product, slug, id, navigate]);
+
 	// click open form update image
 	const handleClickUpdateImage = (image) => {
 		setImageSelected(image);
 		setIsOpenUpdateImage(true);
 	};
 
-	//click open form update variant
+	// click open form update variant
 	const handleClickUpdateVariant = (variant) => {
 		setVariantSelected(variant);
 		setIsOpenUpdateVariant(true);
-	}
-	const previewProduct =()=>{
+	};
+
+	const previewProduct = () => {
 		const url = `/products/${product.slug}`;
 		const popup = window.open(
 			url,
@@ -164,39 +183,36 @@ const UpdateProduct = () => {
 		if (popup) {
 			popup.focus();
 		}
-	}
-	// get product by id
+	};
+
+	// Kiểm tra product ở đây, sau khi tất cả Hook đã được gọi
 	if (!product) return <div className="text-center mt-10">Loading...</div>;
 
 	return (
-		<div
-			className="space-y-6">
-			<div className="bg-white rounded-lg shadow-lg overflow-hidden ">
-				<ErrorList errors={errors}/>
+		<div className="space-y-6">
+			<div className="bg-white rounded-lg shadow-lg overflow-hidden">
+				<ErrorList errors={errors} />
 				{/* Header */}
-				<div className="bg-gradient-to-r  from-blue-600 to-indigo-700 p-6 flex justify-between items-center">
+				<div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 flex justify-between items-center">
 					<h3 className="text-2xl font-bold text-white">Cập nhật sản phẩm</h3>
 					<div className="flex space-x-3">
-
-
 						<button
 							onClick={() => setIsOpenAddTax(true)}
 							className="flex items-center px-4 py-2 bg-white text-orange-600 rounded-lg hover:bg-orange-50 transition-all shadow-md"
 						>
 							<Tag size={18} className="mr-2" /> Cập nhật thuế
 						</button>
-                        <button
-                            onClick={() => previewProduct()}
-                            className="flex items-center px-4 py-2 bg-white text-gray-600 rounded-lg hover:bg-gray-50 transition-all shadow-md"
-                        >
-                            <Eye size={18} className="mr-2" /> Xem trước sản phẩm
-                        </button>
-
-                    </div>
+						<button
+							onClick={() => previewProduct()}
+							className="flex items-center px-4 py-2 bg-white text-gray-600 rounded-lg hover:bg-gray-50 transition-all shadow-md"
+						>
+							<Eye size={18} className="mr-2" /> Xem trước sản phẩm
+						</button>
+					</div>
 				</div>
-				{isLoading ?(
-					<LoadingSkeleton/>
-				):(
+				{isLoading ? (
+					<LoadingSkeleton />
+				) : (
 					<>
 						{/* Product Information */}
 						<div className="p-6">
@@ -242,12 +258,12 @@ const UpdateProduct = () => {
 									<div className="flex items-center">
 										<span className="text-gray-500 w-32">Trạng thái:</span>
 										<span className={`font-medium ${product.status ? "text-green-600" : "text-red-600"} flex items-center`}>
-									{product.status ? (
-										<><CheckCircle size={16} className="mr-1" /> Đang bán</>
-									) : (
-										<><XCircle size={16} className="mr-1" /> Ngừng bán</>
-									)}
-								        </span>
+                                            {product.status ? (
+												<><CheckCircle size={16} className="mr-1" /> Đang bán</>
+											) : (
+												<><XCircle size={16} className="mr-1" /> Ngừng bán</>
+											)}
+                                        </span>
 									</div>
 									<div className="flex items-center">
 										<span className="text-gray-500 w-32">Bảo hành:</span>
@@ -256,12 +272,12 @@ const UpdateProduct = () => {
 									<div className="flex items-center">
 										<span className="text-gray-500 w-32">Free Ship:</span>
 										<span className={`font-medium ${product.status ? "text-green-600" : "text-red-600"} flex items-center`}>
-									{product.freeShip ? (
-										<CheckCircle size={16} className="mr-1" />
-									) : (
-										<XCircle size={16} className="mr-1" />
-									)}
-								        </span>
+                                            {product.freeShip ? (
+												<CheckCircle size={16} className="mr-1" />
+											) : (
+												<XCircle size={16} className="mr-1" />
+											)}
+                                        </span>
 									</div>
 									<div className="flex items-center col-span-2">
 										<span className="text-gray-500 w-32">Danh mục:</span>
@@ -338,7 +354,6 @@ const UpdateProduct = () => {
 												</div>
 											))}
 										</div>
-
 									) : (
 										<div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
 											<div className="text-center">
@@ -358,7 +373,7 @@ const UpdateProduct = () => {
 									</h4>
 									<button
 										onClick={() => setIsOpenCreateVariant(true)}
-										className="flex items-center gap-2 px-4 py-2 text-purple-600 font-medium  rounded-lg shadow-sm transition-all duration-200 bg-purple-100 active:bg-purple-200"
+										className="flex items-center gap-2 px-4 py-2 text-purple-600 font-medium rounded-lg shadow-sm transition-all duration-200 bg-purple-100 active:bg-purple-200"
 									>
 										<Package size={18} /> Thêm biến thể
 									</button>
@@ -445,6 +460,7 @@ const UpdateProduct = () => {
 						setLoading={setLoading}
 						setErrors={setErrors}
 						close={() => setIsOpenUpdateInformation(false)}
+						showToast={showToast}
 					/>
 				</Modal>
 
@@ -459,20 +475,22 @@ const UpdateProduct = () => {
 						setProduct={setProduct}
 						close={() => { setIsOpenAddMoreImage(false) }}
 						setLoading={setLoading}
+						showToast={showToast}
 					/>
 				</Modal>
 
 				<Modal
 					onClose={() => setIsOpenUpdateVariant(false)}
 					isOpen={isOpenUpdateVariant}
-					title={"Cập nhât biến thể"}
+					title={"Cập nhật biến thể"}
 				>
 					<UpdateVariantForm
 						variant={variantSelected}
 						onSetProduct={setProduct}
 						setLoading={setLoading}
 						onUpdateVariant={updateVariant}
-						onClose={()=> setIsOpenUpdateVariant(false)}
+						onClose={() => setIsOpenUpdateVariant(false)}
+						showToast={showToast}
 					/>
 				</Modal>
 
@@ -487,6 +505,7 @@ const UpdateProduct = () => {
 						product={product}
 						onSetProduct={setProduct}
 						onCreateVariant={createVariant}
+						showToast={showToast}
 					/>
 				</Modal>
 
@@ -502,6 +521,7 @@ const UpdateProduct = () => {
 						close={() => { setIsOpenUpdateImage(false) }}
 						onDelete={deleteImage}
 						setLoading={setLoading}
+						showToast={showToast}
 					/>
 				</Modal>
 
@@ -518,12 +538,17 @@ const UpdateProduct = () => {
 						product={product}
 						setProduct={setProduct}
 						onDeleteProductTax={deleteProductTax}
+						showToast={showToast}
 					/>
 				</Modal>
 			</div>
+			{/* Hiển thị toast */}
+			{toastMessage && (
+				<ManagerToast message={toastMessage} onClose={closeToast} />
+			)}
 		</div>
-
 	);
+
 };
 
 export default UpdateProduct;

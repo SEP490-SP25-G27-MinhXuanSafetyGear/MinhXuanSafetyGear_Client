@@ -8,6 +8,8 @@ import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imag
 import ErrorList from "../../../components/ErrorList/ErrorList"
 import ProductPreview from "./ProductPreview"
 import {TextEditor} from "../../../components/TextEditor";
+import ManagerToast from "../../../components/managerToast/ManagerToast";
+
 
 const MAX_IMAGE_SIZE_MB = 0.2
 const TARGET_IMAGE_SIZE_KB = 0.1 * 1024
@@ -40,6 +42,8 @@ const CreateProduct = () => {
 	const [previewDescription, setPreviewDescription] = useState(false)
 	const [previewCertificate, setPreviewCertificate] = useState(false)
 	const [showProductPreview, setShowProductPreview] = useState(false)
+	const [toastMessage, setToastMessage] = useState("");
+	const [showToast, setShowToast] = useState(false);
 
 	const handleChange = (e) => {
 		const { id, value, checked } = e.target
@@ -237,9 +241,11 @@ const CreateProduct = () => {
 				formData.append("files", image)
 			})
 			await createProduct(formData)
-			navigate("/manager/products")
+			navigate("/manager/products", { state: { toastMessage: "Thêm sản phẩm thành công !" } });
 			setIsLoading(false)
 		} catch (err) {
+			setToastMessage("Không tạo được sản phẩm!");
+			setShowToast(true);
 			if (err.errors) {
 				const errorMessages = []
 				for (const field in err.errors) {
@@ -971,6 +977,8 @@ const CreateProduct = () => {
 			{showProductPreview && (
 				<ProductPreview product={product} images={images} onClose={() => setShowProductPreview(false)} />
 			)}
+			{showToast && <ManagerToast message={toastMessage} onClose={() => setShowToast(false)} />}
+
 		</div>
 	)
 }

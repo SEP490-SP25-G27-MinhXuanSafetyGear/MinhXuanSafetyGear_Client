@@ -1,21 +1,20 @@
-﻿import React, {useEffect, useState} from "react";
-import {Plus, Tag, Trash2} from "lucide-react";
+﻿import React, { useEffect, useState } from "react";
+import { Plus, Tag, Trash2 } from "lucide-react";
 
-export default function AddProductTaxForm  ({ setLoading, onAddProductTax, onDeleteProductTax, close, taxes, product, setProduct })  {
+export default function AddProductTaxForm({ setLoading, onAddProductTax, onDeleteProductTax, close, taxes, product, setProduct, showToast }) {
     const [productTaxes, setProductTaxes] = useState(product.taxes || []);
     const [taxMap, setTaxMap] = useState([]);
 
     useEffect(() => {
         const updatedTaxMap = (taxes || []).map(tax => {
-            // Tìm kiếm productTaxId trong productTaxes
             const relatedProductTax = productTaxes.find(productTax => productTax.taxId === tax.taxId);
             return {
                 ...tax,
-                productTaxId: relatedProductTax ? relatedProductTax.productTaxId : null, // Nếu có productTax thì lấy productTaxId, nếu không có thì gán null
-                added: productTaxes.some(productTax => productTax.taxId === tax.taxId) // Kiểm tra xem thuế đã được thêm chưa
+                productTaxId: relatedProductTax ? relatedProductTax.productTaxId : null,
+                added: productTaxes.some(productTax => productTax.taxId === tax.taxId)
             };
         });
-        setTaxMap(updatedTaxMap); // Cập nhật lại taxMap
+        setTaxMap(updatedTaxMap);
     }, [taxes, productTaxes]);
 
     const addTax = async (tax) => {
@@ -23,6 +22,7 @@ export default function AddProductTaxForm  ({ setLoading, onAddProductTax, onDel
         try {
             const result = await onAddProductTax(product.id, tax.taxId);
             setProduct(result);
+            showToast("Thêm thuế sản phẩm thành công!"); // Thêm toast
             close();
         } catch (error) {
             console.log(error);
@@ -30,13 +30,14 @@ export default function AddProductTaxForm  ({ setLoading, onAddProductTax, onDel
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const removeTax = async (tax) => {
         setLoading(true);
         try {
             const result = await onDeleteProductTax(tax.productTaxId);
             setProduct(result);
+            showToast("Xóa thuế sản phẩm thành công!"); // Thêm toast
             close();
         } catch (error) {
             console.log(error);
@@ -50,7 +51,6 @@ export default function AddProductTaxForm  ({ setLoading, onAddProductTax, onDel
         <div className="p-6">
             <div className="mb-4">
                 <h3 className="text-lg font-medium text-gray-800 mb-4">Danh sách thuế</h3>
-
                 {taxMap.length > 0 ? (
                     <div className="overflow-hidden border border-gray-200 rounded-lg">
                         <table className="min-w-full divide-y divide-gray-200">

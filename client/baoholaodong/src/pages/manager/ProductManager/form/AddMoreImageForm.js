@@ -1,8 +1,9 @@
-﻿import React, {useState} from "react";
-import {compressImageToTargetSize, isImageSizeValid} from "../../../../utils/imageUtils";
-const MAX_IMAGE_SIZE_MB = 0.5; // 2MB
-const TARGET_IMAGE_SIZE_KB = 10; // 100KB
-export default function  AddMoreImageForm ({ product, uploadImage, setProduct, close, setLoading })  {
+﻿import React, { useState } from "react";
+import { compressImageToTargetSize, isImageSizeValid } from "../../../../utils/imageUtils";
+const MAX_IMAGE_SIZE_MB = 0.5;
+const TARGET_IMAGE_SIZE_KB = 10;
+
+export default function AddMoreImageForm({ product, uploadImage, setProduct, close, setLoading, showToast }) {
     const [image, setImage] = useState({
         productId: product.id,
         description: "",
@@ -10,21 +11,18 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
         file: null,
     });
     const [preview, setPreview] = useState(null);
-    const [isSubmitting ,setIsSubmitting] = useState(false);
-    // Xử lý khi người dùng chọn ảnh
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleFileChange = async (event) => {
         const selectedFile = event.target.files[0];
-
         if (!selectedFile) return;
 
-        // Kiểm tra kích thước ảnh trước khi xử lý
         if (!isImageSizeValid(selectedFile, MAX_IMAGE_SIZE_MB)) {
             alert("Ảnh quá lớn! Vui lòng chọn ảnh dưới 2MB.");
             return;
         }
 
         try {
-            // Nén ảnh xuống dưới 500KB (nếu cần)
             const compressedFile = await compressImageToTargetSize(selectedFile, TARGET_IMAGE_SIZE_KB);
             setImage({ ...image, file: compressedFile });
             setPreview(URL.createObjectURL(compressedFile));
@@ -42,19 +40,16 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
             file: null,
         });
         setPreview(null);
-    }
+    };
 
-    // Xử lý khi nhập mô tả ảnh
     const handleDescriptionChange = (event) => {
         setImage({ ...image, description: event.target.value });
     };
 
-    // Xử lý khi chọn ảnh chính (Primary)
     const handlePrimaryChange = (event) => {
         setImage({ ...image, isPrimary: event.target.checked });
     };
 
-    // Gửi ảnh lên server
     const handleSubmit = async () => {
         if (!image.file) {
             alert("Vui lòng chọn ảnh trước khi lưu!");
@@ -68,11 +63,12 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
             formData.append("productId", image.productId);
             formData.append("description", image.description);
             formData.append("isPrimary", image.isPrimary);
-            formData.append("file", image.file); // Ảnh được gửi dưới dạng file
-            var result = await uploadImage(formData); // Gửi form-data lên server
+            formData.append("file", image.file);
+            var result = await uploadImage(formData);
             if (result) {
                 clearImage();
                 setProduct(result);
+                showToast("Thêm ảnh sản phẩm thành công!"); // Thêm toast
                 close();
             }
         } catch (error) {
@@ -88,7 +84,6 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
         <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    {/* Nhập mô tả ảnh */}
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả ảnh</label>
                         <input
@@ -99,8 +94,6 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         />
                     </div>
-
-                    {/* Checkbox chọn ảnh chính */}
                     <div className="mb-4">
                         <label className="flex items-center cursor-pointer">
                             <div className="relative">
@@ -118,8 +111,6 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
                             </div>
                         </label>
                     </div>
-
-                    {/* Input chọn ảnh */}
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Chọn ảnh</label>
                         <div className="flex items-center justify-center w-full">
@@ -141,7 +132,6 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
                         </div>
                     </div>
                 </div>
-
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Xem trước</label>
                     <div className="flex-1 border-2 border-gray-200 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
@@ -158,7 +148,6 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
                     </div>
                 </div>
             </div>
-
             <div className="flex justify-end mt-6 pt-4 border-t border-gray-200">
                 <button
                     type="button"
@@ -178,11 +167,7 @@ export default function  AddMoreImageForm ({ product, uploadImage, setProduct, c
                 <button
                     onClick={handleSubmit}
                     disabled={!image.file || isSubmitting}
-                    className={`px-4 py-2 rounded-lg ${
-                        image.file
-                            ? "bg-blue-600 hover:bg-blue-700 text-white"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    } transition-colors`}
+                    className={`px-4 py-2 rounded-lg ${image.file ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"} transition-colors`}
                 >
                     Lưu
                 </button>

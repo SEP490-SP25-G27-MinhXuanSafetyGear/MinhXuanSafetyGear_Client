@@ -1,34 +1,36 @@
-﻿import React, {useContext, useEffect, useMemo, useState} from "react";
-import {Edit, Trash2, Plus, CheckCircle} from "lucide-react";
+﻿// src/pages/manager/ProductManager/Products.js
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Edit, Trash2, Plus, CheckCircle } from "lucide-react";
 import { FaRegFrown } from "react-icons/fa";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ProductContext } from "../../../contexts/AdminProductContext";
 import Loading from "../../../components/Loading/Loading";
 import noImage from "../../../images/no-image-product.jpg";
 import { motion } from "framer-motion";
 import Modal from "../../../components/Modal/Modal";
-import {toSlug} from "../../../utils/SlugUtils";
-import {formatVND} from "../../../utils/format";
+import { formatVND } from "../../../utils/format";
+import ManagerToast from "../../../components/managerToast/ManagerToast";
+
 const useQuery = () => new URLSearchParams(useLocation().search);
-// Component bảng sản phẩm, sử dụng React.memo để tránh re-render không cần thiết
+
 const ProductTable = React.memo(({ products, handleUpdate }) => {
 	const [selectImage, setSelectImage] = useState(null);
 	const [isOpenShowImage, setIsOpenShowImage] = useState(false);
-	const handelClickImage =(image)=>{
+	const handelClickImage = (image) => {
 		setSelectImage(image);
 		setIsOpenShowImage(true);
-	}
+	};
 
 	return (
 		<>
-			<Modal onClose={()=>setIsOpenShowImage(false)} isOpen={isOpenShowImage} title={"Product image"}>
+			<Modal onClose={() => setIsOpenShowImage(false)} isOpen={isOpenShowImage} title={"Product image"}>
 				<div className="flex justify-center items-center">
 					<img src={selectImage || noImage} alt="Product Image" className=" max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg" />
 				</div>
 			</Modal>
 			<table className="min-w-full divide-y divide-gray-200">
 				<motion.thead>
-					<tr >
+					<tr>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã sản phẩm</th>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ảnh sản phẩm</th>
 						<th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản phẩm</th>
@@ -47,7 +49,7 @@ const ProductTable = React.memo(({ products, handleUpdate }) => {
 						hidden: { opacity: 0 },
 						visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
 					}}>
-					{products.map(({ id, name, price,quantity,priceDiscount,discount,image,isNew,status }, index) => (
+					{products.map(({ id, name, price, quantity, priceDiscount, discount, image, isNew, status }, index) => (
 						<motion.tr
 							key={id}
 							variants={{
@@ -60,24 +62,23 @@ const ProductTable = React.memo(({ products, handleUpdate }) => {
 								{id} {isNew && <span className="ml-2 px-2 py-1 text-xs text-white bg-green-500 rounded">Mới</span>}
 							</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">
-								<img onClick={()=>handelClickImage(image)} src={image || noImage} alt={name} className="w-16 h-16 object-cover rounded-md"/>
+								<img onClick={() => handelClickImage(image)} src={image || noImage} alt={name} className="w-16 h-16 object-cover rounded-md" />
 							</td>
 							<td className="px-6 py-4 text-sm truncate max-w-[150px]">
 								{name}
 							</td>
-
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{formatVND(price)}</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{formatVND(priceDiscount)}</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{discount}%</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{quantity}</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">
-								<span className={`font-medium ${status ? "text-green-600" : "text-red-600"} flex items-center`}>
-									{status ? (
+                                <span className={`font-medium ${status ? "text-green-600" : "text-red-600"} flex items-center`}>
+                                    {status ? (
 										<><CheckCircle size={16} className="mr-1" /> Đang bán</>
 									) : (
 										<><Trash2 size={16} className="mr-1" /> Ngừng bán</>
 									)}
-								</span>
+                                </span>
 							</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm flex space-x-2">
 								<button className="p-2 text-blue-600 hover:bg-blue-50 rounded" onClick={() => handleUpdate(id)}>
@@ -91,13 +92,22 @@ const ProductTable = React.memo(({ products, handleUpdate }) => {
 		</>
 	);
 });
+
 const Products = () => {
 	const query = useQuery();
 	const page = parseInt(query.get("page") ?? "1", 10);
 	const navigate = useNavigate();
-	const { products, loading,groupCategories,selectedGroup,setSelectGroup, search, setSearch ,currentPage,setCurrentPage,totalPages} = useContext(ProductContext);
+	const location = useLocation();
+	const { products, loading, groupCategories, selectedGroup, setSelectGroup, search, setSearch, currentPage, setCurrentPage, totalPages } = useContext(ProductContext);
 	const handleCreate = () => navigate("/manager/createproduct");
 	const handleUpdate = (id) => navigate(`/manager/update-product/${id}/slug`);
+	const [toastMessage, setToastMessage] = useState("");
+
+	useEffect(() => {
+		if (location.state?.toastMessage) {
+			setToastMessage(location.state.toastMessage);
+		}
+	}, [location.state]);
 
 	useEffect(() => {
 		if (selectedGroup) {
@@ -107,18 +117,17 @@ const Products = () => {
 	}, [selectedGroup]);
 
 	useEffect(() => {
-		if(currentPage){
+		if (currentPage) {
 			navigate(`/manager/products?page=${currentPage}`, { replace: true });
 		}
 	}, [currentPage]);
 
-
-	// Dùng useMemo để tính toán danh sách sản phẩm
 	const memoizedProducts = useMemo(() => products, [products]);
+
 	return (
 		<div className="space-y-6">
 			<div className="bg-white min-h-[800px] rounded-lg shadow">
-				<Loading isLoading={loading}/>
+				<Loading isLoading={loading} />
 				<div className="p-6 border-b flex justify-between items-center">
 					<h3 className="text-lg font-semibold text-gray-800">Danh sách sản phẩm</h3>
 					<div className="flex space-x-4">
@@ -146,7 +155,7 @@ const Products = () => {
 						<button
 							className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
 							onClick={handleCreate}>
-							<Plus className="w-5 h-5 mr-2"/>
+							<Plus className="w-5 h-5 mr-2" />
 							Thêm sản phẩm
 						</button>
 					</div>
@@ -155,18 +164,18 @@ const Products = () => {
 				<div className="p-6">
 					{loading ? (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-							{Array.from({length: 4}).map((_, index) => (
+							{Array.from({ length: 4 }).map((_, index) => (
 								<div key={index} className="animate-pulse bg-gray-200 h-48 rounded-lg"></div>
 							))}
 						</div>
 					) : memoizedProducts.length === 0 ? (
 						<div className="flex justify-center items-center">
-							<FaRegFrown className="text-gray-500 w-12 h-12"/>
+							<FaRegFrown className="text-gray-500 w-12 h-12" />
 							<span className="text-gray-500 ml-4">Không có sản phẩm nào</span>
 						</div>
 					) : (
 						<div className="overflow-x-auto">
-							<ProductTable products={memoizedProducts} handleUpdate={handleUpdate}/>
+							<ProductTable products={memoizedProducts} handleUpdate={handleUpdate} />
 						</div>
 					)}
 				</div>
@@ -181,7 +190,7 @@ const Products = () => {
 							{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
 								<button
 									key={page}
-									onClick={() => setCurrentPage(() => Number(page))} // Đảm bảo React cập nhật state chính xác
+									onClick={() => setCurrentPage(() => Number(page))}
 									className={`px-3 py-1 border rounded-md ${
 										currentPage === page
 											? "bg-blue-500 text-white"
@@ -190,7 +199,6 @@ const Products = () => {
 								>
 									{page}
 								</button>
-
 							))}
 							<button
 								onClick={() => setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages))}
@@ -198,12 +206,14 @@ const Products = () => {
 								className="px-3 py-1 border rounded-md text-gray-700 hover:bg-gray-200"><i
 								className="fas fa-angle-right"></i></button>
 						</nav>
-					):(
+					) : (
 						""
 					)}
 				</div>
 			</div>
+			{toastMessage && <ManagerToast message={toastMessage} onClose={() => setToastMessage("")} />}
 		</div>
 	);
 };
+
 export default Products;

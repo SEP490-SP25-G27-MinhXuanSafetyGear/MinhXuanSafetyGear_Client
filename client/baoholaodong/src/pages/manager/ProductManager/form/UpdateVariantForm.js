@@ -1,12 +1,16 @@
-﻿import React, {useState} from "react";
+﻿import React, { useState } from "react";
 
-export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoading, onSetProduct,onClose })  {
+export default function UpdateVariantForm({ variant, onUpdateVariant, setLoading, onSetProduct, onClose, showToast }) {
     const [variantUpdate, setVariantUpdate] = useState(variant);
 
     const handleVariantChange = (field, value) => {
-        let newValue ;
-        if(field === "price") {
-            newValue = parseFloat(value.replace(/\D/g, ""),10)||0;
+        let newValue;
+        if (field === "price") {
+            newValue = parseFloat(value.replace(/\D/g, "")) || 0;
+        } else if (field === "quantity" || field === "discount") {
+            newValue = Number(value);
+        } else {
+            newValue = value;
         }
         setVariantUpdate(prev => ({
             ...prev,
@@ -21,6 +25,7 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
             var result = await onUpdateVariant(variantUpdate);
             if (result) {
                 await onSetProduct(result);
+                showToast("Cập nhật biến thể thành công!"); // Thêm toast
                 onClose();
             }
         } catch (error) {
@@ -34,7 +39,6 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
         <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Size */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="size">
                             Kích thước
@@ -47,8 +51,6 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
                             onChange={(e) => handleVariantChange("size", e.target.value)}
                         />
                     </div>
-
-                    {/* Color */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="color">
                             Màu sắc
@@ -62,9 +64,7 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
                         />
                     </div>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    {/* Quantity */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="quantity">
                             Số lượng
@@ -78,8 +78,6 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
                             onChange={(e) => handleVariantChange("quantity", Number(e.target.value))}
                         />
                     </div>
-
-                    {/* Price */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">
                             Giá (đ)
@@ -98,8 +96,6 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
                             />
                         </div>
                     </div>
-
-                    {/* Discount */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discount">
                             Giảm giá (%)
@@ -120,8 +116,6 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
                         </div>
                     </div>
                 </div>
-
-                {/* Status */}
                 <div>
                     <label className="flex items-center cursor-pointer">
                         <div className="relative">
@@ -139,7 +133,6 @@ export default function  UpdateVariantForm  ({ variant, onUpdateVariant, setLoad
                         </div>
                     </label>
                 </div>
-
                 <div className="flex justify-end pt-4 border-t border-gray-200">
                     <button
                         type="submit"

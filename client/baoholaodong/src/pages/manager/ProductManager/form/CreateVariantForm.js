@@ -1,6 +1,6 @@
-﻿import React, {useEffect, useState} from "react";
+﻿import React, { useEffect, useState } from "react";
 
-export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreateVariant, product,onClose })  {
+export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVariant, product, onClose, showToast }) {
     const [newVariant, setNewVariant] = useState({
         productId: product.id,
         size: "",
@@ -13,7 +13,6 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
 
     const [isVariantValid, setIsVariantValid] = useState(false);
 
-    // Kiểm tra tính hợp lệ của biến thể
     const checkVariant = () => {
         if (newVariant.quantity < 0 || newVariant.price < 0 || newVariant.discount < 0) return false;
         if (!newVariant.size.trim() || !newVariant.color.trim()) return false;
@@ -21,31 +20,29 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
         return true;
     };
 
-    // Cập nhật dữ liệu khi nhập input
     const handleVariantChange = (field, value) => {
         setNewVariant(prev => ({
             ...prev,
             [field]: field === "price" || field === "quantity" || field === "discount"
-                ? Math.max(0, Number(value)) // Chặn nhập số âm
+                ? Math.max(0, Number(value))
                 : value,
         }));
     };
 
-    // Cập nhật trạng thái hợp lệ của variant
     useEffect(() => {
         setIsVariantValid(checkVariant());
     }, [newVariant]);
 
-    // Xử lý submit
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Ngăn chặn load lại trang
+        e.preventDefault();
         if (!isVariantValid) return;
 
         try {
             setLoading(true);
             const result = await onCreateVariant(newVariant);
-            if (result){
+            if (result) {
                 await onSetProduct(result);
+                showToast("Thêm biến thể thành công!"); // Thêm toast
                 onClose();
             }
         } catch (error) {
@@ -60,7 +57,6 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
         <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Size */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="size">
                             Kích thước <span className="text-red-500">*</span>
@@ -75,8 +71,6 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
                             required
                         />
                     </div>
-
-                    {/* Color */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="color">
                             Màu sắc <span className="text-red-500">*</span>
@@ -92,9 +86,7 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
                         />
                     </div>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    {/* Quantity */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="quantity">
                             Số lượng <span className="text-red-500">*</span>
@@ -110,8 +102,6 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
                             required
                         />
                     </div>
-
-                    {/* Price */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">
                             Giá ($) <span className="text-red-500">*</span>
@@ -133,8 +123,6 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
                             />
                         </div>
                     </div>
-
-                    {/* Discount */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discount">
                             Giảm giá (%)
@@ -156,8 +144,6 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
                         </div>
                     </div>
                 </div>
-
-                {/* Status */}
                 <div>
                     <label className="flex items-center cursor-pointer">
                         <div className="relative">
@@ -175,16 +161,11 @@ export default function  CreateVariantForm ({ setLoading, onSetProduct, onCreate
                         </div>
                     </label>
                 </div>
-
                 <div className="flex justify-end pt-4 border-t border-gray-200">
                     <button
                         type="submit"
                         disabled={!isVariantValid}
-                        className={`px-4 py-2 rounded-lg ${
-                            isVariantValid
-                                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        } transition-colors`}
+                        className={`px-4 py-2 rounded-lg ${isVariantValid ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"} transition-colors`}
                     >
                         Tạo biến thể
                     </button>
