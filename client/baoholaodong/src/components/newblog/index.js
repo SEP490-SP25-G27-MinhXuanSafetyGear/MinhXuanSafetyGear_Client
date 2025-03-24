@@ -6,6 +6,9 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+const API_BASE = process.env.REACT_APP_BASE_URL_API;
+
+
 const NewBlog = () => {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +36,7 @@ const NewBlog = () => {
             setLoading(true);
             try {
                 const response = await axios.get(
-                    "http://localhost:5000/api/BlogPost/get-blog-page?categoryId=0&page=1&size=10"
+                    `${API_BASE}/api/BlogPost/get-blog-page?categoryId=0&page=1&size=10`
                 );
                 setBlogs(response.data.items); // Lấy danh sách bài viết từ API
             } catch (err) {
@@ -45,6 +48,7 @@ const NewBlog = () => {
 
         fetchBlogs();
     }, []);
+
 
     const settings = {
         dots: false,
