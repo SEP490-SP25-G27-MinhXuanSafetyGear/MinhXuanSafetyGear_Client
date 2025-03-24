@@ -6,6 +6,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
 import "./style.css";
 
+const API_BASE = process.env.REACT_APP_BASE_URL_API;
+
 const BlogList = () => {
     const [blogs, setBlogs] = useState([]);
     const [filters, setFilters] = useState([]);
@@ -27,7 +29,7 @@ const BlogList = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/BlogPost/get-blog-categories");
+                const response = await axios.get(`${API_BASE}/api/BlogPost/get-blog-categories`);
                 const categoriesWithSlug = response.data.map(category => ({
                     ...category,
                     slug: toSlug(category.name),
@@ -60,7 +62,7 @@ const BlogList = () => {
             setError(null);
             try {
                 const response = await axios.get(
-                    `http://localhost:5000/api/BlogPost/get-blog-page?categoryId=${categoryId}&page=${page}&size=${pageSize}`
+                    `${API_BASE}/api/BlogPost/get-blog-page?categoryId=${categoryId}&page=${page}&size=${pageSize}`
                 );
                 setBlogs(response.data.items);
                 setTotalPages(response.data.totalPages);
