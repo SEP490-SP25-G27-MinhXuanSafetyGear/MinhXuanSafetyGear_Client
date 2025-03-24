@@ -2,15 +2,16 @@
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaClock } from "react-icons/fa";
-import { DisplayContent } from "../../components/TextEditor"; // Import DisplayContent
+import { DisplayContent } from "../../components/TextEditor";
 import "./style.css";
 
 const BlogDetail = () => {
-    const { slug } = useParams(); // Lấy slug từ URL (ví dụ: "dia-chi")
+    const { slug } = useParams(); // Lấy slug từ URL
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
     // Gọi API để lấy chi tiết bài viết
     useEffect(() => {
@@ -18,7 +19,7 @@ const BlogDetail = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get(`http://localhost:5000/api/BlogPost/get-blog-by-slug/${slug}`);
+                const response = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-slug/${slug}`);
                 setBlog(response.data);
             } catch (err) {
                 setError("Không tìm thấy bài viết hoặc lỗi server");
