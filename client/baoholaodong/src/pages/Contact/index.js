@@ -26,67 +26,66 @@ const Contact = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Bắt đầu gửi dữ liệu
-        setError(null); // Xóa lỗi cũ
-        setSubmissionStatus(null); // Xóa trạng thái cũ
+        setLoading(true);
+        setError(null);
+        setSubmissionStatus(null);
 
         try {
-            // Gửi dữ liệu form đến API
             const response = await axios.post(`${API_BASE}/api/contact/submit`, formData);
-            setSubmissionStatus("Form submitted successfully!");
+            console.log("Phản hồi từ máy chủ:", response.data);
+            setSubmissionStatus("Gửi tin nhắn thành công!");
             setFormData({
                 name: "",
                 email: "",
                 phone: "",
-                message: "",
+                message: ""
             });
         } catch (err) {
-            setError("Có lỗi xảy ra khi gửi form. Vui lòng thử lại!");
-            console.error(err);
+            setError("Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại!");
+            console.error("Lỗi gửi biểu mẫu:", err);
         } finally {
-            setLoading(false); // Kết thúc gửi dữ liệu
+            setLoading(false);
         }
     };
 
+    // Kiểm tra loading
     if (loading) {
         return (
-            <div className="blog-detail-wrapper">
+            <div className="contact-wrapper">
                 <p>Đang gửi dữ liệu...</p>
             </div>
         );
     }
 
+    // Kiểm tra error
     if (error) {
         return (
-            <div className="blog-detail-wrapper">
+            <div className="contact-wrapper">
                 <p className="text-red-500">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="blog-detail-wrapper">
-            <div className="blog-detail-container">
-                <div className="blog-detail-header">
+        <div className="contact-wrapper">
+            <div className="contact-container">
+                <div className="contact-header">
                     <img
                         src="https://via.placeholder.com/1200x400"
                         alt="Contact Header"
-                        className="blog-detail-image"
+                        className="contact-image"
                     />
-                    <div className="blog-detail-meta">
-                        <MapPin className="blog-detail-date-icon" size={20} />
-                        <span className="blog-detail-date-text">
+                    <div className="contact-meta">
+                        <MapPin className="contact-date-icon" size={20} />
+                        <span className="contact-date-text">
                             4A, Hai Bà Trưng, Hà Nội
                         </span>
                     </div>
                 </div>
 
-                {/* Main Content Section */}
-                <div className="blog-detail-content">
-                    <h1 className="blog-detail-title">
-                        CỬA HÀNG BẢO HỘ MINH XUÂN
-                    </h1>
-                    <div className="blog-detail-body">
+                <div className="contact-content">
+                    <h1 className="contact-title">CỬA HÀNG BẢO HỘ MINH XUÂN</h1>
+                    <div className="contact-body">
                         <p>
                             Hiện nay, Minh Xuân là một trong những Công ty lớn cung cấp và sản xuất tất cả các trang thiết bị bảo hộ, an toàn cho người lao động trên toàn quốc.
                         </p>
@@ -113,6 +112,7 @@ const Contact = () => {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={loading}
                                 />
                                 <input
                                     type="email"
@@ -122,6 +122,7 @@ const Contact = () => {
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={loading}
                                 />
                                 <input
                                     type="tel"
@@ -131,6 +132,7 @@ const Contact = () => {
                                     value={formData.phone}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={loading}
                                 />
                                 <textarea
                                     name="message"
@@ -140,13 +142,19 @@ const Contact = () => {
                                     value={formData.message}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={loading}
                                 />
-                                <button type="submit" className="submit-button">
-                                    Gửi tin nhắn
+                                <button
+                                    type="submit"
+                                    className="submit-button"
+                                    disabled={loading}
+                                >
+                                    {loading ? "Đang gửi..." : "Gửi tin nhắn"}
                                 </button>
                             </form>
+
                             {submissionStatus && (
-                                <p className="submission-status">{submissionStatus}</p>
+                                <p className="submission-status text-green-500 mt-2">{submissionStatus}</p>
                             )}
                         </div>
 
