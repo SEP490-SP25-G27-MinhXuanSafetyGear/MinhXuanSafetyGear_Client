@@ -23,9 +23,7 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
     const handleVariantChange = (field, value) => {
         setNewVariant(prev => ({
             ...prev,
-            [field]: field === "price" || field === "quantity" || field === "discount"
-                ? Math.max(0, Number(value))
-                : value,
+            [field]: field === "price" || field === "quantity" || field === "discount" ? Math.max(0, Number(value)) : value,
         }));
     };
 
@@ -42,12 +40,12 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
             const result = await onCreateVariant(newVariant);
             if (result) {
                 await onSetProduct(result);
-                showToast("Thêm biến thể thành công!"); // Thêm toast
+                showToast("Thêm biến thể thành công!", "success");
                 onClose();
             }
         } catch (error) {
             console.error("Error creating variant:", error);
-            alert("Không thể tạo biến thể. Vui lòng thử lại!");
+            showToast("Không thể tạo biến thể. Vui lòng thử lại!", "error");
         } finally {
             setTimeout(() => setLoading(false), 1000);
         }
@@ -58,9 +56,7 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="size">
-                            Kích thước <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="size">Kích thước <span className="text-red-500">*</span></label>
                         <input
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             id="size"
@@ -72,9 +68,7 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="color">
-                            Màu sắc <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="color">Màu sắc <span className="text-red-500">*</span></label>
                         <input
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             id="color"
@@ -88,9 +82,7 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="quantity">
-                            Số lượng <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="quantity">Số lượng <span className="text-red-500">*</span></label>
                         <input
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             id="quantity"
@@ -103,9 +95,7 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">
-                            Giá ($) <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">Giá ($) <span className="text-red-500">*</span></label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span className="text-gray-500">$</span>
@@ -124,9 +114,7 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discount">
-                            Giảm giá (%)
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discount">Giảm giá (%)</label>
                         <div className="relative">
                             <input
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -156,9 +144,7 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
                             <div className="block bg-gray-200 w-14 h-8 rounded-full"></div>
                             <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${newVariant.status ? 'transform translate-x-6 bg-blue-500' : ''}`}></div>
                         </div>
-                        <div className="ml-3 text-gray-700 font-medium">
-                            {newVariant.status ? 'Đang bán' : 'Ngừng bán'}
-                        </div>
+                        <div className="ml-3 text-gray-700 font-medium">{newVariant.status ? 'Đang bán' : 'Ngừng bán'}</div>
                     </label>
                 </div>
                 <div className="flex justify-end pt-4 border-t border-gray-200">

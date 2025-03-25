@@ -22,11 +22,11 @@ export default function AddProductTaxForm({ setLoading, onAddProductTax, onDelet
         try {
             const result = await onAddProductTax(product.id, tax.taxId);
             setProduct(result);
-            showToast("Thêm thuế sản phẩm thành công!"); // Thêm toast
+            showToast("Thêm thuế sản phẩm thành công!", "success");
             close();
         } catch (error) {
             console.log(error);
-            alert("Không thể thêm thuế. Vui lòng thử lại!");
+            showToast("Không thể thêm thuế. Vui lòng thử lại!", "error");
         } finally {
             setLoading(false);
         }
@@ -37,11 +37,11 @@ export default function AddProductTaxForm({ setLoading, onAddProductTax, onDelet
         try {
             const result = await onDeleteProductTax(tax.productTaxId);
             setProduct(result);
-            showToast("Xóa thuế sản phẩm thành công!"); // Thêm toast
+            showToast("Xóa thuế sản phẩm thành công!", "success");
             close();
         } catch (error) {
             console.log(error);
-            alert("Không thể xóa thuế. Vui lòng thử lại!");
+            showToast("Không thể xóa thuế. Vui lòng thử lại!", "error");
         } finally {
             setLoading(false);
         }
@@ -56,26 +56,16 @@ export default function AddProductTaxForm({ setLoading, onAddProductTax, onDelet
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tên Thuế
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tỷ Lệ (%)
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Thao tác
-                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên Thuế</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tỷ Lệ (%)</th>
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
                             </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                             {taxMap.map((tax) => (
                                 <tr key={tax.taxId} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {tax.taxName}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {tax.taxRate}%
-                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tax.taxName}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tax.taxRate}%</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         {!tax.added ? (
                                             <button
@@ -106,7 +96,6 @@ export default function AddProductTaxForm({ setLoading, onAddProductTax, onDelet
                     </div>
                 )}
             </div>
-
             <div className="flex justify-end pt-4 border-t border-gray-200">
                 <button
                     onClick={close}

@@ -78,14 +78,14 @@ export default function UpdateImageForm({ image, onUpdateImage, onSetProduct, cl
             var result = await onUpdateImage(formData);
             if (result) {
                 onSetProduct(result);
-                showToast("Cập nhật ảnh sản phẩm thành công!"); // Thêm toast
+                showToast("Cập nhật ảnh sản phẩm thành công!", "success");
                 close();
             } else {
-                alert("Cập nhật thất bại!");
+                showToast("Cập nhật ảnh thất bại!", "error");
             }
         } catch (error) {
             console.log(error.message);
-            alert("Không thể cập nhật ảnh. Vui lòng thử lại!");
+            showToast("Không thể cập nhật ảnh. Vui lòng thử lại!", "error");
         } finally {
             setLoading(false);
         }
@@ -99,11 +99,11 @@ export default function UpdateImageForm({ image, onUpdateImage, onSetProduct, cl
         try {
             var result = await onDelete(image.id);
             onSetProduct(result);
-            showToast("Xóa ảnh sản phẩm thành công!"); // Thêm toast
+            showToast("Xóa ảnh sản phẩm thành công!", "success");
             close();
         } catch (error) {
             console.error("Lỗi khi xóa ảnh:", error);
-            alert("Không thể xóa ảnh. Vui lòng thử lại!");
+            showToast("Không thể xóa ảnh. Vui lòng thử lại!", "error");
         } finally {
             setLoading(false);
         }
@@ -135,9 +135,7 @@ export default function UpdateImageForm({ image, onUpdateImage, onSetProduct, cl
                                 <div className="block bg-gray-200 w-14 h-8 rounded-full"></div>
                                 <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${newImage.isPrimary ? 'transform translate-x-6 bg-blue-500' : ''}`}></div>
                             </div>
-                            <div className="ml-3 text-gray-700 font-medium">
-                                Đặt làm ảnh chính
-                            </div>
+                            <div className="ml-3 text-gray-700 font-medium">Đặt làm ảnh chính</div>
                         </label>
                     </div>
                     <div className="mb-4">
