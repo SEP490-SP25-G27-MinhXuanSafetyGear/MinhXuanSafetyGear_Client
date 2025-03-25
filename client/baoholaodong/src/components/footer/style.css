@@ -187,6 +187,13 @@
     font-weight: 700;
 }
 
+
+
+.footer-link:hover {
+    text-decoration: underline;
+    color: #b50a00;
+}
+
 /* Tablet Styles (769px–1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     .footer-content {

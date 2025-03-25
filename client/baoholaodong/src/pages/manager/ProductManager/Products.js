@@ -102,10 +102,12 @@ const Products = () => {
 	const handleCreate = () => navigate("/manager/createproduct");
 	const handleUpdate = (id) => navigate(`/manager/update-product/${id}/slug`);
 	const [toastMessage, setToastMessage] = useState("");
+	const [toastType, setToastType] = useState("success"); // Thêm state cho type
 
 	useEffect(() => {
 		if (location.state?.toastMessage) {
 			setToastMessage(location.state.toastMessage);
+			setToastType(location.state.toastType || "success"); // Lấy type từ state, mặc định là success
 		}
 	}, [location.state]);
 
@@ -211,8 +213,9 @@ const Products = () => {
 					)}
 				</div>
 			</div>
-			{toastMessage && <ManagerToast message={toastMessage} onClose={() => setToastMessage("")} />}
-		</div>
+			{toastMessage && (
+				<ManagerToast message={toastMessage} onClose={() => setToastMessage("")} type={toastType} />
+			)}		</div>
 	);
 };
 
