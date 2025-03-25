@@ -124,12 +124,14 @@ const UpdateProduct = () => {
 	const [isLoading, setLoading] = useState(false);
 	const [isOpenAddTax, setIsOpenAddTax] = useState(false);
 	const [errors, setErrors] = useState([]);
-	const [toastMessage, setToastMessage] = useState(null); // Di chuyển lên đầu
+	const [toastMessage, setToastMessage] = useState(null);
+	const [toastType, setToastType] = useState("success");
 	const navigate = useNavigate();
 
-	// Hàm hiển thị toast
-	const showToast = (message) => {
+// Hàm hiển thị toast
+	const showToast = (message, type = "success") => {
 		setToastMessage(message);
+		setToastType(type);
 	};
 
 	// Đóng toast
@@ -544,7 +546,7 @@ const UpdateProduct = () => {
 			</div>
 			{/* Hiển thị toast */}
 			{toastMessage && (
-				<ManagerToast message={toastMessage} onClose={closeToast} />
+				<ManagerToast message={toastMessage} onClose={closeToast} type={toastType} />
 			)}
 		</div>
 	);

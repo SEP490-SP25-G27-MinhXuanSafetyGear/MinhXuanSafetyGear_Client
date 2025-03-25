@@ -43,6 +43,7 @@ const CreateProduct = () => {
 	const [previewCertificate, setPreviewCertificate] = useState(false)
 	const [showProductPreview, setShowProductPreview] = useState(false)
 	const [toastMessage, setToastMessage] = useState("");
+	const [toastType, setToastType] = useState("success"); // Thêm state cho type
 	const [showToast, setShowToast] = useState(false);
 
 	const handleChange = (e) => {
@@ -211,56 +212,54 @@ const CreateProduct = () => {
 
 	// Gửi dữ liệu lên server
 	const handleSubmit = async (e) => {
-		e.preventDefault()
+		e.preventDefault();
 		try {
-			setIsLoading(true)
-			// Chuẩn bị dữ liệu gửi đi
-			const formData = new FormData()
-			formData.append("name", product.name)
-			formData.append("category", product.category)
-			formData.append("description", product.description)
-			formData.append("material", product.material)
-			formData.append("origin", product.origin)
-			formData.append("quantity", product.quantity)
-			formData.append("price", product.price)
-			formData.append("freeShip", product.freeShip)
-			formData.append("guarantee", product.guarantee)
-			formData.append("discount", product.discount)
-			formData.append("status", product.status)
-			formData.append("qualityCertificate", product.qualityCertificate)
+			setIsLoading(true);
+			const formData = new FormData();
+			formData.append("name", product.name);
+			formData.append("category", product.category);
+			formData.append("description", product.description);
+			formData.append("material", product.material);
+			formData.append("origin", product.origin);
+			formData.append("quantity", product.quantity);
+			formData.append("price", product.price);
+			formData.append("freeShip", product.freeShip);
+			formData.append("guarantee", product.guarantee);
+			formData.append("discount", product.discount);
+			formData.append("status", product.status);
+			formData.append("qualityCertificate", product.qualityCertificate);
 			product.productVariants.forEach((variant, index) => {
-				formData.append(`productVariants[${index}].size`, variant.size)
-				formData.append(`productVariants[${index}].color`, variant.color)
-				formData.append(`productVariants[${index}].quantity`, variant.quantity)
-				formData.append(`productVariants[${index}].price`, variant.price)
-				formData.append(`productVariants[${index}].discount`, variant.discount)
-				formData.append(`productVariants[${index}].status`, variant.status)
-			})
-			// Thêm ảnh vào formData
+				formData.append(`productVariants[${index}].size`, variant.size);
+				formData.append(`productVariants[${index}].color`, variant.color);
+				formData.append(`productVariants[${index}].quantity`, variant.quantity);
+				formData.append(`productVariants[${index}].price`, variant.price);
+				formData.append(`productVariants[${index}].discount`, variant.discount);
+				formData.append(`productVariants[${index}].status`, variant.status);
+			});
 			images.forEach((image) => {
-				formData.append("files", image)
-			})
-			await createProduct(formData)
-			navigate("/manager/products", { state: { toastMessage: "Thêm sản phẩm thành công !" } });
-			setIsLoading(false)
+				formData.append("files", image);
+			});
+			await createProduct(formData);
+			navigate("/manager/products", { state: { toastMessage: "Thêm sản phẩm thành công!", toastType: "success" } });
 		} catch (err) {
 			setToastMessage("Không tạo được sản phẩm!");
+			setToastType("error"); // Thêm type error
 			setShowToast(true);
 			if (err.errors) {
-				const errorMessages = []
+				const errorMessages = [];
 				for (const field in err.errors) {
 					if (Array.isArray(err.errors[field])) {
 						err.errors[field].forEach((message) => {
-							errorMessages.push(`${field}: ${message}`)
-						})
+							errorMessages.push(`${field}: ${message}`);
+						});
 					}
 				}
-				setErrors(errorMessages)
+				setErrors(errorMessages);
 			}
 		} finally {
-			setIsLoading(false)
+			setIsLoading(false);
 		}
-	}
+	};
 
 	// Chuyển đến bước tiếp theo
 	const nextStep = () => {
@@ -977,8 +976,9 @@ const CreateProduct = () => {
 			{showProductPreview && (
 				<ProductPreview product={product} images={images} onClose={() => setShowProductPreview(false)} />
 			)}
-			{showToast && <ManagerToast message={toastMessage} onClose={() => setShowToast(false)} />}
-
+			{showToast && (
+				<ManagerToast message={toastMessage} onClose={() => setShowToast(false)} type={toastType} />
+			)}
 		</div>
 	)
 }
