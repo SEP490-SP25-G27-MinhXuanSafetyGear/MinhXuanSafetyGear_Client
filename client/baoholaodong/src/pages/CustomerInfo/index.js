@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './style.css';
 
-
 const CustomerInfo = () => {
     const [formData, setFormData] = useState({
         FullName: '',
@@ -11,6 +10,7 @@ const CustomerInfo = () => {
         Email: '',
         PhoneNumber: '',
         Address: '',
+        ProfileImage: '',
     });
 
 
@@ -66,7 +66,7 @@ const CustomerInfo = () => {
 
         try {
             const response = await axios.post(`${API_BASE}/api/customer/save-info`, formData);
-            console.log('Customer Info Saved:', response.data);
+            console.log('Lưu thông tin khách hàng:', response.data);
             alert('Thông tin đã được lưu thành công!');
         } catch (err) {
             setError('Lỗi khi lưu thông tin khách hàng');
@@ -77,10 +77,8 @@ const CustomerInfo = () => {
     };
 
 
-    const randomProfileImage = `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`;
+    const userProfileImage = formData.ProfileImage || 'logo.gif';
 
-
-    // Thêm kiểm tra loading và error ở đầu
     if (loading) {
         return (
             <div className="customer-info-page">
@@ -106,10 +104,8 @@ const CustomerInfo = () => {
                     <a href="/">Trang chủ</a> > Thông Tin Khách Hàng
                 </div>
 
-
                 <h1>THÔNG TIN KHÁCH HÀNG</h1>
                 <p className="subtitle">Vui lòng điền đầy đủ thông tin đặt hàng</p>
-
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -199,7 +195,7 @@ const CustomerInfo = () => {
                         <div className="profile-section">
                             <div className="profile-image">
                                 <img
-                                    src={randomProfileImage}
+                                    src={userProfileImage}
                                     alt="Profile"
                                     className="profile-img"
                                 />
@@ -215,7 +211,6 @@ const CustomerInfo = () => {
                         </div>
                     </div>
                 )}
-
 
                 <div className="order-list">
                     <h2>Lịch Sử Đặt Hàng</h2>
@@ -256,6 +251,5 @@ const CustomerInfo = () => {
         </div>
     );
 };
-
 
 export default CustomerInfo;

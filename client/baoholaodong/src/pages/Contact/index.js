@@ -14,13 +14,11 @@ const Contact = () => {
     });
 
 
-    // State for form submission
     const [formLoading, setFormLoading] = useState(false);
     const [formError, setFormError] = useState(null);
     const [submissionStatus, setSubmissionStatus] = useState(null);
 
 
-    // State for fetching contact details
     const [contactDetails, setContactDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -191,4 +189,3 @@ const Contact = () => {
 };
 
 export default Contact;
-
