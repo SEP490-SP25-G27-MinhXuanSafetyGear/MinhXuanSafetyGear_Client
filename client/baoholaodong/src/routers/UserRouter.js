@@ -9,7 +9,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import Users from "../pages/manager/Users/Users";
 import { Orders } from "../pages/manager/OrderManager";
 import { CreateProduct, Products, UpdateProduct } from "../pages/manager/ProductManager";
-import {UpdateBlogs,CreateBlogs, BlogPosts} from "../pages/manager/BlogManager";
+import { UpdateBlogs, CreateBlogs, BlogPosts } from "../pages/manager/BlogManager";
 import Invoices from "../pages/manager/InvoiceManager/Invoices";
 import { Notifications } from "../pages/manager/NotificationManager";
 import Settings from "../pages/manager/Settings";
@@ -40,10 +40,10 @@ import CreateEmployee from "../pages/manager/EmployeeManager/CreateEmployee";
 import UpdateEmployee from "../pages/manager/EmployeeManager/UpdateEmployee";
 import CreateOrder from "../pages/manager/OrderManager/CreateOrder";
 import OrderDetail from "../pages/manager/OrderManager/OrderDetail";
-import {ConfirmOrder} from "../pages/ConfirmOrder";
+import { ConfirmOrder } from "../pages/ConfirmOrder";
 import ProductVariantSelector from "../pages/ProductDetails/ProductVariantSelector";
 import BlogDetail from "../pages/BlogDetail";
-
+import OrderHistory from "../pages/OrderHistory";
 
 const UserRouter = () => {
     return (
@@ -82,8 +82,11 @@ const UserRouter = () => {
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
                     <Route path="/category/:categoryId" element={<ProductListByCategory />} />
                     <Route path="confirm-order" element={<ConfirmOrder />} />
+                    
+                    <Route path="/order-history/:userId" element={<OrderHistory />} />{" "}
+
                 </Route>
-                <Route path="/demo" element={<ProductVariantSelector/>}/>
+                <Route path="/demo" element={<ProductVariantSelector />} />
                 {/* Admin Routes */}
                 <Route
                     path="/manager"
@@ -103,11 +106,11 @@ const UserRouter = () => {
                     />
                     <Route path="users" element={<Users />} />
                     <Route path="employees" element={<Employees />} />
-                    <Route path="create-employee" element={<CreateEmployee/>} />
+                    <Route path="create-employee" element={<CreateEmployee />} />
                     <Route path="update-employee" element={<UpdateEmployee />} />
                     <Route path="orders" element={<Orders />} />
                     <Route path="create-order" element={<CreateOrder />} />
-                    <Route path="order-detail/:id" element={<OrderDetail/>} />
+                    <Route path="order-detail/:id" element={<OrderDetail />} />
                     <Route path="products" element={<Products />} />
                     <Route path="blog-posts" element={<BlogPosts />} />
                     <Route path="create-blog" element={<CreateBlogs />} />
