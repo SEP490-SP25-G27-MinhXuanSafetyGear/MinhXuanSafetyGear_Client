@@ -18,7 +18,6 @@ const ProductList = () => {
     const [products, setProducts] = useState([]);
     const { groupCategories, searchProduct, getProductPage } = useContext(CustomerProductContext);
     const { addToCart } = useContext(CartContext);
-    const [hoveredGroup, setHoveredGroup] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");

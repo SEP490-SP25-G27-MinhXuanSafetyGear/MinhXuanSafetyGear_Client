@@ -3,17 +3,18 @@
 import { useState, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
-import { FaImage, FaMarkdown, FaQuestionCircle } from "react-icons/fa"
+import { FaImage } from "react-icons/fa"
 import "./create-blog.css"
 import { BlogPostContext } from "../../../contexts/BlogPostContext"
-import {TextEditor} from "../../../components/TextEditor";
-import type React from "react";
+import { TextEditor } from "../../../components/TextEditor"
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
 export default function CreateBlog() {
   const navigate = useNavigate()
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
+  const [summary, setSummary] = useState("")
+  const [tags, setTags] = useState("")
   const [status, setStatus] = useState("Draft")
   const [category, setCategory] = useState(0)
   const [file, setFile] = useState(null)
@@ -49,6 +50,8 @@ export default function CreateBlog() {
     const formData = new FormData()
     formData.append("title", title)
     formData.append("content", content)
+    formData.append("summary", summary)
+    formData.append("tags", tags)
     formData.append("category", category)
     formData.append("status", status)
     formData.append("file", file)
@@ -105,10 +108,40 @@ export default function CreateBlog() {
               </div>
 
               <div className="form-group">
+                <label htmlFor="summary" className="form-label">
+                  Tóm tắt
+                </label>
+                <textarea
+                    id="summary"
+                    className="form-input"
+                    placeholder="Nhập tóm tắt bài viết (tối đa 500 ký tự)"
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
+                    maxLength={500}
+                    rows={3}
+                />
+              </div>
+
+              <div className="form-group">
                 <label htmlFor="content" className="form-label">
                   Nội dung
                 </label>
-                <TextEditor width={"100%"} height={"300px"} value={content} setValue={setContent} maxLength={2000}/>
+                <TextEditor width={"100%"} height={"300px"} value={content} setValue={setContent} maxLength={2000} />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="tags" className="form-label">
+                  Thẻ
+                </label>
+                <input
+                    type="text"
+                    id="tags"
+                    className="form-input"
+                    placeholder="Nhập thẻ, phân cách bằng dấu phẩy (ví dụ: tin tức, sự kiện)"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                    maxLength={255}
+                />
               </div>
 
               <div className="form-row">
@@ -208,4 +241,3 @@ export default function CreateBlog() {
       </div>
   )
 }
-

@@ -3,8 +3,6 @@ import { FaPhoneAlt, FaUser, FaShoppingCart, FaSearch, FaBars, FaTimes } from "r
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import CartDropdown from "../Cartdropdown/CartDropdown";
-import Notification from "../notifications/Notification";
-
 import "./style.css";
 import { AuthContext } from "../../contexts/AuthContext";
 
@@ -17,17 +15,14 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     const navigate = useNavigate();
     const location = useLocation();
     const [search, setSearch] = useState("");
-    
-    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-    const handleSearch = (e) => {
+    const handleSearch = (e)=>{
         e.preventDefault();
-        if (search !== "") {
-            window.location.href = ("/products?search=" + search);
+        if(search !== ""){
+            window.location.href= ("/products?search="+search);
         }
     }
     useEffect(() => {
-        if (cartItems) {
+        if(cartItems){
             updateCartCount();
         }
     }, [cartItems]);
@@ -62,38 +57,6 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
         navigate("/cart");
     };
 
-    const handleMarkAsRead = async (notificationId, orderId) => {
-        try {
-            console.log(
-                `Sending PUT request to mark notification ${notificationId} as read`
-            );
-            const response = await fetch(
-                `${BASE_URL}/api/Notification/mask-as-read?notificationId=${notificationId}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Accept: "*/*",
-                    },
-                }
-            );
-            const responseText = await response.text();
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to mark notification as read: ${response.status} - ${responseText || "No response body"
-                    }`
-                );
-            }
-            console.log(
-                `Notification ${notificationId} marked as read successfully. Response: ${responseText}`
-            );
-            showToast("Thông báo đã được đánh dấu là đã đọc", "success");
-        } catch (error) {
-            console.error("Mark as read error:", error);
-            showToast(`Lỗi khi cập nhật thông báo: ${error.message}`, "error");
-        }
-    };
-
     return (
         <>
             <header className={`header-gradient shadow ${isScrolled ? "scrolled" : ""}`}>
@@ -120,7 +83,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                         <form className="w-full" onSubmit={handleSearch}>
                             <input
                                 value={search}
-                                onChange={(e) => { setSearch(e.target.value) }}
+                                onChange={(e)=>{setSearch(e.target.value)}}
                                 type="text"
                                 placeholder="Tìm kiếm..."
                                 className="w-full px-4 py-2 "
@@ -143,12 +106,6 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                                 </div>
                             </div>
                         </div>
-                        {user && (
-                            <Notification
-                                userId={user.userId}
-                                onMarkAsRead={handleMarkAsRead}
-                            />
-                        )}
                         <div className="relative group">
                             <div className="flex items-center cursor-pointer">
                                 {user ? (
@@ -177,16 +134,9 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             </div>
                             <div
                                 className="absolute right-0 mt-2 w-48 bg-white border  shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                                {user ? (
-                                    <>
-                                        <a href
-                                            ={`/order-history/${user.userId}`}
-                                            className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                                            Lịch sử đơn hàng
-                                        </a>
-                                        <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
-                                            xuất</a>
-                                    </>
+                                {user? (
+                                    <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
+                                        xuất</a>
                                 ) : (
                                     <>
                                         <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
@@ -197,8 +147,8 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             </div>
                         </div>
                         <div className="relative flex items-center"
-                            onMouseEnter={() => location.pathname !== "/cart" && setDropdownVisible(true)}
-                            onMouseLeave={() => setDropdownVisible(false)}>
+                             onMouseEnter={() => location.pathname !== "/cart" && setDropdownVisible(true)}
+                             onMouseLeave={() => setDropdownVisible(false)}>
                             <div className="relative">
                                 <FaShoppingCart className="text-white h-8 w-8 cursor-pointer" onClick={handleCartClick} />
                                 <span
@@ -217,7 +167,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                     <form className="w-full" onSubmit={handleSearch}>
                         <input
                             value={search}
-                            onChange={(e) => { setSearch(e.target.value) }}
+                            onChange={(e)=>{setSearch(e.target.value)}}
                             type="text"
                             placeholder="Tìm kiếm..."
                             className="w-full px-4 py-2 "

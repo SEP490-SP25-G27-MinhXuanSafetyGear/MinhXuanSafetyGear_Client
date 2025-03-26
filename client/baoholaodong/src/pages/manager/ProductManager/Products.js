@@ -49,7 +49,7 @@ const ProductTable = React.memo(({ products, handleUpdate }) => {
 						hidden: { opacity: 0 },
 						visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
 					}}>
-					{products.map(({ id, name, price, quantity, priceDiscount, discount, image, isNew, status }, index) => (
+					{products.map(({ id, name, price, quantity,  priceAfterDiscount, discount, image, isNew, status }, index) => (
 						<motion.tr
 							key={id}
 							variants={{
@@ -68,7 +68,7 @@ const ProductTable = React.memo(({ products, handleUpdate }) => {
 								{name}
 							</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{formatVND(price)}</td>
-							<td className="px-6 py-4 whitespace-nowrap text-sm">{formatVND(priceDiscount)}</td>
+							<td className="px-6 py-4 whitespace-nowrap text-sm">{formatVND(priceAfterDiscount)}</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{discount}%</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">{quantity}</td>
 							<td className="px-6 py-4 whitespace-nowrap text-sm">

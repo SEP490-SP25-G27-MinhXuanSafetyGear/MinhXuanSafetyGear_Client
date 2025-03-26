@@ -65,34 +65,44 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
         : allColors
 
     const handleColorSelect = (color) => {
-        setSelectedColor(color)
+        // Nếu người dùng nhấp vào màu đã chọn, hủy chọn nó
+        if (selectedColor && normalizeString(selectedColor) === normalizeString(color)) {
+            setSelectedColor(null)
+        } else {
+            setSelectedColor(color)
 
-        // Nếu kích thước hiện tại không khả dụng với màu mới, reset kích thước
-        if (
-            selectedSize &&
-            !product.productVariants.some(
-                (v) =>
-                    normalizeString(v.color) === normalizeString(color) &&
-                    normalizeString(v.size) === normalizeString(selectedSize),
-            )
-        ) {
-            setSelectedSize(null)
+            // Nếu kích thước hiện tại không khả dụng với màu mới, reset kích thước
+            if (
+                selectedSize &&
+                !product.productVariants.some(
+                    (v) =>
+                        normalizeString(v.color) === normalizeString(color) &&
+                        normalizeString(v.size) === normalizeString(selectedSize),
+                )
+            ) {
+                setSelectedSize(null)
+            }
         }
     }
 
     const handleSizeSelect = (size) => {
-        setSelectedSize(size)
+        // Nếu người dùng nhấp vào kích thước đã chọn, hủy chọn nó
+        if (selectedSize && normalizeString(selectedSize) === normalizeString(size)) {
+            setSelectedSize(null)
+        } else {
+            setSelectedSize(size)
 
-        // Nếu màu hiện tại không khả dụng với kích thước mới, reset màu
-        if (
-            selectedColor &&
-            !product.productVariants.some(
-                (v) =>
-                    normalizeString(v.size) === normalizeString(size) &&
-                    normalizeString(v.color) === normalizeString(selectedColor),
-            )
-        ) {
-            setSelectedColor(null)
+            // Nếu màu hiện tại không khả dụng với kích thước mới, reset màu
+            if (
+                selectedColor &&
+                !product.productVariants.some(
+                    (v) =>
+                        normalizeString(v.size) === normalizeString(size) &&
+                        normalizeString(v.color) === normalizeString(selectedColor),
+                )
+            ) {
+                setSelectedColor(null)
+            }
         }
     }
 
@@ -104,7 +114,7 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
                     normalizeString(v.size) === normalizeString(selectedSize),
             )
             setSelectedVariant(variant || null)
-            console.log(variant);
+            console.log(variant)
         } else {
             setSelectedVariant(null)
         }
@@ -139,6 +149,9 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
                                 }`}
                                 onClick={() => isAvailable && handleColorSelect(color)}
                                 disabled={!isAvailable}
+                                title={
+                                    selectedColor && normalizeString(selectedColor) === normalizeString(color) ? "Nhấp để bỏ chọn" : ""
+                                }
                             >
                                 {color}
                             </button>
@@ -167,6 +180,7 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
                                 }`}
                                 onClick={() => isAvailable && handleSizeSelect(size)}
                                 disabled={!isAvailable}
+                                title={selectedSize && normalizeString(selectedSize) === normalizeString(size) ? "Nhấp để bỏ chọn" : ""}
                             >
                                 {size}
                             </button>

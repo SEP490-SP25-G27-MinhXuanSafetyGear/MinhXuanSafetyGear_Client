@@ -70,6 +70,55 @@ const TextEditor = ({ width = "100%", height = "300px", value = "", setValue, ma
         </div>
     );
 };
+const TextEditor2 = ({ width = "100%", height = "200px", value = "", setValue, maxLength = 500 }) => {
+    // ✅ Chỉ giữ lại các công cụ cần thiết
+    const modules = {
+        toolbar: [
+            ["bold", "italic"], // Chỉ cho phép in đậm và in nghiêng
+            [{ list: "ordered" }, { list: "bullet" }], // Danh sách có thứ tự và không thứ tự
+            ["clean"], // Xóa định dạng
+        ],
+    };
+
+    // ✅ Đảm bảo hỗ trợ đúng các kiểu định dạng
+    const formats = ["bold", "italic", "list", "ordered", "bullet"];
+
+    // ✅ Xử lý thay đổi nội dung, kiểm soát số ký tự
+    const handleChange = (content, delta, source) => {
+        if (source === "user") { // Chỉ xử lý khi người dùng nhập
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = content;
+            const textOnly = tempDiv.innerText.trim(); // Lấy văn bản thực tế
+
+            if (textOnly.length <= maxLength) {
+                setValue(content); // Cập nhật nếu chưa vượt quá giới hạn
+            }
+        }
+    };
+
+    const textLength = (() => {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = value;
+        return tempDiv.innerText.trim().length;
+    })();
+
+    return (
+        <div style={{ width, height }}>
+            <ReactQuill
+                theme="snow"
+                value={value}
+                onChange={handleChange}
+                modules={modules}
+                formats={formats}
+                style={{ height }}
+            />
+            {/* Hiển thị số ký tự đã nhập */}
+            <p className={`text-right text-sm ${textLength >= maxLength ? "text-red-500 font-bold" : "text-gray-500"}`}>
+                {textLength}/{maxLength} ký tự {textLength >= maxLength ? " - Đã đạt giới hạn!" : ""}
+            </p>
+        </div>
+    );
+};
 
 const DisplayContent = ({ content }) => {
     const safeContent = DOMPurify.sanitize(content, {
@@ -80,4 +129,4 @@ const DisplayContent = ({ content }) => {
     return <div dangerouslySetInnerHTML={{ __html: safeContent }} />;
 };
 
-export { TextEditor, DisplayContent };
+export { TextEditor, DisplayContent,TextEditor2 };

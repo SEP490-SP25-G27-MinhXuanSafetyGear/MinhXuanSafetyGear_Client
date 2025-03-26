@@ -117,9 +117,9 @@ const AdminLayout = () => {
 
     const markAsRead =async (id,orderId) => {
         setNotifications((prevNotifications) =>
-          prevNotifications.map((notif) =>
-            notif.id === id ? { ...notif, isRead: true } : notif
-          )
+            prevNotifications.map((notif) =>
+                notif.id === id ? { ...notif, isRead: true } : notif
+            )
         );
         try {
             await axios.put(`${BASE_URL}/api/Notification/mask-as-read`, null, {
@@ -132,12 +132,12 @@ const AdminLayout = () => {
         } catch (error) {
             console.error("Error marking notification as read:", error);
         }
-      };
-    
+    };
+
     return (
         <div className="flex h-screen bg-gray-100">
             <div className={`${isCollapsed ? 'w-16' : 'w-64'
-                } bg-white shadow-lg transition-all duration-300 z-20`}>
+            } bg-white shadow-lg transition-all duration-300 z-20`}>
                 <div className="p-4 border-b flex justify-between items-center">
                     {!isCollapsed && (
                         <h1 className="text-2xl font-bold text-gray-800">{user.role}</h1>
@@ -158,7 +158,7 @@ const AdminLayout = () => {
                                     className={`flex items-center p-2 rounded-lg ${location.pathname === item.path
                                         ? 'bg-blue-50 text-blue-700'
                                         : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                    }`}
                                 >
                                     <item.icon className="w-5 h-5" />
                                     {!isCollapsed && <span className="ml-3">{item.label}</span>}

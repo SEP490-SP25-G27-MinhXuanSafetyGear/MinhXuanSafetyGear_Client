@@ -16,19 +16,21 @@ export default function UpdateBlog() {
 	const [title, setTitle] = useState("")
 	const [content, setContent] = useState("")
 	const [status, setStatus] = useState("Draft")
+	const [summary, setSummary] = useState("")
+	const [tags, setTags] = useState("")
 	const [category, setCategory] = useState(0)
 	const [file, setFile] = useState(null)
 	const [previewUrl, setPreviewUrl] = useState("")
 	const [message, setMessage] = useState({ type: "", text: "" })
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [activeTab, setActiveTab] = useState("edit")
-	const [showHelp, setShowHelp] = useState(false)
 	const { categories } = useContext(BlogPostContext)
 	const { id } = useParams();
 	const [post, setPost] = useState({
 		id: 0,
 		title: "",
 		content: "",
+		tags:"",
+		summary: "",
 		status: "draft",
 		imageUrl: "",
 		categoryId: 0,
@@ -37,7 +39,12 @@ export default function UpdateBlog() {
 		const fetchData = async () => {
 			try {
 				const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog/${id}`);
-				setPost(response.data);
+				setTitle(response.data.title)
+				setContent(response.data.content)
+				setStatus(response.data.status)
+				setSummary(response.data.summary)
+				setTags(response.data.tags)
+				setCategory(response.data.categoryId);
 			} catch (e) {
 				console.error("Error fetching post data", e);
 			}
@@ -71,15 +78,17 @@ export default function UpdateBlog() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if (!post.title || !post.content || !post.categoryId) {
-			alert("Please fill in all required fields!");
-			return;
-		}
+		// if (!post.title || !post.content || !post.categoryId) {
+		// 	alert("Please fill in all required fields!");
+		// 	return;
+		// }
 
 		const formData = new FormData();
 		formData.append("id", parseInt(id));
 		formData.append("title", title);
 		formData.append("content", content);
+		formData.append("tags", tags);
+		formData.append("summary", summary);
 		formData.append("status", status);
 		formData.append("category", category);
 		formData.append("file", file);
@@ -135,13 +144,42 @@ export default function UpdateBlog() {
 								required
 							/>
 						</div>
-
+						<div className="form-group">
+							<label htmlFor="summary" className="form-label">
+								Tóm tắt
+							</label>
+							<textarea
+								id="summary"
+								className="form-input"
+								placeholder="Nhập tóm tắt bài viết (tối đa 500 ký tự)"
+								value={summary}
+								onChange={(e) => setSummary(e.target.value)}
+								maxLength={500}
+								rows={3}
+							/>
+						</div>
 						<div className="form-group">
 							<label htmlFor="content" className="form-label">
 								Nội dung
 							</label>
-							<TextEditor width={"100%"} height={"300px"} value={content} setValue={setContent} />
+							<TextEditor width={"100%"} height={"300px"} maxLength={50000} value={content} setValue={setContent} />
 						</div>
+
+						<div className="form-group">
+							<label htmlFor="tags" className="form-label">
+								Thẻ
+							</label>
+							<input
+								type="text"
+								id="tags"
+								className="form-input"
+								placeholder="Nhập thẻ, phân cách bằng dấu phẩy (ví dụ: tin tức, sự kiện)"
+								value={tags}
+								onChange={(e) => setTags(e.target.value)}
+								maxLength={255}
+							/>
+						</div>
+
 						<div className="form-row">
 							<div className="form-col">
 								<div className="form-group">
