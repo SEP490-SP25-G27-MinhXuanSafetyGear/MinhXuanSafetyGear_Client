@@ -1,5 +1,4 @@
 ﻿"use client"
-
 import { useContext, useState } from "react"
 import { CartContext } from "../../contexts/CartContext"
 import { useNavigate } from "react-router-dom"
@@ -152,7 +151,7 @@ const Cart = () => {
                                                             )}
                                                             {variant.color && (
                                                                 <span className="flex items-center">Màu:<span className="inline-block w-3 h-3 rounded-full ml-1 mr-1"
-                                                                                                              style={{ backgroundColor: variant.color }}
+                                                                   style={{ backgroundColor: variant.color }}
                                                                 ></span>
                                                                     {variant.color}
                                                                 </span>
@@ -268,5 +267,5 @@ const Cart = () => {
     )
 }
 
-export default Cart
+export default Cart;
 
