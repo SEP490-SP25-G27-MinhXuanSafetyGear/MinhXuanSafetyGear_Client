@@ -68,12 +68,12 @@ export default function AddMoreImageForm({ product, uploadImage, setProduct, clo
             if (result) {
                 clearImage();
                 setProduct(result);
-                showToast("Thêm ảnh sản phẩm thành công!"); // Thêm toast
+                showToast("Thêm ảnh sản phẩm thành công!", "success");
                 close();
             }
         } catch (error) {
             console.error("Lỗi khi tải ảnh lên:", error);
-            alert("Không thể tải ảnh lên. Vui lòng thử lại!");
+            showToast("Không thể tải ảnh lên. Vui lòng thử lại!", "error");
         } finally {
             setLoading(false);
             setIsSubmitting(false);
@@ -106,9 +106,7 @@ export default function AddMoreImageForm({ product, uploadImage, setProduct, clo
                                 <div className="block bg-gray-200 w-14 h-8 rounded-full"></div>
                                 <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${image.isPrimary ? 'transform translate-x-6 bg-blue-500' : ''}`}></div>
                             </div>
-                            <div className="ml-3 text-gray-700 font-medium">
-                                Đặt làm ảnh chính
-                            </div>
+                            <div className="ml-3 text-gray-700 font-medium">Đặt làm ảnh chính</div>
                         </label>
                     </div>
                     <div className="mb-4">

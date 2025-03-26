@@ -76,30 +76,32 @@ export default function UpdateInformationProductForm({
     }, [productUpdate])
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        if (!productIsValid) return // Không cho submit nếu dữ liệu không hợp lệ
+        e.preventDefault();
+        if (!productIsValid) return;
         try {
-            setLoading(true)
-            const updatedProduct = await onUpdate(productUpdate)
-            setProduct(updatedProduct)
-            showToast("Cập nhật thông tin sản phẩm thành công!") // Gọi toast khi thành công
-            close()
+            setLoading(true);
+            const updatedProduct = await onUpdate(productUpdate);
+            setProduct(updatedProduct);
+            showToast("Cập nhật thông tin sản phẩm thành công!", "success"); // Thành công
+            close();
         } catch (err) {
+            console.error(err);
+            showToast("Không thể cập nhật thông tin sản phẩm!", "error"); // Thất bại
             if (err.errors) {
-                const errorMessages = []
+                const errorMessages = [];
                 for (const field in err.errors) {
                     if (Array.isArray(err.errors[field])) {
                         err.errors[field].forEach((message) => {
-                            errorMessages.push(`${field}: ${message}`)
-                        })
+                            errorMessages.push(`${field}: ${message}`);
+                        });
                     }
                 }
-                setErrors(errorMessages)
+                setErrors(errorMessages);
             }
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="p-6 overflow-y-auto max-h-[80vh]">

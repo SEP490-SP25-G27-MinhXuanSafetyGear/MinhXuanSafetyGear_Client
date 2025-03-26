@@ -1,21 +1,23 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./style.css";
 import { FaArrowRight, FaArrowLeft, FaClock } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { toSlug } from "../../utils/SlugUtils";
 
 const API_BASE = process.env.REACT_APP_BASE_URL_API;
-
 
 const NewBlog = () => {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const sliderRef = useRef(null);
+    const navigate = useNavigate();
 
-    //  Hàm xử lý loại bỏ HTML và rút gọn nội dung
+    // Hàm xử lý loại bỏ HTML và rút gọn nội dung
     const stripHtmlTags = (html) => {
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = html;
@@ -30,17 +32,34 @@ const NewBlog = () => {
         return plainText.substring(0, maxLength) + "...";
     };
 
-    //  Gọi API lấy danh sách bài blog
+    // Gọi API để lấy danh sách bài blog theo danh mục "Kiến Thức An Toàn Lao Động"
     useEffect(() => {
         const fetchBlogs = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(
-                    `${API_BASE}/api/BlogPost/get-blog-page?categoryId=0&page=1&size=10`
+                // Lấy danh sách danh mục
+                const categoriesResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-categories`);
+                const categories = categoriesResponse.data;
+
+                // Tìm danh mục "KIẾN THỨC AN TOÀN LAO ĐỘNG"
+                const targetCategory = categories.find(
+                    (cat) => cat.name === "KIẾN THỨC AN TOÀN LAO ĐỘNG"
                 );
-                setBlogs(response.data.items); // Lấy danh sách bài viết từ API
+                if (!targetCategory) {
+                    throw new Error("Không tìm thấy danh mục 'KIẾN THỨC AN TOÀN LAO ĐỘNG'");
+                }
+
+                // Tạo slug từ tên danh mục
+                const categorySlug = toSlug(targetCategory.name);
+
+                // Gọi API lấy bài viết theo slug
+                const blogsResponse = await axios.get(
+                    `${API_BASE}/api/BlogPost/get-blog-by-category/${categorySlug}`
+                );
+                setBlogs(blogsResponse.data);
             } catch (err) {
                 setError("Lỗi khi tải dữ liệu blog");
+                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -49,6 +68,11 @@ const NewBlog = () => {
         fetchBlogs();
     }, []);
 
+    // Hàm điều hướng khi nhấp "Xem chi tiết"
+    const handleViewDetail = (blog) => {
+        const blogSlug = blog.slug || toSlug(blog.title);
+        navigate(`/blogs/${blogSlug}`);
+    };
 
     const settings = {
         dots: false,
@@ -112,7 +136,10 @@ const NewBlog = () => {
                                 </p>
                             </div>
                             <div className="new-blog-read-more">
-                                <button className="new-blog-read-more-button">
+                                <button
+                                    className="new-blog-read-more-button"
+                                    onClick={() => handleViewDetail(blog)}
+                                >
                                     <div className="new-blog-read-more-text">
                                         Xem chi tiết <FaArrowRight className="inline" />
                                     </div>

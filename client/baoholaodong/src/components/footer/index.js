@@ -1,7 +1,55 @@
-import React from 'react';
-import './style.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toSlug } from "../../utils/SlugUtils";
+import "./style.css";
+
+const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
 const Footer = () => {
+    const [contactBlogs, setContactBlogs] = useState([]);
+    const [policyBlogs, setPolicyBlogs] = useState([]);
+    const [guideBlogs, setGuideBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    // Hàm xử lý loại bỏ HTML từ content
+    const stripHtmlTags = (html) => {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        return tempDiv.textContent || tempDiv.innerText || "";
+    };
+
+    // Gọi API cho từng danh mục
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            setLoading(true);
+            try {
+                const contactResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-category/lien-he`);
+                setContactBlogs(contactResponse.data);
+
+                const policyResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-category/chinh-sach`);
+                setPolicyBlogs(policyResponse.data);
+
+                const guideResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-category/huong-dan`);
+                setGuideBlogs(guideResponse.data);
+            } catch (err) {
+                setError("Lỗi khi tải dữ liệu footer");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBlogs();
+    }, []);
+
+    const handleViewDetail = (blog) => {
+        const blogSlug = blog.slug || toSlug(blog.title);
+        navigate(`/blogs/${blogSlug}`);
+    };
+
     return (
         <div className="footer-container">
             <div className="footer-content">
@@ -34,23 +82,25 @@ const Footer = () => {
                 <div className="footer-section">
                     <div className="footer-contact">
                         <div className="footer-contact-title">Liên Hệ</div>
-                        <div className="footer-contact-item">
-                            <span>Địa chỉ: Hai Bà Trưng, Hà Nội</span>
-                        </div>
-                        <div className="footer-contact-item">
-                            <span>Điện thoại: 0912.423.062</span>
-                        </div>
-                        <div className="footer-contact-item">
-                            <span>Zalo: 0912.423.062</span>
-                        </div>
-                        <div className="footer-contact-item">
-                            <span>Email: minhxuanbhld@gmail.com</span>
-                        </div>
-                    </div>
-                    <div className="footer-branches">
-                        <div className="footer-branches-title">Chuỗi Cửa Hàng</div>
-                        <div className="footer-branches-item">Chi nhánh Hai Bà Trưng, Hà Nội</div>
-                        {/* Add more branches as needed */}
+                        {loading ? (
+                            <p>Đang tải...</p>
+                        ) : error ? (
+                            <p className="text-red-500">{error}</p>
+                        ) : contactBlogs.length > 0 ? (
+                            contactBlogs.map((blog) => (
+                                <div key={blog.postId} className="footer-contact-item">
+                                    <span
+                                        className="footer-link"
+                                        onClick={() => handleViewDetail(blog)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        {blog.title}: {stripHtmlTags(blog.content)}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <p>Không có thông tin liên hệ.</p>
+                        )}
                     </div>
                 </div>
 
@@ -58,12 +108,25 @@ const Footer = () => {
                 <div className="footer-section">
                     <div className="footer-policy">
                         <div className="footer-policy-title">Chính Sách</div>
-                        <div className="footer-policy-item">Chính sách mua hàng</div>
-                        <div className="footer-policy-item">Chính sách thanh toán</div>
-                        <div className="footer-policy-item">Chính sách vận chuyển</div>
-                        <div className="footer-policy-item">Chính sách bảo mật</div>
-                        <div className="footer-policy-item">Cam kết cửa hàng</div>
-                        <div className="footer-policy-item">Chính sách thành viên</div>
+                        {loading ? (
+                            <p>Đang tải...</p>
+                        ) : error ? (
+                            <p className="text-red-500">{error}</p>
+                        ) : policyBlogs.length > 0 ? (
+                            policyBlogs.map((blog) => (
+                                <div key={blog.postId} className="footer-policy-item">
+                                    <span
+                                        className="footer-link"
+                                        onClick={() => handleViewDetail(blog)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        {blog.title}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <p>Không có chính sách nào.</p>
+                        )}
                     </div>
                 </div>
 
@@ -71,16 +134,29 @@ const Footer = () => {
                 <div className="footer-section">
                     <div className="footer-guide">
                         <div className="footer-guide-title">Hướng Dẫn</div>
-                        <div className="footer-guide-item">Hướng dẫn mua hàng</div>
-                        <div className="footer-guide-item">Hướng dẫn đổi trả</div>
-                        <div className="footer-guide-item">Hướng dẫn chuyển khoản</div>
-                        <div className="footer-guide-item">Hướng dẫn trả góp</div>
-                        <div className="footer-guide-item">Hướng dẫn hoàn hàng</div>
-                        <div className="footer-guide-item">Kiểm tra đơn hàng</div>
+                        {loading ? (
+                            <p>Đang tải...</p>
+                        ) : error ? (
+                            <p className="text-red-500">{error}</p>
+                        ) : guideBlogs.length > 0 ? (
+                            guideBlogs.map((blog) => (
+                                <div key={blog.postId} className="footer-guide-item">
+                                    <span
+                                        className="footer-link"
+                                        onClick={() => handleViewDetail(blog)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        {blog.title}
+                                    </span>
+                                </div>
+                            ))
+                        ) : (
+                            <p>Không có hướng dẫn nào.</p>
+                        )}
                     </div>
                 </div>
 
-                {/* Support Section (Payment Methods and Certification) */}
+                {/* Support Section */}
                 <div className="footer-section">
                     <div className="footer-support">
                         <div className="footer-support-title">Hỗ Trợ Thanh Toán</div>
@@ -104,7 +180,7 @@ const Footer = () => {
                 </div>
             </div>
 
-            {/* Bottom Section (Only for Mobile) */}
+            {/* Bottom Section */}
             <div className="footer-bottom">
                 <div className="footer-bottom-text">
                     <span>© Bản quyền thuộc về </span>
