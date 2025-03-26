@@ -16,7 +16,7 @@ const TARGET_IMAGE_SIZE_KB = 0.1 * 1024
 
 const CreateProduct = () => {
 	const navigate = useNavigate()
-	const { categories, createProduct,productState,setProductState } = useContext(ProductContext)
+	const { categories, createProduct } = useContext(ProductContext)
 	const [product, setProduct] = useState({
 		name: "",
 		category: "",
@@ -38,9 +38,6 @@ const CreateProduct = () => {
 	const [currentStep, setCurrentStep] = useState(1)
 	const totalSteps = 4
 	const [errors, setErrors] = useState([])
-	const [showMarkdownHelp, setShowMarkdownHelp] = useState(false)
-	const [previewDescription, setPreviewDescription] = useState(false)
-	const [previewCertificate, setPreviewCertificate] = useState(false)
 	const [showProductPreview, setShowProductPreview] = useState(false)
 	const [toastMessage, setToastMessage] = useState("");
 	const [toastType, setToastType] = useState("success"); // Thêm state cho type
@@ -88,7 +85,6 @@ const CreateProduct = () => {
 			return { ...prev, productVariants: updatedVariants }
 		})
 	}
-
 	// Xóa biến thể sản phẩm
 	const removeVariant = (index) => {
 		setProduct((prev) => ({

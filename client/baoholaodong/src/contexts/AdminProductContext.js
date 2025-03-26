@@ -315,6 +315,7 @@ export const AdminProductProvider = ({ children }) => {
 		setCategories(()=>{
 			return groupCategories.flatMap(group => group.categories);
 		});
+		console.log(categories);
 	},[groupCategories])
 
 	/** Delay tìm kiếm để tránh spam API */

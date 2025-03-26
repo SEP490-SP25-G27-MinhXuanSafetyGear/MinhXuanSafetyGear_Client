@@ -27,6 +27,7 @@ export default function OrderDetail() {
         try {
             const response = await axios.get(`${BASE_URL}/api/Order/get-order/${id}`)
             setOrder(response.data)
+            console.log("API Response:", response.data);
         } catch (err) {
             setError("Không thể tải dữ liệu đơn hàng.")
         } finally {
@@ -35,18 +36,22 @@ export default function OrderDetail() {
     }
 
     const updateOrderStatus = async (newStatus) => {
-        if (updating) return
-        setUpdating(true)
-        try {
-            await axios.put(`${BASE_URL}/api/invoice/confirm-invoice-by-employee/${order.invoice.invoiceNumber}/${newStatus}`)
-            await fetchOrder()
-        } catch (err) {
-            alert("Cập nhật trạng thái đơn hàng thất bại.")
-            console.error(err)
-        } finally {
-            setUpdating(false)
+        if (updating) return;
+        if (!order?.invoice) {
+            alert("Không có thông tin hóa đơn để cập nhật trạng thái.");
+            return;
         }
-    }
+        setUpdating(true);
+        try {
+            await axios.put(`${BASE_URL}/api/invoice/confirm-invoice-by-employee/${order.invoice.invoiceNumber}/${newStatus}`);
+            await fetchOrder();
+        } catch (err) {
+            alert("Cập nhật trạng thái đơn hàng thất bại.");
+            console.error(err);
+        } finally {
+            setUpdating(false);
+        }
+    };
 
     if (loading)
         return (
