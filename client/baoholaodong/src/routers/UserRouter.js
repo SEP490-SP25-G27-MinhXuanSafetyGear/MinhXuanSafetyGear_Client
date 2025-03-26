@@ -74,6 +74,7 @@ const UserRouter = () => {
                     <Route path="/blogs" element={<BlogList />} />
                     <Route path="/blogs/:slug" element={<BlogDetail />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="confirm-order" element={<ConfirmOrder />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/verification" element={<VerificationPage />} />
                     <Route path="/logout" element={<Logout />} />
@@ -81,7 +82,6 @@ const UserRouter = () => {
                     <Route path="/customerInfo" element={<CustomerInfo />} />
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
                     <Route path="/category/:categoryId" element={<ProductListByCategory />} />
-                    <Route path="confirm-order" element={<ConfirmOrder />} />
                 </Route>
                 <Route path="/demo" element={<ProductVariantSelector/>}/>
                 {/* Admin Routes */}

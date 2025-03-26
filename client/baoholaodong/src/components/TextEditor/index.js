@@ -72,7 +72,11 @@ const TextEditor = ({ width = "100%", height = "300px", value = "", setValue, ma
 };
 
 const DisplayContent = ({ content }) => {
-    const safeContent = DOMPurify.sanitize(content); // Lọc mã độc XSS
+    const safeContent = DOMPurify.sanitize(content, {
+        ADD_TAGS: ["iframe"],
+        ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"],
+    });
+
     return <div dangerouslySetInnerHTML={{ __html: safeContent }} />;
 };
 

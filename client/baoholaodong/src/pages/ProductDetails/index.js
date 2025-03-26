@@ -25,7 +25,7 @@ import ProductVariantSelector from "./ProductVariantSelector";
 import {DisplayContent} from "../../components/TextEditor";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
-function ProductDetail() {
+export default function ProductDetail() {
     const { slug } = useParams()
     const { addToCart } = useContext(CartContext)
     const [selectedVariant, setSelectedVariant] = useState(null)
@@ -751,6 +751,5 @@ function ProductDetail() {
     )
 }
 
-export default ProductDetail
 
 

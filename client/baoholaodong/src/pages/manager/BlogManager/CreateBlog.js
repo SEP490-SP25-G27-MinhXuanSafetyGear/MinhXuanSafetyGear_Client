@@ -108,7 +108,7 @@ export default function CreateBlog() {
                 <label htmlFor="content" className="form-label">
                   Nội dung
                 </label>
-                <TextEditor width={"100%"} height={"300px"} value={content} setValue={setContent} />
+                <TextEditor width={"100%"} height={"300px"} value={content} setValue={setContent} maxLength={2000}/>
               </div>
 
               <div className="form-row">
