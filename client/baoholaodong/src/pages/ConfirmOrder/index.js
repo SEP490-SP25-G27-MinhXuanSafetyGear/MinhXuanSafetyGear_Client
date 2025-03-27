@@ -1,5 +1,4 @@
-﻿// ConfirmOrder.js
-"use client"
+﻿"use client"
 
 import { useState, useContext, useEffect } from "react"
 import { useLocation } from "react-router-dom"
@@ -28,8 +27,8 @@ export function ConfirmOrder() {
         paymentMethod: orderData.paymentMethod,
     })
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [truckAnimation, setTruckAnimation] = useState(false) // Trạng thái cho animation xe tải
-    const [rotatePage, setRotatePage] = useState(false) // Trạng thái cho animation xoay trang
+    const [truckAnimation, setTruckAnimation] = useState(false)
+    const [rotatePage, setRotatePage] = useState(false)
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
