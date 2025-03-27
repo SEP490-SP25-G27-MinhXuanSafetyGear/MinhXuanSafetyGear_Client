@@ -172,11 +172,11 @@ function OrderHistory() {
               <div className="order-products">
                 {order.orderDetails.map((item) => (
                   <div key={item.orderDetailId} className="product-item">
-                    <div className="product-info">
+                    <div className="order-product-info">
                       <span>{item.productName}</span>
                       <span className="quantity">x{item.quantity}</span>
                     </div>
-                    <div className="product-price">
+                    <div className="order-product-price">
                       {formatCurrency(item.totalPrice)}
                     </div>
                   </div>

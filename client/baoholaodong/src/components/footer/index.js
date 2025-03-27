@@ -45,9 +45,28 @@ const Footer = () => {
         fetchBlogs();
     }, []);
 
+    // Hàm điều hướng khi nhấp vào title (cho Chính Sách và Hướng Dẫn)
     const handleViewDetail = (blog) => {
         const blogSlug = blog.slug || toSlug(blog.title);
         navigate(`/blogs/${blogSlug}`);
+    };
+
+    // Hàm xử lý liên kết cho phần Liên Hệ
+    const getContactLink = (blog) => {
+        const titleLower = blog.title.toLowerCase();
+        const content = stripHtmlTags(blog.content);
+
+        if (titleLower.includes("địa chỉ")) {
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content)}`;
+        } else if (titleLower.includes("điện thoại")) {
+            return `tel:${content.replace(/\D/g, "")}`;
+        } else if (titleLower.includes("email")) {
+            return `mailto:${content}`;
+        } else if (titleLower.includes("zalo")) {
+            return `https://zalo.me/${content.replace(/\D/g, "")}`;
+        } else {
+            return null;
+        }
     };
 
     return (
@@ -87,17 +106,27 @@ const Footer = () => {
                         ) : error ? (
                             <p className="text-red-500">{error}</p>
                         ) : contactBlogs.length > 0 ? (
-                            contactBlogs.map((blog) => (
-                                <div key={blog.postId} className="footer-contact-item">
-                                    <span
-                                        className="footer-link"
-                                        onClick={() => handleViewDetail(blog)}
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        {blog.title}: {stripHtmlTags(blog.content)}
-                                    </span>
-                                </div>
-                            ))
+                            contactBlogs.map((blog) => {
+                                const link = getContactLink(blog);
+                                const content = stripHtmlTags(blog.content);
+                                return (
+                                    <div key={blog.postId} className="footer-contact-item">
+                                        {link ? (
+                                            <a href={link} className="footer-link">
+                                                {blog.title}: {content}
+                                            </a>
+                                        ) : (
+                                            <span
+                                                className="footer-link"
+                                                onClick={() => handleViewDetail(blog)}
+                                                style={{ cursor: "pointer" }}
+                                            >
+                                                {blog.title}: {content}
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })
                         ) : (
                             <p>Không có thông tin liên hệ.</p>
                         )}
