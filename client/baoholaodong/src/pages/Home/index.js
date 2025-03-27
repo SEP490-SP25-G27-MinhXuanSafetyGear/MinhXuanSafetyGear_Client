@@ -52,6 +52,7 @@ function Index() {
             setTimeout(() => setShowWelcome(false), 3000); // Auto-hide after 3s
         }
     }, [])
+
     const fetchTopSaleProducts = async (size) => {
         try{
             const response = await axios.get(`${BASE_URL}/api/Product/top-sale-product`,{

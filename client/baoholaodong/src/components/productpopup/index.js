@@ -10,20 +10,11 @@ const ProductPopup = ({ product, onClose }) => {
     const [quantity, setQuantity] = useState(1);
     const { addToCart } = useContext(CartContext);
     const [selectedVariant, setSelectedVariant] = useState(null);
+
     if (!product) return null;
 
     const handleAddToCart = () => {
-        if(selectedVariant !== null){
-            addToCart({ ...product,
-                product:product,
-                variant:selectedVariant,
-                quantity });
-        }else{
-            addToCart({ ...product,
-                product:product,
-                variant:{},
-                quantity });
-        }
+        addToCart({ ...product, selectedVariant, quantity });
         onClose();
     };
 
@@ -42,16 +33,20 @@ const ProductPopup = ({ product, onClose }) => {
                     <div className="popup-product-details">
                         <h3 className="popup-product-name">{product.name}</h3>
                         <p className="popup-product-price">
-                            {product.discount > 0 ? (
+                            {selectedVariant?.discount > 0 ? (
                                 <>
-                                    <span className="text-red-500">{product.price - product.discount}</span>
-                                    <span className="text-gray-400 line-through ml-2">{product.price}</span>
+                                    <span className="text-red-500">
+                                        {(selectedVariant.price - (selectedVariant.price * selectedVariant.discount / 100)).toLocaleString()}đ
+                                    </span>
+                                    <span className="text-gray-400 line-through ml-2">
+                                        {selectedVariant.price.toLocaleString()}đ
+                                    </span>
                                 </>
                             ) : (
-                                <span>{product.price}</span>
+                                <span>{(selectedVariant?.price || product.price).toLocaleString()}đ</span>
                             )}
                         </p>
-                       <ProductVariantSelector product={product} setSelectedVariant={setSelectedVariant} />
+                        <ProductVariantSelector product={product} setSelectedVariant={setSelectedVariant} />
                         <div className="flex items-center mt-4">
                             <button onClick={() => setQuantity((prev) => Math.max(1, prev - 1))} className="quantity-button">
                                 <Minus size={16} />

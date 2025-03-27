@@ -116,7 +116,7 @@
     padding: 5px 0;
   }
   
-  .product-info {
+  .order-product-info {
     display: flex;
     gap: 8px;
     font-size: 14px;
@@ -126,7 +126,7 @@
     color: #6b7280;
   }
   
-  .product-price {
+  .order-product-price {
     text-align: right;
     font-weight: 600;
     color: #c00;

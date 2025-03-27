@@ -28,7 +28,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     if (selectedFilter === "Giá tăng dần") {
         sortedProducts.sort((a, b) => a.price - b.price);
     } else if (selectedFilter === "Giá giảm dần") {
-        sortedProducts.sort((a, b) => b.price - a.price);
+        sortedProducts.sort((a, b) => b.price - b.price);
     } else if (selectedFilter === "Rating") {
         sortedProducts.sort((a, b) => b.averageRating - a.averageRating);
     }
@@ -46,7 +46,18 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
         if (product.productVariants.length > 0) {
             setSelectedProduct(product);
         } else {
-            addToCart(product);
+            const cartItem = {
+                id: product.id,
+                name: product.name,
+                image: product.image || noImage,
+                quantity: 1,
+                selectedVariant: null,
+                price: product.price,
+                priceAfterDiscount: product.priceAfterDiscount || product.price,
+                discount: product.discount || 0,
+                quantityInStock: product.quantity, // Tồn kho
+            };
+            addToCart(cartItem);
         }
     };
 
@@ -105,7 +116,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                             <div className="product-price">
                                 {product.discount > 0 ? (
                                     <>
-                                        <span className="text-red-500">{(product.price - product.discount).toLocaleString()}đ</span>
+                                        <span className="text-red-500">{(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ</span>
                                         <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
                                         <p className="product-discount-percentage"> Giảm {product.discount} %</p>
                                     </>
@@ -133,6 +144,5 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
         </main>
     );
 };
-
 
 export default TopSaleProducts;

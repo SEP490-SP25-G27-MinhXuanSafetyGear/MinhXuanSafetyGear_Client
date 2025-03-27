@@ -1,6 +1,6 @@
 ﻿import React, { useEffect } from "react";
 import "./style.css";
-import { CheckCircle, XCircle, X } from "lucide-react"; // Sử dụng icon từ lucide-react
+import { CheckCircle, XCircle, X } from "lucide-react";
 
 const ManagerToast = ({ message, onClose, type = "success" }) => {
     useEffect(() => {

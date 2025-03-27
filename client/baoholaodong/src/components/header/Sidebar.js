@@ -138,7 +138,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                         Về Bảo hộ lao động Minh Xuân
                     </a>
                     <a href="/blogs" className="cursor-pointer hover:underline block mb-2">
-                        Kiến thức an toàn lao động
+                        Các bài viết và tin tức mới nhất
                     </a>
                     <a href="/contact" className="cursor-pointer hover:underline block">
                         Liên hệ chúng tôi

@@ -5,6 +5,7 @@ import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import slugify from "slugify";
+import noImage from "../../images/no-image-product.jpg"; // Thêm import nếu cần
 
 export default function TopDealProducts({ products = [] }) {
     const scrollRef = useRef(null);
@@ -29,10 +30,18 @@ export default function TopDealProducts({ products = [] }) {
     };
 
     const handleAddToCart = (product) => {
-        addToCart({
-            ...product,
-            quantity: 1
-        });
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            image: product.image || noImage,
+            quantity: 1, // Chỉ thêm 1 đơn vị
+            selectedVariant: null, // Không có variant
+            price: product.price,
+            priceAfterDiscount: product.priceAfterDiscount || product.price,
+            discount: product.discount || 0,
+            quantityInStock: product.quantity, // Lưu tồn kho riêng
+        };
+        addToCart(cartItem);
     };
 
     const handleDetailProduct = (product) => {
@@ -59,7 +68,7 @@ export default function TopDealProducts({ products = [] }) {
                         <div key={product.id} className="product-discounted-card">
                             <div className="product-discounted-image-container">
                                 <img
-                                    src={product.image}
+                                    src={product.image || noImage}
                                     alt={product.name}
                                     className="product-discounted-image"
                                     onClick={() => handleDetailProduct(product)}
@@ -78,7 +87,7 @@ export default function TopDealProducts({ products = [] }) {
                                 <h3 className="product-discounted-name">{product.name}</h3>
                                 <div className="product-discounted-prices">
                                     <p className="product-discount-price">
-                                        {(product.price - product.discount).toLocaleString()}đ
+                                        {(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ
                                     </p>
                                     <p className="product-original-price">{product.price.toLocaleString()}đ</p>
                                 </div>

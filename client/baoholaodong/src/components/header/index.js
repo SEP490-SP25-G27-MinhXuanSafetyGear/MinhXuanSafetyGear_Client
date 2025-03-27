@@ -10,19 +10,21 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [cartCount, setCartCount] = useState(0);
-    const [isScrolled, setIsScrolled] = useState(false); // State to track scroll position
+    const [isScrolled, setIsScrolled] = useState(false);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
     const [search, setSearch] = useState("");
-    const handleSearch = (e)=>{
+
+    const handleSearch = (e) => {
         e.preventDefault();
-        if(search !== ""){
-            window.location.href= ("/products?search="+search);
+        if (search !== "") {
+            window.location.href = ("/products?search=" + search);
         }
-    }
+    };
+
     useEffect(() => {
-        if(cartItems){
+        if (cartItems) {
             updateCartCount();
         }
     }, [cartItems]);
@@ -31,7 +33,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
         const handleScroll = () => {
             const header = document.querySelector(".header-gradient");
             const headerHeight = header.offsetHeight;
-            if (window.scrollY > headerHeight * 2) { // Adjust the threshold as needed
+            if (window.scrollY > headerHeight * 2) {
                 setIsScrolled(true);
             } else {
                 setIsScrolled(false);
@@ -61,10 +63,10 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
         <>
             <header className={`header-gradient shadow ${isScrolled ? "scrolled" : ""}`}>
                 <div className="container mx-auto flex flex-col md:flex-row justify-between items-center py-4">
-                    <div className="flex items-center w-full md:w-auto mb-4 md:mb-0">
+                    <div className="flex items-center w-full md:w-auto">
                         <button onClick={toggleSidebar} className="text-white mr-4">
                             {sidebarOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
-                            <span className="ml-2  md:inline">MENU</span>
+                            <span className="ml-2 md:inline">MENU</span>
                         </button>
                         <a href="/">
                             <img alt="Company Logo" className="h-12 md:h-16" src={"http://baoholaodongminhxuan.com/images/common/logo1.gif"} />
@@ -78,15 +80,29 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             </p>
                         </div>
                     </div>
-                    <div className="search-container w-full md:w-auto mx-4 md:mx-8 flex items-center">
+                    {/* Mobile Search Container for scrolled state - Hidden by default */}
+                    <div className="mobile-search-container-scrolled w-full md:hidden flex items-center">
                         <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
                         <form className="w-full" onSubmit={handleSearch}>
                             <input
                                 value={search}
-                                onChange={(e)=>{setSearch(e.target.value)}}
+                                onChange={(e) => { setSearch(e.target.value); }}
                                 type="text"
                                 placeholder="Tìm kiếm..."
-                                className="w-full px-4 py-2 "
+                                className="w-full px-4 py-2"
+                            />
+                        </form>
+                    </div>
+                    {/* Desktop Search Container */}
+                    <div className="search-container w-full md:w-auto mx-4 md:mx-8 flex items-center hidden md:flex">
+                        <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
+                        <form className="w-full" onSubmit={handleSearch}>
+                            <input
+                                value={search}
+                                onChange={(e) => { setSearch(e.target.value); }}
+                                type="text"
+                                placeholder="Tìm kiếm..."
+                                className="w-full px-4 py-2"
                             />
                         </form>
                     </div>
@@ -95,13 +111,9 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             <div className="flex items-center cursor-pointer">
                                 <FaPhoneAlt className="text-white h-6 w-6" />
                                 <div className="ml-2">
-                                    <p className="text-sm text-white">
-                                        Liên hệ
-                                    </p>
+                                    <p className="text-sm text-white">Liên hệ</p>
                                     <div className="flex items-center">
-                                        <p className="text-lg font-bold text-white">
-                                            0912.201.309
-                                        </p>
+                                        <p className="text-lg font-bold text-white">0912.201.309</p>
                                     </div>
                                 </div>
                             </div>
@@ -128,53 +140,57 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                                     <p className="text-sm text-white">Thông tin</p>
                                     <div className="flex items-center">
                                         <p className="text-lg font-bold text-white">Tài khoản</p>
-                                        <span className="ml-1 text-white">&#9662;</span>
+                                        <span className="ml-1 text-white">▾</span>
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                className="absolute right-0 mt-2 w-48 bg-white border  shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                                {user? (
-                                    <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
-                                        xuất</a>
+                            <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                {user ? (
+                                    <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng xuất</a>
                                 ) : (
                                     <>
-                                        <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
-                                            ký</a>
-                                        <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng
-                                            nhập</a></>
+                                        <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
+                                        <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
+                                    </>
                                 )}
                             </div>
                         </div>
-                        <div className="relative flex items-center"
-                             onMouseEnter={() => location.pathname !== "/cart" && setDropdownVisible(true)}
-                             onMouseLeave={() => setDropdownVisible(false)}>
+                        <div
+                            className="relative flex items-center"
+                            onMouseEnter={() => location.pathname !== "/cart" && setDropdownVisible(true)}
+                            onMouseLeave={() => setDropdownVisible(false)}
+                        >
                             <div className="relative">
                                 <FaShoppingCart className="text-white h-8 w-8 cursor-pointer" onClick={handleCartClick} />
-                                <span
-                                    className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-block w-4 h-4 bg-white text-red-600 text-xs font-bold rounded-full text-center">{cartCount}</span>
+                                <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 inline-block w-4 h-4 bg-white text-red-600 text-xs font-bold rounded-full text-center">
+                                    {cartCount}
+                                </span>
                             </div>
-                            <span className="ml-2 text-lg font-bold text-white">
-                                Giỏ hàng
-                            </span>
-                            {dropdownVisible && <CartDropdown cartItems={cartItems} removeFromCart={removeFromCart} updateCartItemQuantity={updateCartItemQuantity} showToast={showToast} />}
+                            <span className="ml-2 text-lg font-bold text-white">Giỏ hàng</span>
+                            {dropdownVisible && (
+                                <CartDropdown
+                                    cartItems={cartItems}
+                                    removeFromCart={removeFromCart}
+                                    updateCartItemQuantity={updateCartItemQuantity}
+                                    showToast={showToast}
+                                />
+                            )}
                         </div>
                     </div>
-
                 </div>
+                {/* Original Mobile Search Container - For non-scrolled state */}
                 <div className="mobile-search-container w-full md:hidden mx-4 md:mx-8 flex items-center">
                     <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
                     <form className="w-full" onSubmit={handleSearch}>
                         <input
                             value={search}
-                            onChange={(e)=>{setSearch(e.target.value)}}
+                            onChange={(e) => { setSearch(e.target.value); }}
                             type="text"
                             placeholder="Tìm kiếm..."
-                            className="w-full px-4 py-2 "
+                            className="w-full px-4 py-2"
                         />
                     </form>
                 </div>
-
             </header>
             <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
         </>

@@ -3,7 +3,6 @@
     width: 602px;
     position: relative;
     background: white;
-    margin: 40px auto 0;
     padding: 20px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
     margin-bottom: 80px;
@@ -269,7 +268,7 @@
         width: 602px;
         padding: 20px;
         margin: 40px auto 0;
-        margin-bottom: 80px;
+        margin-bottom: 140px;
     }
 
     .signin-form-header h2 {

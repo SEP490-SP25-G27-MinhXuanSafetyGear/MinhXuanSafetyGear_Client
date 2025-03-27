@@ -1,37 +1,38 @@
-﻿"use client"
-import { useContext, useState } from "react"
-import { CartContext } from "../../contexts/CartContext"
-import { useNavigate } from "react-router-dom"
-import { Minus, Plus, ShoppingBag, ShoppingCart, Trash2, ArrowRight } from "lucide-react"
-import "./style.css"
-import {formatPrice} from "../../utils/format";
+﻿"use client";
+import { useContext, useState } from "react";
+import { CartContext } from "../../contexts/CartContext";
+import { useNavigate } from "react-router-dom";
+import { Minus, Plus, ShoppingBag, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
+import "./style.css";
+import noImage from "../../images/no-image-product.jpg"; // Thêm import
+
 const Cart = () => {
-    const { cartItems, setCartItems } = useContext(CartContext)
-    const [selectedItems, setSelectedItems] = useState([])
-    const navigate = useNavigate()
+    const { cartItems, setCartItems } = useContext(CartContext);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const navigate = useNavigate();
 
     const handleQuantityChange = (index, delta) => {
         setCartItems((prevItems) =>
             prevItems.map((item, i) =>
-                i === index ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
+                i === index
+                    ? {
+                        ...item,
+                        quantity: Math.min(Math.max(1, item.quantity + delta), item.availableQuantity),
+                    }
+                    : item
             )
         );
     };
 
-
-
     const handleRemove = (index) => {
         setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
     };
-
-
 
     const handleSelectItem = (index) => {
         setSelectedItems((prevSelected) =>
             prevSelected.includes(index) ? prevSelected.filter((i) => i !== index) : [...prevSelected, index]
         );
     };
-
 
     const handleSelectAll = () => {
         if (selectedItems.length === cartItems.length) {
@@ -42,16 +43,14 @@ const Cart = () => {
         }
     };
 
-
     const totalPrice = cartItems
         .filter((_, index) => selectedItems.includes(index))
-        .reduce((total, item) => total + item.price * item.quantity, 0);
-
+        .reduce((total, item) => total + item.finalPrice * item.quantity, 0);
 
     const handelOrder = () => {
         if (selectedItems.length === 0) {
-            alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán")
-            return
+            alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán");
+            return;
         }
         const orderPayload = {
             customerId: null,
@@ -61,19 +60,19 @@ const Cart = () => {
             customerAddress: "",
             paymentMethod: "Cash",
             orderDetails: cartItems
-                .map((item, index) => ({
-                    index,  // Lưu index để so sánh
-                    productId: item.id,
-                    productName: item.name,
-                    quantity: item.quantity,
-                    price: item.price,
-                    image: item.product.image || "/images/default.png",
-                    variant: item.variant ,
-                }))
-                .filter((item) => selectedItems.includes(item.index)),  // Kiểm tra theo index
-        }
-        navigate("/confirm-order", { state: orderPayload })
-    }
+            .map((item, index) => ({
+                index,
+                productId: item.id,
+                productName: item.name,
+                quantity: item.quantity,
+                price: item.finalPrice,
+                image: item.image || noImage,
+                variant: item.selectedVariant || {},
+            }))
+                .filter((item) => selectedItems.includes(item.index)),
+        };
+        navigate("/confirm-order", { state: orderPayload });
+    };
 
     return (
         <div className="bg-gray-50 min-h-screen py-8">
@@ -84,7 +83,6 @@ const Cart = () => {
                 </h1>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Cart Items */}
                     <div className="lg:w-2/3">
                         {cartItems.length === 0 ? (
                             <div className="bg-white rounded-lg shadow-md p-8 text-center">
@@ -110,14 +108,15 @@ const Cart = () => {
                                             onChange={handleSelectAll}
                                             className="w-5 h-5 rounded border-gray-300 text-red-600 focus:ring-red-500"
                                         />
-                                        <span className="ml-2 text-sm font-medium text-gray-700">Chọn tất cả ({cartItems.length} sản phẩm)
+                                        <span className="ml-2 text-sm font-medium text-gray-700">
+                                            Chọn tất cả ({cartItems.length} sản phẩm)
                                         </span>
                                     </label>
                                 </div>
 
                                 <div className="divide-y divide-gray-200">
-                                    {cartItems.map(({product,variant,quantity},index) => {
-                                        const isSelected = selectedItems.includes(index)
+                                    {cartItems.map((item, index) => {
+                                        const isSelected = selectedItems.includes(index);
                                         return (
                                             <div
                                                 key={index}
@@ -136,24 +135,27 @@ const Cart = () => {
 
                                                 <div className="flex-shrink-0">
                                                     <img
-                                                        src={product.image || "/images/default.png"}
-                                                        alt={product.name}
+                                                        src={item.image || noImage}
+                                                        alt={item.name}
                                                         className="w-20 h-20 object-cover rounded-md border border-gray-200"
                                                     />
                                                 </div>
 
                                                 <div className="flex-grow">
-                                                    <h3 className="font-medium text-gray-800">{product.name}</h3>
-                                                    {variant && (
+                                                    <h3 className="font-medium text-gray-800">{item.name}</h3>
+                                                    {item.selectedVariant && (
                                                         <p className="text-sm text-gray-500 mt-1">
-                                                            {variant.size && (
-                                                                <span className="mr-2">Size: {variant.size}</span>
+                                                            {item.selectedVariant.size && (
+                                                                <span className="mr-2">Size: {item.selectedVariant.size}</span>
                                                             )}
-                                                            {variant.color && (
-                                                                <span className="flex items-center">Màu:<span className="inline-block w-3 h-3 rounded-full ml-1 mr-1"
-                                                                   style={{ backgroundColor: variant.color }}
-                                                                ></span>
-                                                                    {variant.color}
+                                                            {item.selectedVariant.color && (
+                                                                <span className="flex items-center">
+                                                                    Màu:
+                                                                      <span
+
+                                                                        style={{ backgroundColor: item.selectedVariant.color }}
+                                                                    ></span>
+                                                                    {item.selectedVariant.color}
                                                                 </span>
                                                             )}
                                                         </p>
@@ -161,7 +163,18 @@ const Cart = () => {
                                                 </div>
 
                                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 w-full sm:w-auto">
-                                                    <div className="text-red-600 font-semibold">{formatPrice(product.price)}</div>
+                                                    <div className="text-red-600 font-semibold">
+                                                        {item.discount > 0 ? (
+                                                            <>
+                                                                <span>{item.finalPrice.toLocaleString()}đ</span>
+                                                                <span className="text-gray-400 line-through ml-2">
+                                                                    {item.originalPrice.toLocaleString()}đ
+                                                                </span>
+                                                            </>
+                                                        ) : (
+                                                            <span>{item.finalPrice.toLocaleString()}đ</span>
+                                                        )}
+                                                    </div>
 
                                                     <div className="flex items-center border border-gray-300 rounded-md">
                                                         <button
@@ -170,7 +183,7 @@ const Cart = () => {
                                                         >
                                                             <Minus className="w-4 h-4" />
                                                         </button>
-                                                        <span className="px-3 py-1 text-center w-10">{quantity}</span>
+                                                        <span className="px-3 py-1 text-center w-10">{item.quantity}</span>
                                                         <button
                                                             className="px-3 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
                                                             onClick={() => handleQuantityChange(index, 1)}
@@ -180,7 +193,7 @@ const Cart = () => {
                                                     </div>
 
                                                     <div className="text-red-600 font-semibold whitespace-nowrap">
-                                                        {formatPrice(variant.price * quantity)}
+                                                        {(item.finalPrice * item.quantity).toLocaleString()}đ
                                                     </div>
 
                                                     <button
@@ -191,14 +204,13 @@ const Cart = () => {
                                                     </button>
                                                 </div>
                                             </div>
-                                        )
+                                        );
                                     })}
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Order Summary */}
                     {cartItems.length > 0 && (
                         <div className="lg:w-1/3">
                             <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-4">
@@ -215,7 +227,6 @@ const Cart = () => {
                                                 .reduce((total, item) => total + item.quantity, 0)}{" "}
                                             sản phẩm
                                         </span>
-
                                     </div>
 
                                     <div className="flex justify-between items-center py-3 border-b border-gray-200">
@@ -264,8 +275,7 @@ const Cart = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Cart;
-

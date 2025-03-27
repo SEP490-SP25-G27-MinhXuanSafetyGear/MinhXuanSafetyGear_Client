@@ -1,6 +1,6 @@
-﻿"use client"
+﻿"use client";
 
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react";
 import {
     Star,
     StarHalf,
@@ -14,30 +14,30 @@ import {
     ArrowRight,
     Heart,
     ChevronRight,
-} from "lucide-react"
-import { useNavigate, useParams } from "react-router-dom"
-import * as signalR from "@microsoft/signalr"
-import noImage from "../../images/no-image-product.jpg"
-import { CartContext } from "../../contexts/CartContext"
-import "./style.css"
-import axios from "axios"
+} from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import * as signalR from "@microsoft/signalr";
+import noImage from "../../images/no-image-product.jpg";
+import { CartContext } from "../../contexts/CartContext";
+import "./style.css";
+import axios from "axios";
 import ProductVariantSelector from "./ProductVariantSelector";
-import {DisplayContent} from "../../components/TextEditor";
-import {formatVND, parseVND} from "../../utils/format";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API
+import { DisplayContent } from "../../components/TextEditor";
+import { formatVND, parseVND } from "../../utils/format";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export default function ProductDetail() {
-    const { slug } = useParams()
-    const { addToCart } = useContext(CartContext)
-    const [selectedVariant, setSelectedVariant] = useState(null)
-    const [quantity, setQuantity] = useState(1)
-    const [imageIndex, setImageIndex] = useState(0)
-    const [isLoading, setIsLoading] = useState(true)
-    const [hubConnection, setHubConnection] = useState(null)
-    const [activeTab, setActiveTab] = useState("description")
-    const navigate = useNavigate()
-    const [relatedProducts, setRelatedProducts] = useState([])
-    const [topSaleProducts, setTopSaleProducts] = useState([])
+    const { slug } = useParams();
+    const { addToCart, showToast } = useContext(CartContext); // Thêm showToast từ CartContext
+    const [selectedVariant, setSelectedVariant] = useState(null);
+    const [quantity, setQuantity] = useState(1);
+    const [imageIndex, setImageIndex] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [hubConnection, setHubConnection] = useState(null);
+    const [activeTab, setActiveTab] = useState("description");
+    const navigate = useNavigate();
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    const [topSaleProducts, setTopSaleProducts] = useState([]);
     const [review, setReview] = useState({
         totalStar: 0,
         star1: 0,
@@ -58,77 +58,30 @@ export default function ProductDetail() {
                 customerImage: "",
             },
         ],
-    })
-    const [BlogTransport,setBlogTransport] = useState(null)
+    });
+    const [BlogTransport, setBlogTransport] = useState(null);
+
     const renderStars = (rating) => {
-        const stars = []
-        const fullStars = Math.floor(rating)
-        const hasHalfStar = rating % 1 !== 0
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
 
         for (let i = 0; i < fullStars; i++) {
-            stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)
+            stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
         }
         if (hasHalfStar) {
-            stars.push(<StarHalf key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />)
+            stars.push(<StarHalf key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
         }
-        const remainingStars = 5 - stars.length
+        const remainingStars = 5 - stars.length;
         for (let i = 0; i < remainingStars; i++) {
-            stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />)
+            stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
         }
-        return stars
-    }
-    const handleDetailProduct= (product)=>{
-        navigate(`/products/${product.slug}`,{replace:true});
-    }
+        return stars;
+    };
 
-    const LoadingSkeleton = () => (
-        <div>
-            <div className="animate-pulse">
-                <div className="pd-grid">
-                    <div className="pd-images">
-                        <div className="pd-main-image bg-gray-200" style={{ minHeight: "560px" }}></div>
-                        <div className="pd-thumbnails">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="pd-thumbnail bg-gray-200" style={{ minHeight: "128px" }}></div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="pd-info" style={{ minHeight: "600px" }}>
-                        <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-                        <div className="flex items-center space-x-4 mb-6">
-                            <div className="h-4 bg-gray-200 rounded w-32"></div>
-                        </div>
-
-                        <div className="h-10 bg-gray-200 rounded w-1/2 mb-6"></div>
-
-                        <div className="space-y-6">
-                            <div>
-                                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                                <div className="grid grid-cols-4 gap-2">
-                                    {[1, 2, 3, 4].map((i) => (
-                                        <div key={i} className="h-10 bg-gray-200 rounded"></div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="h-12 bg-gray-200 rounded w-1/3 my-6"></div>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            <div className="h-12 bg-gray-200 rounded"></div>
-                            <div className="h-12 bg-gray-200 rounded"></div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4 pt-6 border-t">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="h-6 bg-gray-200 rounded"></div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
+    const handleDetailProduct = (product) => {
+        navigate(`/products/${product.slug}`, { replace: true });
+    };
 
     const [product, setProduct] = useState({
         id: 0,
@@ -172,89 +125,152 @@ export default function ProductDetail() {
                 status: true,
             },
         ],
-    })
+    });
 
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
             .withAutomaticReconnect()
-            .build()
+            .build();
 
         connection
             .start()
             .then(() => {
-                console.log("Connected to SignalR")
-                setHubConnection(connection)
+                console.log("Connected to SignalR");
+                setHubConnection(connection);
             })
-            .catch((err) => console.error("Lỗi khi kết nối SignalR:", err))
+            .catch((err) => console.error("Lỗi khi kết nối SignalR:", err));
 
         return () => {
             if (connection.state === signalR.HubConnectionState.Connected) {
-                connection.stop()
+                connection.stop();
             }
-        }
-    }, [])
+        };
+    }, []);
 
     useEffect(() => {
-        if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return
+        if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
 
         const handleProductChange = (updatedProduct) => {
-            console.log(`Received update for product ID: ${updatedProduct}`)
+            console.log(`Received update for product ID: ${updatedProduct}`);
             if (updatedProduct.slug === slug) {
-                setProduct(updatedProduct)
+                setProduct(updatedProduct);
             }
-        }
-        hubConnection.on("ProductUpdated", handleProductChange)
+        };
+        hubConnection.on("ProductUpdated", handleProductChange);
         return () => {
             if (hubConnection.state === signalR.HubConnectionState.Connected) {
-                hubConnection.off("ProductUpdated", handleProductChange)
+                hubConnection.off("ProductUpdated", handleProductChange);
             }
-        }
-    }, [hubConnection, slug])
+        };
+    }, [hubConnection, slug]);
 
     useEffect(() => {
         const fetchData = async () => {
-            setIsLoading(true)
+            setIsLoading(true);
             try {
-                const response = await axios.get(`${BASE_URL}/api/Product/get-product-by-slug-for-page-detail/${slug}`)
-                setProduct(response.data.product)
-                setRelatedProducts(response.data.relatedProducts||[])
-                setTopSaleProducts(response.data.topSaleProducts||[])
-                setBlogTransport(response.data.blogTransport||null)
+                const response = await axios.get(`${BASE_URL}/api/Product/get-product-by-slug-for-page-detail/${slug}`);
+                setProduct(response.data.product);
+                setRelatedProducts(response.data.relatedProducts || []);
+                setTopSaleProducts(response.data.topSaleProducts || []);
+                setBlogTransport(response.data.blogTransport || null);
                 setReview(response.data.review);
             } catch (error) {
-                console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message)
+                console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message);
             } finally {
-                setIsLoading(false)
+                setIsLoading(false);
             }
-        }
-        fetchData()
-    }, [slug])
-
+        };
+        fetchData();
+    }, [slug]);
 
     useEffect(() => {
         if (!isLoading) {
-            const elements = document.querySelectorAll(".content-loaded")
+            const elements = document.querySelectorAll(".content-loaded");
             elements.forEach((el) => {
-                el.classList.remove("content-loaded")
-                void el.offsetWidth // Force reflow
-                el.classList.add("content-loaded")
-            })
+                el.classList.remove("content-loaded");
+                void el.offsetWidth; // Force reflow
+                el.classList.add("content-loaded");
+            });
         }
-    }, [isLoading])
+    }, [isLoading]);
 
     const handleAddToCart = () => {
-        if (selectedVariant) {
-            addToCart({
-                ...product,
-                product:product,
-                variant: selectedVariant,
-                quantity,
-            })
-        } else {
-            alert("Vui lòng chọn kích thước và màu sắc")
+        const availableQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
+
+        if (!selectedVariant && product.productVariants.length > 0) {
+            showToast("Vui lòng chọn kích thước và màu sắc");
+            return;
         }
-    }
+
+        if (quantity > availableQuantity) {
+            showToast("Số lượng vượt quá tồn kho!");
+            return;
+        }
+
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            image: product.productImages[0]?.image || noImage,
+            quantity, // Số lượng người dùng chọn từ useState
+            selectedVariant,
+            price: product.price,
+            priceAfterDiscount: product.priceAfterDiscount || product.price,
+            discount: product.discount || 0,
+            quantityInStock: product.quantity, // Thêm tồn kho thực tế
+        };
+
+        addToCart(cartItem);
+        showToast("Sản phẩm đã được thêm vào giỏ hàng");
+    };
+
+    const handleBuyNow = () => {
+        const availableQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
+
+        if (!selectedVariant && product.productVariants.length > 0) {
+            showToast("Vui lòng chọn kích thước và màu sắc");
+            return;
+        }
+
+        if (quantity > availableQuantity) {
+            showToast("Số lượng vượt quá tồn kho!");
+            return;
+        }
+
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            image: product.productImages[0]?.image || noImage,
+            quantity,
+            selectedVariant,
+            price: product.price, // Giá gốc
+            priceAfterDiscount: product.priceAfterDiscount || product.price, // Giá đã giảm (nếu có)
+            discount: product.discount || 0, // Discount để CartContext tính lại nếu cần
+        };
+
+        addToCart(cartItem);
+
+        const orderPayload = {
+            customerId: null,
+            customerName: "",
+            customerPhone: "",
+            customerEmail: "",
+            customerAddress: "",
+            paymentMethod: "Cash",
+            orderDetails: [
+                {
+                    index: 0,
+                    productId: product.id,
+                    productName: product.name,
+                    quantity,
+                    price: selectedVariant?.price || product.priceAfterDiscount || product.price, // Ưu tiên giá đã giảm
+                    image: product.productImages[0]?.image || noImage,
+                    variant: selectedVariant || {},
+                },
+            ],
+        };
+        navigate("/confirm-order", { state: orderPayload });
+    };
 
     return (
         <div className="pd-container">
@@ -284,8 +300,8 @@ export default function ProductDetail() {
                                     src={product.productImages.length > 0 ? product.productImages[imageIndex].image : noImage}
                                     alt={product.name}
                                     onError={(e) => {
-                                        e.target.onerror = null
-                                        e.target.src = noImage
+                                        e.target.onerror = null;
+                                        e.target.src = noImage;
                                     }}
                                 />
                             </div>
@@ -301,8 +317,8 @@ export default function ProductDetail() {
                                                 src={img.image || "/placeholder.svg"}
                                                 alt={`Ảnh ${index + 1}`}
                                                 onError={(e) => {
-                                                    e.target.onerror = null
-                                                    e.target.src = noImage
+                                                    e.target.onerror = null;
+                                                    e.target.src = noImage;
                                                 }}
                                             />
                                         </div>
@@ -344,8 +360,8 @@ export default function ProductDetail() {
                                         +
                                     </button>
                                     <span className="pd-stock">
-                    Còn {selectedVariant ? selectedVariant.quantity : product.quantity} sản phẩm
-                  </span>
+                                        Còn {selectedVariant ? selectedVariant.quantity : product.quantity} sản phẩm
+                                    </span>
                                 </div>
 
                                 <div className="pd-cart-buttons">
@@ -353,7 +369,7 @@ export default function ProductDetail() {
                                         <ShoppingCart className="pd-icon" />
                                         <span>Thêm vào giỏ</span>
                                     </button>
-                                    <button className="pd-buy-btn">
+                                    <button className="pd-buy-btn" onClick={handleBuyNow}>
                                         <span>Mua ngay</span>
                                     </button>
                                 </div>
@@ -395,19 +411,25 @@ export default function ProductDetail() {
                     <div className="pd-description-card">
                         <div className="flex border-b mb-6">
                             <button
-                                className={`px-6 py-3 font-medium ${activeTab === "description" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`px-6 py-3 font-medium ${
+                                    activeTab === "description" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
+                                }`}
                                 onClick={() => setActiveTab("description")}
                             >
                                 Thông tin sản phẩm
                             </button>
                             <button
-                                className={`px-6 py-3 font-medium ${activeTab === "reviews" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`px-6 py-3 font-medium ${
+                                    activeTab === "reviews" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
+                                }`}
                                 onClick={() => setActiveTab("reviews")}
                             >
                                 Đánh giá ({review.totalStar || 0})
                             </button>
                             <button
-                                className={`px-6 py-3 font-medium ${activeTab === "shipping" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`px-6 py-3 font-medium ${
+                                    activeTab === "shipping" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
+                                }`}
                                 onClick={() => setActiveTab("shipping")}
                             >
                                 Vận chuyển
@@ -424,9 +446,9 @@ export default function ProductDetail() {
                             <div className="content-loaded">
                                 {activeTab === "description" && (
                                     <div className="pd-description-content">
-                                        <div >
+                                        <div>
                                             <h3 className="pd-subtitle">Mô tả sản phẩm</h3>
-                                            <DisplayContent content={product.description}/>
+                                            <DisplayContent content={product.description} />
 
                                             <h3 className="pd-subtitle mt-6">Chất liệu</h3>
                                             <div className="pd-text-content">
@@ -434,7 +456,7 @@ export default function ProductDetail() {
                                             </div>
                                         </div>
 
-                                        <div >
+                                        <div>
                                             <h3 className="pd-subtitle">Xuất xứ</h3>
                                             <div className="pd-text-content">
                                                 <p>Sản xuất tại: {product.origin}</p>
@@ -463,13 +485,15 @@ export default function ProductDetail() {
                                                             <div
                                                                 className="pd-bar-fill"
                                                                 style={{
-                                                                    width: `${review.totalStar ? (review[`star${star}`] / review.totalStar) * 100 : 0}%`,
+                                                                    width: `${
+                                                                        review.totalStar ? (review[`star${star}`] / review.totalStar) * 100 : 0
+                                                                    }%`,
                                                                 }}
                                                             ></div>
                                                         </div>
                                                         <span className="pd-review-percent">
-                              {review.totalStar ? ((review[`star${star}`] / review.totalStar) * 100).toFixed(1) : 0}%
-                            </span>
+                                                            {review.totalStar ? ((review[`star${star}`] / review.totalStar) * 100).toFixed(1) : 0}%
+                                                        </span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -486,15 +510,17 @@ export default function ProductDetail() {
                                                                     alt={customerName}
                                                                     className="pd-review-user-img"
                                                                     onError={(e) => {
-                                                                        e.target.onerror = null
-                                                                        e.target.src = noImage
+                                                                        e.target.onerror = null;
+                                                                        e.target.src = noImage;
                                                                     }}
                                                                 />
                                                                 <div>
                                                                     <div className="pd-user-name">{customerName}</div>
                                                                     <div className="pd-review-user-rating">
                                                                         <div className="flex">{renderStars(rating)}</div>
-                                                                        <span className="pd-review-date">{new Date(createdAt).toLocaleDateString()}</span>
+                                                                        <span className="pd-review-date">
+                                                                            {new Date(createdAt).toLocaleDateString()}
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -514,7 +540,7 @@ export default function ProductDetail() {
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                    ),
+                                                    )
                                                 )}
                                         </div>
 
@@ -530,7 +556,7 @@ export default function ProductDetail() {
                                     <div className="space-y-4">
                                         <h3>{BlogTransport.title}</h3>
                                         <div className="grid md:grid-cols-2 gap-4 mt-4">
-                                           <DisplayContent content={BlogTransport.content} />
+                                            <DisplayContent content={BlogTransport.content} />
                                         </div>
                                     </div>
                                 )}
@@ -549,10 +575,7 @@ export default function ProductDetail() {
                         </div>
 
                         {isLoading ? (
-                            <div
-                                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
-                                style={{ minHeight: "300px" }}
-                            >
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" style={{ minHeight: "300px" }}>
                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
                                     <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
                                         <div className="aspect-square bg-gray-200"></div>
@@ -578,8 +601,8 @@ export default function ProductDetail() {
                                                     alt={product.name}
                                                     className="w-full h-full object-cover hover:scale-105 transition-transform"
                                                     onError={(e) => {
-                                                        e.target.onerror = null
-                                                        e.target.src = noImage
+                                                        e.target.onerror = null;
+                                                        e.target.src = noImage;
                                                     }}
                                                 />
                                             </div>
@@ -629,8 +652,8 @@ export default function ProductDetail() {
                                                     alt={product.name}
                                                     className="pd-related-product-img"
                                                     onError={(e) => {
-                                                        e.target.onerror = null
-                                                        e.target.src = noImage
+                                                        e.target.onerror = null;
+                                                        e.target.src = noImage;
                                                     }}
                                                 />
                                             </div>
@@ -678,8 +701,58 @@ export default function ProductDetail() {
                 </div>
             </div>
         </div>
-    )
+    );
+
+    // Định nghĩa LoadingSkeleton trong cùng file
+    function LoadingSkeleton() {
+        return (
+            <div>
+                <div className="animate-pulse">
+                    <div className="pd-grid">
+                        <div className="pd-images">
+                            <div className="pd-main-image bg-gray-200" style={{ minHeight: "560px" }}></div>
+                            <div className="pd-thumbnails">
+                                {[1, 2, 3, 4].map((i) => (
+                                    <div key={i} className="pd-thumbnail bg-gray-200" style={{ minHeight: "128px" }}></div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="pd-info" style={{ minHeight: "600px" }}>
+                            <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+                            <div className="flex items-center space-x-4 mb-6">
+                                <div className="h-4 bg-gray-200 rounded w-32"></div>
+                            </div>
+
+                            <div className="h-10 bg-gray-200 rounded w-1/2 mb-6"></div>
+
+                            <div className="space-y-6">
+                                <div>
+                                    <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {[1, 2, 3, 4].map((i) => (
+                                            <div key={i} className="h-10 bg-gray-200 rounded"></div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="h-12 bg-gray-200 rounded w-1/3 my-6"></div>
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="h-12 bg-gray-200 rounded"></div>
+                                <div className="h-12 bg-gray-200 rounded"></div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-4 pt-6 border-t">
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="h-6 bg-gray-200 rounded"></div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+    }
 }
-
-
-
