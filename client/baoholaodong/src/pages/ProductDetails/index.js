@@ -23,6 +23,7 @@ import "./style.css"
 import axios from "axios"
 import ProductVariantSelector from "./ProductVariantSelector";
 import {DisplayContent} from "../../components/TextEditor";
+import {formatVND, parseVND} from "../../utils/format";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
 export default function ProductDetail() {
@@ -37,7 +38,6 @@ export default function ProductDetail() {
     const navigate = useNavigate()
     const [relatedProducts, setRelatedProducts] = useState([])
     const [topSaleProducts, setTopSaleProducts] = useState([])
-
     const [review, setReview] = useState({
         totalStar: 0,
         star1: 0,
@@ -59,7 +59,7 @@ export default function ProductDetail() {
             },
         ],
     })
-
+    const [BlogTransport,setBlogTransport] = useState(null)
     const renderStars = (rating) => {
         const stars = []
         const fullStars = Math.floor(rating)
@@ -140,7 +140,7 @@ export default function ProductDetail() {
         categoryName: "",
         quantity: 0,
         price: 0,
-        priceDiscount: 0,
+        priceAfterDiscount: 0,
         freeShip: false,
         totalSale: 0,
         guarantee: 0,
@@ -173,57 +173,6 @@ export default function ProductDetail() {
             },
         ],
     })
-
-    const fetchTopSaleProducts = async (sizeTopSale) => {
-        try {
-            const response = await axios.get(`${BASE_URL}/api/Product/top-sale-product`, {
-                params: {
-                    size: sizeTopSale,
-                },
-            })
-            console.log(response.data.length)
-            setTopSaleProducts(response.data || [])
-        } catch (error) {
-            return []
-        }
-    }
-
-    const getProductBySlug = async (slug) => {
-        try {
-            const response = await axios.get(`${BASE_URL}/api/Product/get-product-by-slug/${slug}`)
-            setProduct(response.data)
-        } catch (error) {
-            console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message)
-        }
-    }
-
-    const fetchRelatedProducts = async (id, size) => {
-        try {
-            const response = await axios.get(`${BASE_URL}/api/Product/related`, {
-                params: {
-                    size: size,
-                    id: id,
-                },
-            })
-            setRelatedProducts(response.data)
-        } catch (error) {
-            return []
-        }
-    }
-
-    const fetchReviewProduct = async (id, size) => {
-        try {
-            const response = await axios.get(`${BASE_URL}/api/Product/reviews`, {
-                params: {
-                    size: size,
-                    id: id,
-                },
-            })
-            setReview(response.data)
-        } catch (error) {
-            return null
-        }
-    }
 
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
@@ -267,9 +216,14 @@ export default function ProductDetail() {
         const fetchData = async () => {
             setIsLoading(true)
             try {
-                await getProductBySlug(slug)
+                const response = await axios.get(`${BASE_URL}/api/Product/get-product-by-slug-for-page-detail/${slug}`)
+                setProduct(response.data.product)
+                setRelatedProducts(response.data.relatedProducts||[])
+                setTopSaleProducts(response.data.topSaleProducts||[])
+                setBlogTransport(response.data.blogTransport||null)
+                setReview(response.data.review);
             } catch (error) {
-                console.error("Error fetching product:", error)
+                console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message)
             } finally {
                 setIsLoading(false)
             }
@@ -277,11 +231,6 @@ export default function ProductDetail() {
         fetchData()
     }, [slug])
 
-    useEffect(() => {
-        fetchRelatedProducts(Number.parseInt(product.id), 10)
-        fetchReviewProduct(Number.parseInt(product.id), 10)
-        fetchTopSaleProducts(10)
-    }, [product])
 
     useEffect(() => {
         if (!isLoading) {
@@ -373,8 +322,8 @@ export default function ProductDetail() {
                             </div>
 
                             <div className="pd-price-section">
-                                <span className="pd-price">{product.priceDiscount.toLocaleString("vi-vn")}₫</span>
-                                <span className="pd-original-price">{product.price.toLocaleString("vi-vn")}₫</span>
+                                <span className="pd-price">{formatVND(product.priceAfterDiscount)}</span>
+                                <span className="pd-original-price">{formatVND(product.price)}</span>
                                 {product.discount > 0 && <span className="pd-discount">-{product.discount}%</span>}
                             </div>
 
@@ -579,28 +528,9 @@ export default function ProductDetail() {
 
                                 {activeTab === "shipping" && (
                                     <div className="space-y-4">
-                                        <h3 className="pd-subtitle">Thông tin vận chuyển</h3>
-                                        <p>Sản phẩm được giao hàng từ 2-5 ngày làm việc tùy khu vực.</p>
+                                        <h3>{BlogTransport.title}</h3>
                                         <div className="grid md:grid-cols-2 gap-4 mt-4">
-                                            <div className="border rounded-lg p-4">
-                                                <h4 className="font-medium mb-2">Miền Bắc</h4>
-                                                <p className="text-sm text-gray-600">Thời gian giao hàng: 1-3 ngày</p>
-                                                <p className="text-sm text-gray-600">Phí vận chuyển: 30.000₫</p>
-                                            </div>
-                                            <div className="border rounded-lg p-4">
-                                                <h4 className="font-medium mb-2">Miền Trung</h4>
-                                                <p className="text-sm text-gray-600">Thời gian giao hàng: 2-4 ngày</p>
-                                                <p className="text-sm text-gray-600">Phí vận chuyển: 35.000₫</p>
-                                            </div>
-                                            <div className="border rounded-lg p-4">
-                                                <h4 className="font-medium mb-2">Miền Nam</h4>
-                                                <p className="text-sm text-gray-600">Thời gian giao hàng: 2-4 ngày</p>
-                                                <p className="text-sm text-gray-600">Phí vận chuyển: 35.000₫</p>
-                                            </div>
-                                            <div className="border rounded-lg p-4">
-                                                <h4 className="font-medium mb-2">Miễn phí vận chuyển</h4>
-                                                <p className="text-sm text-gray-600">Áp dụng cho đơn hàng từ 500.000₫</p>
-                                            </div>
+                                           <DisplayContent content={BlogTransport.content} />
                                         </div>
                                     </div>
                                 )}
@@ -657,8 +587,8 @@ export default function ProductDetail() {
                                                 <h3 className="font-medium text-gray-900 line-clamp-2 mb-1">{product.name}</h3>
                                                 <div className="flex items-center mt-1">{renderStars(product.averageRating)}</div>
                                                 <div className="mt-2 flex items-center gap-2">
-                                                    <span className="text-red-600 font-medium">{product.priceDiscount.toLocaleString()}₫</span>
-                                                    <span className="text-sm text-gray-500 line-through">{product.price.toLocaleString()}₫</span>
+                                                    <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
+                                                    <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -708,8 +638,8 @@ export default function ProductDetail() {
                                                 <h4 className="pd-related-product-name">{product.name}</h4>
                                                 <div className="pd-related-product-rating">{renderStars(product.averageRating)}</div>
                                                 <div className="pd-related-product-prices">
-                                                    <span className="pd-related-product-price">{product.priceDiscount.toLocaleString()}₫</span>
-                                                    <span className="pd-related-product-original-price">{product.price.toLocaleString()}₫</span>
+                                                    <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
+                                                    <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
                                                 </div>
                                             </div>
                                         </div>

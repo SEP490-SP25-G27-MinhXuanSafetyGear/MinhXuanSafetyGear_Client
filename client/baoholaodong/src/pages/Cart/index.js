@@ -67,7 +67,7 @@ const Cart = () => {
                     productName: item.name,
                     quantity: item.quantity,
                     price: item.price,
-                    image: item.productImages?.[0]?.image || "/images/default.png",
+                    image: item.product.image || "/images/default.png",
                     variant: item.variant ,
                 }))
                 .filter((item) => selectedItems.includes(item.index)),  // Kiểm tra theo index

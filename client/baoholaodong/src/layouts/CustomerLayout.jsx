@@ -3,7 +3,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import Toast from "../components/toast";
-import Breadcrumb from "../components/breadcrumb";
 import { CartContext } from "../contexts/CartContext";
 
 const CustomerLayout = () => {

@@ -7,7 +7,7 @@ import Loading from "../../../components/Loading/Loading"
 import { isImageSizeValid, compressImageToTargetSize } from "../../../utils/imageUtils"
 import ErrorList from "../../../components/ErrorList/ErrorList"
 import ProductPreview from "./ProductPreview"
-import {TextEditor} from "../../../components/TextEditor";
+import {TextEditor, TextEditor2} from "../../../components/TextEditor";
 import ManagerToast from "../../../components/managerToast/ManagerToast";
 
 
@@ -418,7 +418,7 @@ const CreateProduct = () => {
 									</select>
 								</div>
 
-								{/* Description with Markdown */}
+								{/* Description with TextEditor */}
 								<div className="md:col-span-2 space-y-2">
 									<div className="flex justify-between items-center">
 										<label className="block text-sm font-medium text-gray-700" htmlFor="description">
@@ -426,7 +426,7 @@ const CreateProduct = () => {
 										</label>
 									</div>
 									<div className="h-[250px] overflow-hidden">
-										<TextEditor
+										<TextEditor2
 											height="200px"
 											value={product.description}
 											maxLength={1200}
@@ -434,7 +434,7 @@ const CreateProduct = () => {
 										/>
 									</div>
 								</div>
-								{/* Quality Certificate with Markdown */}
+								{/* Quality Certificate with TextEditor */}
 								<div className="md:col-span-2 space-y-2">
 									<div className="flex justify-between items-center">
 										<label className="block text-sm font-medium text-gray-700" htmlFor="qualityCertificate">
@@ -442,7 +442,7 @@ const CreateProduct = () => {
 										</label>
 									</div>
 									<div className="h-[250px] overflow-hidden">
-										<TextEditor
+										<TextEditor2
 											value={product.qualityCertificate}
 											height={'100px'}
 											setValue={(newValue) => setProduct((prev) => ({ ...prev, qualityCertificate: newValue }))}

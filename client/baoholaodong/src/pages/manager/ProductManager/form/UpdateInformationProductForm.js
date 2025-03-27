@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { formatPrice, parseVND } from "../../../../utils/format"
-import { TextEditor } from "../../../../components/TextEditor"
+import {TextEditor, TextEditor2} from "../../../../components/TextEditor"
 
 export default function UpdateInformationProductForm({
                                                          product,
@@ -127,7 +127,7 @@ export default function UpdateInformationProductForm({
                         </label>
                     </div>
                     <div className="bg-white min-h-[300px] overflow-hidden">
-                        <TextEditor
+                        <TextEditor2
                             value={productUpdate.description}
                             height={"200px"}
                             maxLength={1200}
@@ -144,7 +144,7 @@ export default function UpdateInformationProductForm({
                     </div>
                     <div>
                         <div className="bg-white min-h-[200px]">
-                            <TextEditor
+                            <TextEditor2
                                 value={productUpdate.qualityCertificate}
                                 height={"100px"}
                                 setValue={(newValue) => setProductUpdate((prev) => ({ ...prev, qualityCertificate: newValue }))}
