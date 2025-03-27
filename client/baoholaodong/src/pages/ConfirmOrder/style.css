@@ -74,6 +74,11 @@
     margin-bottom: 1.5rem;
 }
 
+.confirm-order-info p {
+    text-align: left;
+    padding: 0.5rem 0;
+}
+
 .confirm-info-title {
     font-weight: 600;
     color: #374151;
