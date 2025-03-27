@@ -26,7 +26,7 @@ const CustomerLayout = () => {
         showToast(null);
     };
 
-    const isCheckoutPage = location.pathname === "/checkout";
+    const isCheckoutPage = location.pathname === "/check-out";
 
     return (
         <div className="main-container">
