@@ -4,7 +4,9 @@ import { CartContext } from "../../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { Minus, Plus, ShoppingBag, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
 import "./style.css";
-import noImage from "../../images/no-image-product.jpg"; // Thêm import
+import noImage from "../../images/no-image-product.jpg";
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const Cart = () => {
     const { cartItems, setCartItems } = useContext(CartContext);
@@ -75,6 +77,7 @@ const Cart = () => {
     };
 
     return (
+        <PageWrapper title="Giỏ hàng">
         <div className="bg-gray-50 min-h-screen py-8">
             <div className="container mx-auto px-4">
                 <h1 className="text-2xl md:text-3xl font-bold mb-8 text-red-700 flex items-center">
@@ -167,9 +170,6 @@ const Cart = () => {
                                                         {item.discount > 0 ? (
                                                             <>
                                                                 <span>{item.finalPrice.toLocaleString()}đ</span>
-                                                                <span className="text-gray-400 line-through ml-2">
-                                                                    {item.originalPrice.toLocaleString()}đ
-                                                                </span>
                                                             </>
                                                         ) : (
                                                             <span>{item.finalPrice.toLocaleString()}đ</span>
@@ -275,6 +275,7 @@ const Cart = () => {
                 </div>
             </div>
         </div>
+        </PageWrapper>
     );
 };
 

@@ -1,4 +1,5 @@
-﻿"use client"
+﻿
+"use client"
 
 import { useState, useContext, useEffect } from "react"
 import { useLocation } from "react-router-dom"
@@ -7,6 +8,8 @@ import axios from "axios"
 import { AuthContext } from "../../contexts/AuthContext"
 import { CreditCard, Truck, MapPin, Phone, Mail, User, DollarSign, CheckCircle, X } from "lucide-react"
 import "./style.css"
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
@@ -18,6 +21,8 @@ export function ConfirmOrder() {
     const [orderSuccess, setOrderSuccess] = useState(false)
     const [orderMessage, setOrderMessage] = useState("")
     const [notification, setNotification] = useState({ show: false, message: "", type: "" })
+    const [invoiceNumber, setInvoiceNumber] = useState(null)
+    const [calculatedTotal, setCalculatedTotal] = useState(null)
     const [customerInfo, setCustomerInfo] = useState({
         customerId: null,
         customerName: user ? user.customerName : "",
@@ -29,6 +34,28 @@ export function ConfirmOrder() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [truckAnimation, setTruckAnimation] = useState(false)
     const [rotatePage, setRotatePage] = useState(false)
+
+
+    useEffect(() => {
+        const fetchCalculatedTotal = async () => {
+            try {
+                const body = {
+                    orderDetails: orderData.orderDetails.map(({ productId, quantity, variant }) => ({
+                        productId,
+                        quantity,
+                        variantId: variant.variantId,
+                    })),
+                };
+                const response = await axios.post(`${BASE_URL}/api/Order/calculate-order`, body);
+                setCalculatedTotal(response.data.totalAmount);
+            } catch (error) {
+                console.error("Lỗi tính toán đơn hàng:", error);
+            }
+        };
+
+        fetchCalculatedTotal();
+    }, [orderData]);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
@@ -44,12 +71,12 @@ export function ConfirmOrder() {
 
     const handleOrder = async () => {
         if (!customerInfo.customerName || !customerInfo.customerPhone || !customerInfo.customerAddress) {
-            showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error")
-            return
+            showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error");
+            return;
         }
 
-        setIsSubmitting(true)
-        setTruckAnimation(true)
+        setIsSubmitting(true);
+        setTruckAnimation(true);
 
         const newOrder = {
             customerName: customerInfo.customerName,
@@ -62,34 +89,39 @@ export function ConfirmOrder() {
                 quantity,
                 variantId: variant.variantId,
             })),
-        }
+        };
 
         try {
-            console.log(newOrder)
-            const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder)
+            const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder);
+            const orderResponse = response.data;
 
             setTimeout(() => {
-                setTruckAnimation(false)
-                setRotatePage(true)
+                setTruckAnimation(false);
+
+                setRotatePage(true);
                 setTimeout(() => {
-                    setOrderSuccess(true)
-                    setOrderMessage(response.data)
-                    setRotatePage(false)
-                    window.scrollTo({ top: 0, behavior: "smooth" })
-                }, 1000) // Thời gian xoay trang: 1s
-            }, 1500) // Thời gian xe tải chạy: 1.5s
+                    setOrderSuccess(true);
+                    setOrderMessage("Đơn hàng của bạn đã được ghi nhận.");
+                    if (customerInfo.paymentMethod === "Online") {
+                        setInvoiceNumber(orderResponse.invoice?.invoiceNumber);
+                    }
+                    setRotatePage(false);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                }, 1000);
+            }, 3500);
         } catch (error) {
-            console.error("Order failed:", error)
-            setTruckAnimation(false)
-            showNotification("Đặt hàng thất bại. Vui lòng thử lại sau!", "error")
-            setIsSubmitting(false)
+            console.error("Order failed:", error);
+            setTruckAnimation(false);
+            showNotification("Đặt hàng thất bại. Vui lòng thử lại sau!", "error");
+            setIsSubmitting(false);
         }
-    }
+    };
 
     const totalAmount = orderData.orderDetails.reduce((total, item) => total + item.price * item.quantity, 0)
 
     if (orderSuccess) {
         return (
+            <PageWrapper title="Đặt hàng thành công">
             <div className="confirm-container">
                 <div className="confirm-success-card">
                     <div className="confirm-success-header">
@@ -112,7 +144,7 @@ export function ConfirmOrder() {
                             <p>
                                 Phương thức thanh toán: {customerInfo.paymentMethod === "Cash" ? "Tiền mặt" : "Thanh toán online"}
                             </p>
-                            <p className="confirm-total">Tổng tiền: {formatVND(totalAmount)}</p>
+                            <p className="confirm-total">Tổng tiền: {formatVND(calculatedTotal ?? totalAmount)}</p>
                         </div>
                         <div className="confirm-button-group">
                             <button onClick={() => (window.location.href = "/")} className="confirm-btn-continue">
@@ -121,45 +153,26 @@ export function ConfirmOrder() {
                             <button onClick={() => (window.location.href = "/account/orders")} className="confirm-btn-view-order">
                                 Xem đơn hàng của tôi
                             </button>
+                            {customerInfo.paymentMethod === "Online" && invoiceNumber && (
+                                <button
+                                    onClick={() => window.location.href = `/checkout?invoiceNumber=${invoiceNumber}`}
+                                    className="confirm-btn-pay-now"
+                                >
+                                    Thanh toán ngay
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+            </PageWrapper>
         )
     }
 
     return (
+        <PageWrapper title="Xác nhận đơn hàng">
         <div className={`confirm-container ${rotatePage ? "confirm-rotate" : ""}`}>
-            {notification.show && (
-                <div className={`confirm-notification ${notification.type}`}>
-                    <div className="confirm-notification-content">
-                        {notification.type === "error" ? (
-                            <svg className="confirm-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path
-                                    fillRule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        ) : (
-                            <svg className="confirm-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path
-                                    fillRule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        )}
-                        <span>{notification.message}</span>
-                    </div>
-                    <button
-                        onClick={() => setNotification({ show: false, message: "", type: "" })}
-                        className="confirm-close-btn"
-                    >
-                        <X className="confirm-icon-small" />
-                    </button>
-                </div>
-            )}
+
             <div className="confirm-order-card">
                 <div className="confirm-order-header">
                     <h1 className="confirm-order-title">
@@ -306,48 +319,32 @@ export function ConfirmOrder() {
                                         <td>{item.quantity}</td>
                                         <td>{formatVND(item.price)}</td>
                                         <td>{formatVND(item.price * item.quantity)}</td>
-                                            </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    </div>
-                                    </div>
-                                    <div className="confirm-footer">
-                                    <div className="confirm-note">Vui lòng kiểm tra thông tin trước khi đặt hàng</div>
-                                    <div className="confirm-total-section">
-                                    <div className="confirm-total-amount">
-                                    Tổng tiền: <span>{formatVND(totalAmount)}</span>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
                         </div>
-                        <button
-                            className={`confirm-order-btn ${isSubmitting ? "confirm-disabled" : ""}`}
-                            onClick={handleOrder}
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <div className="confirm-loading">
-                                    <svg
-                                        className="confirm-spinner"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle className="confirm-circle" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path
-                                            className="confirm-path"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        />
-                                    </svg>
-                                    Đang xử lý...
-                                </div>
-                            ) : (
-                                "Đặt hàng"
-                            )}
-                        </button>
+                    </div>
+                    <div className="confirm-footer">
+                        <div className="confirm-note">Vui lòng kiểm tra thông tin trước khi đặt hàng</div>
+                        <div className="confirm-total-section">
+                            <div className="confirm-total-amount">
+                                Tổng tiền: <span>{formatVND(calculatedTotal ?? totalAmount)}</span>
+                            </div>
+                            <button
+                                className={`confirm-order-btn ${isSubmitting ? "confirm-disabled" : ""}`}
+                                onClick={handleOrder}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? "Đang xử lý..." : "Đặt hàng"}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-</div>
-)
+            </ PageWrapper>
+
+    )
 }

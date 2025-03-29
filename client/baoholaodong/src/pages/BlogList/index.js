@@ -5,6 +5,8 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
 import "./style.css";
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
@@ -103,6 +105,7 @@ const BlogList = () => {
     };
 
     return (
+        <PageWrapper title="Danh sách bài viết">
         <div className="blog-container">
             <nav className="breadcrumb-blog-list">
                 <a href="/" className="breadcrumb-item">
@@ -219,6 +222,7 @@ const BlogList = () => {
                 </div>
             </div>
         </div>
+        </PageWrapper>
     );
 };
 

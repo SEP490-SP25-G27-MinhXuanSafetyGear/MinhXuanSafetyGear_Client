@@ -124,6 +124,17 @@
     background: #d1d5db;
 }
 
+.confirm-btn-pay-now{
+    padding: 0.75rem 1.5rem;
+    background: #b50a00;
+    color: white;
+    border-radius: 0.5rem;
+}
+
+.confirm-btn-pay-now:hover {
+    background: #910800;
+}
+
 /* Notification */
 .confirm-notification {
     margin-bottom: 1rem;

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import './style.css';
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -34,6 +36,7 @@ const Contact = () => {
     };
 
     return (
+        <PageWrapper title="Liên hệ">
         <div className="contact-page" id="yourElementId">
             <div className="contact-container">
                 <div className="contact-grid">
@@ -122,6 +125,7 @@ const Contact = () => {
                 </div>
             </div>
         </div>
+        </PageWrapper>
     );
 };
 
