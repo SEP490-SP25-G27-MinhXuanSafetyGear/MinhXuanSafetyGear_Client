@@ -146,7 +146,12 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             </div>
                             <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
                                 {user ? (
+                                     <>
+                                     <a href={`/order-history/${user.userId}`}className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                                       Lịch sử đơn hàng
+                                     </a>
                                     <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng xuất</a>
+                                    </>
                                 ) : (
                                     <>
                                         <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
