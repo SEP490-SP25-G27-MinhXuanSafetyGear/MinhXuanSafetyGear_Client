@@ -104,6 +104,90 @@ body {
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+.after-payment-actions {
+    margin-top: 20px;
+    padding: 2rem;
+    background-color: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    animation: fadeIn 0.4s ease-in-out;
+    height: 400px;
+    align-items: center;
+
+}
+
+.thank-you-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--success-color);
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+}
+
+.thank-you-desc {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+
+
+.button-group .btn-view-orders,
+.button-group .btn-go-home,
+.button-group .btn-reload {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-view-orders {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-go-home {
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.btn-reload {
+    background-color: #efefef;
+    color: var(--text-light);
+}
+
+.btn-view-orders:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-go-home:hover,
+.btn-reload:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 
 .notification-icon {

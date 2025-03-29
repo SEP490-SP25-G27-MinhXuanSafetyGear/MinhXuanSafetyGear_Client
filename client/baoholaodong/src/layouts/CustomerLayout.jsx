@@ -26,16 +26,19 @@ const CustomerLayout = () => {
         showToast(null);
     };
 
-    const isCheckoutPage = location.pathname === "/check-out";
+    const params = new URLSearchParams(location.search);
+    const isCheckoutPage = location.pathname === "/checkout";
+    const isDone = params.get("done") === "true";
+    const shouldHideHeaderFooter = isCheckoutPage && isDone;
 
     return (
         <div className="main-container">
-            {!isCheckoutPage && <Header cartCount={cartCount} cartItems={cartItems} showToast={showToast} />}
+            {!shouldHideHeaderFooter && <Header cartCount={cartCount} cartItems={cartItems} showToast={showToast} />}
             {/*{!isCheckoutPage && location.pathname !== "/" && <Breadcrumb />}*/}
             <main className="main-content">
                 <Outlet context={{ addToCart }} />
             </main>
-            {!isCheckoutPage && <Footer />}
+            {!shouldHideHeaderFooter && <Footer />}
             {toast && (
                 <Toast message={toast} onClose={handleToastClose} />
             )}
