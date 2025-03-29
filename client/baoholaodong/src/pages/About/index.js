@@ -1,5 +1,6 @@
 import React from "react";
 import "./style.css";
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
 
 const sections = [
     {
@@ -36,6 +37,7 @@ const sections = [
 
 const About = () => {
     return (
+        <PageWrapper title="Về chúng tôi">
         <div className="about-container">
             <h1 className="title">
                 CÔNG TY TNHH SẢN XUẤT THƯƠNG MẠI BẢO HỘ LAO ĐỘNG MINH XUÂN
@@ -60,6 +62,7 @@ const About = () => {
                 </div>
             ))}
         </div>
+        </PageWrapper>
     );
 };
 

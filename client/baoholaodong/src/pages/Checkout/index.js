@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import { CheckCircle, X, Upload, CreditCard, ArrowLeft, ShoppingBag, Truck, Clock } from 'lucide-react';
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
@@ -30,7 +32,6 @@ const Checkout = () => {
         if (selectedFile) {
             setFile(selectedFile);
 
-            // Create preview URL
             const reader = new FileReader();
             reader.onloadend = () => {
                 setFilePreview(reader.result);
@@ -53,7 +54,6 @@ const Checkout = () => {
     }, []);
 
     useEffect(() => {
-        // Khởi tạo kết nối SignalR
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/orderHub`)
             .withAutomaticReconnect()
@@ -102,7 +102,6 @@ const Checkout = () => {
                 type: 'success'
             });
 
-            // Redirect after 2 seconds
             setTimeout(() => {
                 navigate("/");
             }, 2000);
@@ -120,6 +119,7 @@ const Checkout = () => {
     };
 
     return (
+        <PageWrapper title="Thanh toán">
         <div className="checkout-container">
             <Loading isLoading={isLoading} />
 
@@ -166,7 +166,7 @@ const Checkout = () => {
                                 </div>
                                 <div className="info-row">
                                     <span className="info-label">Số tiền:</span>
-                                    <span className="info-value highlight">{(totalPrice + 30000).toLocaleString()}đ</span>
+                                    <span className="info-value highlight">{((totalPrice || 0)).toLocaleString()}đ</span>
                                 </div>
                                 <div className="info-row">
                                     <span className="info-label">Nội dung CK:</span>
@@ -179,7 +179,7 @@ const Checkout = () => {
                             <h3>Quét mã QR để thanh toán</h3>
                             <div className="qr-code-container">
                                 <img
-                                    src={`https://vietqr.co/api/generate/${bankName}/${accountNumber}/VIETQR.CO/${totalPrice + 30000}/chuyenkhoan`}
+                                    src={`https://vietqr.co/api/generate/${bankName}/${accountNumber}/VIETQR.CO/${(totalPrice || 0)}/chuyenkhoan`}
                                     alt="Mã QR thanh toán"
                                     className="qr-image"
                                 />
@@ -245,21 +245,23 @@ const Checkout = () => {
                             {cartItems.map((item) => (
                                 <div key={item.id} className="order-item">
                                     <div className="item-image">
-                                        <img src={item.image || "/placeholder.svg"} alt={item.name} />
+                                        <img src={item.image || item.variant?.image || "/placeholder.svg"} alt={item.name || item.variant?.name || "Sản phẩm"} />
                                     </div>
                                     <div className="item-details">
-                                        <h4 className="item-name">{item.name}</h4>
+                                        <h4 className="item-name">{item.name || item.variant?.name || "Sản phẩm không tên"}</h4>
                                         <div className="item-meta">
                                             {item.variant && (
                                                 <span className="item-variant">
-                                                    {item.variant.color}, {item.variant.size}
-                                                </span>
+                                    {item.variant.color}, {item.variant.size}
+                                </span>
                                             )}
                                         </div>
                                     </div>
                                     <div className="item-price-info">
                                         <span className="item-quantity">x{item.quantity}</span>
-                                        <span className="item-price">{item.price.toLocaleString()}đ</span>
+                                        <span className="item-price">
+                                     {((item.price > 0 ? item.price : item.variant?.price || 0).toLocaleString())}đ
+                        </span>
                                     </div>
                                 </div>
                             ))}
@@ -268,24 +270,25 @@ const Checkout = () => {
                         <div className="order-summary">
                             <div className="summary-row">
                                 <span>Tạm tính:</span>
-                                <span>{totalPrice.toLocaleString()}đ</span>
+                                <span>{(totalPrice || 0).toLocaleString()}đ</span>
                             </div>
-                            <div className="summary-row">
-                                <span className="with-icon">
-                                    <Truck size={16} />
-                                    Phí vận chuyển:
-                                </span>
-                                <span>30,000đ</span>
-                            </div>
+                            {/*<div className="summary-row">*/}
+                            {/*<span className="with-icon">*/}
+                            {/*    <Truck size={16} />*/}
+                            {/*    Phí vận chuyển:*/}
+                            {/*</span>*/}
+                            {/*    <span>30,000đ</span>*/}
+                            {/*</div>*/}
                             <div className="summary-row total">
                                 <span>Tổng cộng:</span>
-                                <span>{(totalPrice + 30000).toLocaleString()}đ</span>
+                                <span>{((totalPrice || 0)).toLocaleString()}đ</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        </PageWrapper>
     );
 };
 

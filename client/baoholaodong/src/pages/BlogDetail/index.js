@@ -4,6 +4,8 @@ import axios from "axios";
 import { FaClock } from "react-icons/fa";
 import { DisplayContent } from "../../components/TextEditor";
 import "./style.css";
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const BlogDetail = () => {
     const { slug } = useParams(); // Lấy slug từ URL
@@ -46,6 +48,7 @@ const BlogDetail = () => {
     }
 
     return (
+        <PageWrapper title={blog.title || "Chi tiết bài viết"}>
         <div className="blog-detail-wrapper">
             <div className="blog-detail-container">
                 {/* Header Section */}
@@ -78,6 +81,7 @@ const BlogDetail = () => {
 
             </div>
         </div>
+        </PageWrapper>
     );
 };
 

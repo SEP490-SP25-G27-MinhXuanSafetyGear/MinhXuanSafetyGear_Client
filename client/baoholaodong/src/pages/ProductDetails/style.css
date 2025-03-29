@@ -559,13 +559,14 @@
 /* Related products */
 .pd-related-products-card {
     background-color: #fff;
-    border-radius: 10px;
+    border-radius: 6px;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 20px;
     flex: 1;
     min-height: 200px;
     position: relative;
+
 }
 
 .pd-related-products-title {
@@ -585,6 +586,7 @@
     gap: 10px;
     cursor: pointer;
     transition: transform 0.2s;
+    padding: 10px;
 }
 
 .pd-related-product-item:hover {

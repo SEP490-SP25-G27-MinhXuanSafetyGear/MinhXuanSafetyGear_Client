@@ -7,6 +7,8 @@ import { CartContext } from '../../contexts/CartContext';
 import { toSlug } from "../../utils/SlugUtils";
 import ProductPopup from '../../components/productpopup';
 import './ProductListCategory.css';
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const useQuery = () => new URLSearchParams(useLocation().search);
 
@@ -46,8 +48,20 @@ const ProductList = () => {
     };
 
     const handleAddToCart = (product) => {
-        addToCart(product);
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            image: product.image || "/placeholder.svg",
+            quantity: 1, // Số lượng mặc định
+            selectedVariant: null, // Không có variant
+            price: product.price,
+            priceAfterDiscount: product.priceAfterDiscount || product.price,
+            discount: product.discount || 0,
+            quantityInStock: product.quantity, // Tồn kho thực tế
+        };
+        addToCart(cartItem);
     };
+
 
     const handleNavigateToDetail = (product) => {
         navigate(`/products/${product.slug}`);
@@ -73,6 +87,7 @@ const ProductList = () => {
     }, [search]);
 
     return (
+        <PageWrapper title={search || "Tất cả sản phẩm"}>
         <div className="product-list-category-container">
             {/* Banner */}
             <div className="product-list-category-banner-container">
@@ -249,7 +264,17 @@ const ProductList = () => {
                                             </div>
                                             <div className="product-list-category-product-info">
                                                 <h3 className="product-list-category-product-name">{product.name}</h3>
-                                                <p className="product-list-category-product-price">{product.price.toLocaleString()} VND</p>
+                                                <div className="product-price">
+                                                    {product.discount > 0 ? (
+                                                        <>
+                                                            <span className="text-red-500">{(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ</span>
+                                                            <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                                            <p className="product-discount-percentage"> Giảm {product.discount} %</p>
+                                                        </>
+                                                    ) : (
+                                                        <span>{product.price.toLocaleString()}đ</span>
+                                                    )}
+                                                </div>
                                                 {product.productVariants && product.productVariants.length > 0 ? (
                                                     <button
                                                         className="product-list-category-options-button"
@@ -267,6 +292,7 @@ const ProductList = () => {
                                                         <span>Thêm vào giỏ</span>
                                                     </button>
                                                 )}
+
                                             </div>
                                         </motion.div>
                                     ))}
@@ -279,6 +305,7 @@ const ProductList = () => {
 
             {selectedProduct && <ProductPopup product={selectedProduct} onClose={handleClosePopup} />}
         </div>
+        </PageWrapper>
     );
 };
 

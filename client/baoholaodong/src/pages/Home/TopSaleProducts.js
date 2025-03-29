@@ -8,6 +8,24 @@ import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
 import slugify from "slugify";
 
+const getMinVariant = (product) => {
+    if (!product.productVariants || product.productVariants.length === 0) return null;
+
+    return product.productVariants.reduce((min, variant) => {
+        const discount = variant.discount || 0;
+        const finalPrice = variant.price - (variant.price * discount / 100);
+        const minPrice = min.price - (min.price * (min.discount || 0) / 100);
+        return finalPrice < minPrice ? variant : min;
+    });
+};
+
+const getMinVariantPrice = (product) => {
+    const variant = getMinVariant(product);
+    if (!variant) return product.priceAfterDiscount || product.price;
+    const discount = variant.discount || 0;
+    return variant.price - (variant.price * discount / 100);
+};
+
 const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -26,9 +44,9 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
 
     const sortedProducts = [...products];
     if (selectedFilter === "Giá tăng dần") {
-        sortedProducts.sort((a, b) => a.price - b.price);
+        sortedProducts.sort((a, b) => getMinVariantPrice(a) - getMinVariantPrice(b));
     } else if (selectedFilter === "Giá giảm dần") {
-        sortedProducts.sort((a, b) => b.price - b.price);
+        sortedProducts.sort((a, b) => getMinVariantPrice(b) - getMinVariantPrice(a));
     } else if (selectedFilter === "Rating") {
         sortedProducts.sort((a, b) => b.averageRating - a.averageRating);
     }
@@ -55,7 +73,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                 price: product.price,
                 priceAfterDiscount: product.priceAfterDiscount || product.price,
                 discount: product.discount || 0,
-                quantityInStock: product.quantity, // Tồn kho
+                quantityInStock: product.quantity,
             };
             addToCart(cartItem);
         }
@@ -114,15 +132,34 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                             </div>
                             <div className="product-name">{product.name}</div>
                             <div className="product-price">
-                                {product.discount > 0 ? (
-                                    <>
-                                        <span className="text-red-500">{(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ</span>
-                                        <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
-                                        <p className="product-discount-percentage"> Giảm {product.discount} %</p>
-                                    </>
-                                ) : (
-                                    <span>{product.price.toLocaleString()}đ</span>
-                                )}
+                                {(() => {
+                                    const minVariant = getMinVariant(product);
+                                    const minPrice = getMinVariantPrice(product);
+
+                                    if (minVariant) {
+                                        const hasDiscount = minVariant.discount > 0;
+                                        return hasDiscount ? (
+                                            <>
+                                                <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
+                                                <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
+                                                <p className="product-discount-percentage">Giảm {minVariant.discount}%</p>
+                                            </>
+                                        ) : (
+                                            <span>{minPrice.toLocaleString()}đ</span>
+                                        );
+                                    } else {
+                                        const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
+                                        return hasDiscount ? (
+                                            <>
+                                                <span className="text-red-500">{product.priceAfterDiscount.toLocaleString()}đ</span>
+                                                <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                                <p className="product-discount-percentage">Giảm {product.discount}%</p>
+                                            </>
+                                        ) : (
+                                            <span>{product.price.toLocaleString()}đ</span>
+                                        );
+                                    }
+                                })()}
                             </div>
                             <div className="product-actions">
                                 <button className="option-button" onClick={() => handleProductClick(product)}>

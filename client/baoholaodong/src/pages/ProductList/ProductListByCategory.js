@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
@@ -18,6 +18,8 @@ import { CartContext } from "../../contexts/CartContext"
 import { toSlug } from "../../utils/SlugUtils"
 import ProductPopup from "../../components/productpopup"
 import "./ProductListCategory.css"
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
+
 
 const useQuery = () => new URLSearchParams(useLocation().search)
 
@@ -58,26 +60,20 @@ const ProductListCategory = () => {
     }
 
     const handleAddToCart = (product) => {
-        addToCart(product)
-        const toast = document.createElement("div")
-        toast.className = "product-list-category-toast-notification"
-        toast.innerHTML = `
-      <div class="product-list-category-toast-content">
-        <div class="product-list-category-toast-icon">✓</div>
-        <div class="product-list-category-toast-message">Đã thêm ${product.name} vào giỏ hàng</div>
-      </div>
-    `
-        document.body.appendChild(toast)
-        setTimeout(() => {
-            toast.classList.add("show")
-            setTimeout(() => {
-                toast.classList.remove("show")
-                setTimeout(() => {
-                    document.body.removeChild(toast)
-                }, 300)
-            }, 3000)
-        }, 100)
-    }
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            image: product.image || "/placeholder.svg",
+            quantity: 1, // Số lượng mặc định
+            selectedVariant: null, // Không có variant
+            price: product.price,
+            priceAfterDiscount: product.priceAfterDiscount || product.price,
+            discount: product.discount || 0,
+            quantityInStock: product.quantity, // Tồn kho thực tế
+        };
+        addToCart(cartItem);
+
+    };
 
     const toggleGroupExpand = (groupId) => {
         setExpandedGroups((prev) => ({
@@ -133,6 +129,7 @@ const ProductListCategory = () => {
     }
 
     return (
+        <PageWrapper title={getCurrentCategoryName() || "Danh sách sản phẩm"}>
         <div className="product-list-category-container">
             {/* Banner */}
             <div className="product-list-category-banner-container">
@@ -309,7 +306,17 @@ const ProductListCategory = () => {
                                             </div>
                                             <div className="product-list-category-product-info">
                                                 <h3 className="product-list-category-product-name">{product.name}</h3>
-                                                <p className="product-list-category-product-price">{product.price.toLocaleString()} VND</p>
+                                                <div className="product-price">
+                                                    {product.discount > 0 ? (
+                                                        <>
+                                                            <span className="text-red-500">{(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ</span>
+                                                            <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                                            <p className="product-discount-percentage"> Giảm {product.discount} %</p>
+                                                        </>
+                                                    ) : (
+                                                        <span>{product.price.toLocaleString()}đ</span>
+                                                    )}
+                                                </div>
                                                 {product.productVariants && product.productVariants.length > 0 ? (
                                                     <button
                                                         className="product-list-category-options-button"
@@ -372,6 +379,7 @@ const ProductListCategory = () => {
 
             {selectedProduct && <ProductPopup product={selectedProduct} onClose={handleClosePopup} />}
         </div>
+        </PageWrapper>
     )
 }
 
