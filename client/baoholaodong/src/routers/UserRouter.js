@@ -15,6 +15,7 @@ import { Notifications } from "../pages/manager/NotificationManager";
 import Settings from "../pages/manager/Settings";
 import ProductCategories from "../pages/manager/ProductCategoryManager/ProductCategories";
 import React from "react";
+import BlogCategories from "../pages/manager/BlogCategory/BlogCategories";
 import CustomerLayout from "../layouts/CustomerLayout";
 import Cart from "../pages/Cart";
 import ProductList from "../pages/ProductList";
@@ -52,10 +53,8 @@ const UserRouter = () => {
             <ScrollToTop />
             <Routes>
                 <Route path="/403" element={<Error403 />} />
-                <Route path="/403" element={<Error403 />} />
                 <Route path="/503" element={<Error503 />} />
                 <Route path="/404" element={<Error404 />} />
-
                 <Route path="*" element={<Error404 />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
@@ -67,7 +66,7 @@ const UserRouter = () => {
                         </CustomerProductProvider>
                     }
                 >
-                    <Route path="/feedback/:slug" element={<FeedBack/>}/>
+                    <Route path="/feedback/:slug" element={<FeedBack />} />
                     <Route index element={<Home />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Signin />} />
@@ -85,10 +84,8 @@ const UserRouter = () => {
                     <Route path="/customerInfo" element={<CustomerInfo />} />
                     <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
                     <Route path="/category/:categoryId" element={<ProductListByCategory />} />
-                    <Route path="confirm-order" element={<ConfirmOrder />} />                    
+                    <Route path="confirm-order" element={<ConfirmOrder />} />
                     <Route path="/order-history/:userId" element={<OrderHistory />} />
-
-
                 </Route>
                 <Route path="/demo" element={<ProductVariantSelector />} />
                 {/* Admin Routes */}
@@ -125,6 +122,7 @@ const UserRouter = () => {
                     <Route path="createproduct" element={<CreateProduct />} />
                     <Route path="update-product/:id/:slug" element={<UpdateProduct />} />
                     <Route path="product_categories" element={<ProductCategories />} />
+                    <Route path="blog-categories" element={<BlogCategories />} />
                     <Route path="taxes" element={<Taxes />} />
                 </Route>
             </Routes>

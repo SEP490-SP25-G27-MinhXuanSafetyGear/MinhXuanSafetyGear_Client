@@ -14,7 +14,8 @@ import {
     ChevronLeft,
     Boxes,
     Percent,
-    Briefcase
+    Briefcase,
+    BookOpen
 } from 'lucide-react';
 import { AuthContext } from "../contexts/AuthContext";
 import NotificationBell from "../components/notifications/Notification";
@@ -27,6 +28,7 @@ const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
+
     const navItems = useMemo(() => {
         if (user.role === 'Admin') {
             return [
@@ -36,10 +38,11 @@ const AdminLayout = () => {
                 { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
                 { path: '/manager/products', icon: Package, label: 'Products' },
                 { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
+                { path: '/manager/blog-categories', icon: BookOpen, label: 'Blog Categories' },
                 { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
                 { path: '/manager/invoices', icon: Receipt, label: 'Invoices' },
                 { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
-                { path: '/manager/taxes', icon: Percent, label: 'Taxes' }, // Thêm mục Taxes
+                { path: '/manager/taxes', icon: Percent, label: 'Taxes' },
                 { path: '/manager/settings', icon: Settings, label: 'Settings' },
             ];
         } else if (user.role === 'Manager') {
@@ -48,14 +51,17 @@ const AdminLayout = () => {
                 { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
                 { path: '/manager/products', icon: Package, label: 'Products' },
                 { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
+                { path: '/manager/blog-categories', icon: BookOpen, label: 'Blog Categories' },
                 { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
                 { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
                 { path: '/manager/settings', icon: Settings, label: 'Settings' },
             ];
         }
     }, [user.role]);
+
     const [connection, setConnection] = useState(null);
     const [notifications, setNotifications] = useState([]);
+
     useEffect(() => {
         fetchNotifications();
     }, []);
@@ -72,10 +78,7 @@ const AdminLayout = () => {
                 recipientId: notification.recipientId,
                 orderId: notification.orderId,
             }));
-            console.log(formattedNotifications);
-
             setNotifications(formattedNotifications);
-
         } catch (error) {
             console.error('Error fetching notifications:', error);
         }
@@ -87,7 +90,6 @@ const AdminLayout = () => {
                 .withUrl(`${BASE_URL}/notificationHub`)
                 .withAutomaticReconnect()
                 .build();
-
             setConnection(newConnection);
         }
     }, [connection]);
@@ -99,7 +101,6 @@ const AdminLayout = () => {
                     console.log('Connected to SignalR hub!');
                     connection.invoke('JoinEmployeeGroup')
                         .catch(err => console.error('Error joining group:', err));
-
                     connection.on('ReceiveNotification', (notification) => {
                         setNotifications(prev => [notification, ...prev]);
                     });
@@ -114,8 +115,7 @@ const AdminLayout = () => {
         };
     }, [connection]);
 
-
-    const markAsRead =async (id,orderId) => {
+    const markAsRead = async (id, orderId) => {
         setNotifications((prevNotifications) =>
             prevNotifications.map((notif) =>
                 notif.id === id ? { ...notif, isRead: true } : notif
@@ -128,7 +128,7 @@ const AdminLayout = () => {
                     readAll: false,
                 }
             });
-            navigate(`/manager/order-detail/${orderId}`)
+            navigate(`/manager/order-detail/${orderId}`);
         } catch (error) {
             console.error("Error marking notification as read:", error);
         }
@@ -136,8 +136,7 @@ const AdminLayout = () => {
 
     return (
         <div className="flex h-screen bg-gray-100">
-            <div className={`${isCollapsed ? 'w-16' : 'w-64'
-            } bg-white shadow-lg transition-all duration-300 z-20`}>
+            <div className={`${isCollapsed ? 'w-16' : 'w-64'} bg-white shadow-lg transition-all duration-300 z-20`}>
                 <div className="p-4 border-b flex justify-between items-center">
                     {!isCollapsed && (
                         <h1 className="text-2xl font-bold text-gray-800">{user.role}</h1>
@@ -180,14 +179,15 @@ const AdminLayout = () => {
 
             <div className="flex-1 overflow-auto">
                 <header
-                    className={`bg-white shadow-sm fixed top-0 left-${isCollapsed ? '16' : '64'} w-[calc(100%-${isCollapsed ? '4rem' : '16rem'})] z-10 transition-all duration-300`}>
+                    className={`bg-white shadow-sm fixed top-0 left-${isCollapsed ? '16' : '64'} w-[calc(100%-${isCollapsed ? '4rem' : '16rem'})] z-10 transition-all duration-300`}
+                >
                     <div className="flex items-center justify-between px-6 py-4">
                         <h2 className="text-xl font-semibold text-gray-800">
                             {navItems.find((item) => location.pathname.includes(item.path))?.label}
                         </h2>
                         <div className="flex items-center space-x-4">
                             <button className="p-2 text-while hover:text-gray-700">
-                                <NotificationBell notifications={notifications} onMarkAsRead={markAsRead}/>
+                                <NotificationBell notifications={notifications} onMarkAsRead={markAsRead} />
                             </button>
                             <div className="flex items-center space-x-2">
                                 <img
@@ -201,10 +201,9 @@ const AdminLayout = () => {
                     </div>
                 </header>
 
-                <main className=" transition-all duration-300 pt-20">
+                <main className="transition-all duration-300 pt-20">
                     <Outlet />
                 </main>
-
             </div>
         </div>
     );
