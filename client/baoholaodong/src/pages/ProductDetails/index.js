@@ -178,7 +178,11 @@ export default function ProductDetail() {
                 setBlogTransport(response.data.blogTransport || null);
                 setReview(response.data.review);
             } catch (error) {
-                console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message);
+                if (error.response && error.response.status === 404) {
+                    setTimeout(() => {
+                        navigate("/404");
+                    }, 100);
+                }
             } finally {
                 setIsLoading(false);
             }
