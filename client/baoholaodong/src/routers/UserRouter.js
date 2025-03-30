@@ -44,12 +44,14 @@ import { ConfirmOrder } from "../pages/ConfirmOrder";
 import ProductVariantSelector from "../pages/ProductDetails/ProductVariantSelector";
 import BlogDetail from "../pages/BlogDetail";
 import OrderHistory from "../pages/OrderHistory";
+import FeedBack from "../pages/FeedBack";
 
 const UserRouter = () => {
     return (
         <Router>
             <ScrollToTop />
             <Routes>
+                <Route path="/403" element={<Error403 />} />
                 <Route path="/403" element={<Error403 />} />
                 <Route path="/503" element={<Error503 />} />
                 <Route path="/404" element={<Error404 />} />
@@ -65,6 +67,7 @@ const UserRouter = () => {
                         </CustomerProductProvider>
                     }
                 >
+                    <Route path="/feedback/:slug" element={<FeedBack/>}/>
                     <Route index element={<Home />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Signin />} />

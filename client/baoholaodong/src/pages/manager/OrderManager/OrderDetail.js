@@ -1,4 +1,4 @@
-﻿﻿"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -207,6 +207,12 @@ export default function OrderDetail() {
                         {new Date(order.orderDate).toLocaleString()}
                       </span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Ghi chú:</span>
+                      <span className="font-medium">
+                        {order.notes}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -365,6 +371,12 @@ export default function OrderDetail() {
                           <th className="border border-gray-200 px-3 py-2 text-left">
                             Sản phẩm
                           </th>
+                          <th className="border border-gray-200 px-3 py-2 text-left">
+                            Size
+                          </th>
+                          <th className="border border-gray-200 px-3 py-2 text-left">
+                            Màu sắc
+                          </th>
                           <th className="border border-gray-200 px-3 py-2 text-right">
                             Giá
                           </th>
@@ -392,6 +404,12 @@ export default function OrderDetail() {
                             <td className="border border-gray-200 px-3 py-2">
                               {item.productName}
                             </td>
+                            <td className="border border-gray-200 px-3 py-2">
+                              {item.size}
+                            </td>
+                            <td className="border border-gray-200 px-3 py-2">
+                              {item.color}
+                            </td>
                             <td className="border border-gray-200 px-3 py-2 text-right">
                               {item.productPrice.toLocaleString()} VND
                             </td>
@@ -405,7 +423,7 @@ export default function OrderDetail() {
                         ))}
                         <tr className="bg-gray-50 font-medium">
                           <td
-                            colSpan={4}
+                            colSpan={6}
                             className="border border-gray-200 px-3 py-2 text-right"
                           >
                             Tổng cộng:
