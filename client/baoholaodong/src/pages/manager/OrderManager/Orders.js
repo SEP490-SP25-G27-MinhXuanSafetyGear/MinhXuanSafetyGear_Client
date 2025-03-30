@@ -158,7 +158,7 @@ const Orders = () => {
               className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Tất cả</option>
-              <option value="Processing">Đang xử lý</option>
+              <option value="Pending">Đang xử lý</option>
               <option value="Completed">Hoàn thành</option>
               <option value="Cancelled">Đã hủy</option>
             </select>
