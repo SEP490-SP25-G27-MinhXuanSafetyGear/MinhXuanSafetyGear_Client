@@ -338,6 +338,15 @@
     gap: 1.5rem;
 }
 
+/* Chỉ áp dụng 2 cột cho mobile (dưới 640px) */
+@media (max-width: 639px) {
+    .product-list-category-product-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 cột trên mobile */
+    }
+}
+
+
+
 @media (min-width: 640px) {
     .product-list-category-product-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -431,6 +440,11 @@
     color: #dc2626;
     font-weight: bold;
     margin-bottom: 0.75rem;
+    min-height: 50px;
+}
+
+.deal-product-discount-percentage{
+    color: goldenrod;
 }
 
 .product-list-category-options-button,

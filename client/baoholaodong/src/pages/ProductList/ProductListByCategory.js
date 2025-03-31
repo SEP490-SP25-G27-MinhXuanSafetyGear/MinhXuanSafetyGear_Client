@@ -23,6 +23,25 @@ import PageWrapper from "../../components/pageWrapper/PageWrapper";
 
 const useQuery = () => new URLSearchParams(useLocation().search)
 
+const getMinVariant = (product) => {
+    if (!product.productVariants || product.productVariants.length === 0) return null;
+
+    return product.productVariants.reduce((min, variant) => {
+        const discount = variant.discount || 0;
+        const finalPrice = variant.price - (variant.price * discount / 100);
+        const minPrice = min.price - (min.price * (min.discount || 0) / 100);
+        return finalPrice < minPrice ? variant : min;
+    });
+};
+
+const getMinVariantPrice = (product) => {
+    const variant = getMinVariant(product);
+    if (!variant) return product.priceAfterDiscount || product.price;
+    const discount = variant.discount || 0;
+    return variant.price - (variant.price * discount / 100);
+};
+
+
 const ProductListCategory = () => {
     const { group, cate, slug } = useParams()
     const query = useQuery()
@@ -306,16 +325,39 @@ const ProductListCategory = () => {
                                             </div>
                                             <div className="product-list-category-product-info">
                                                 <h3 className="product-list-category-product-name">{product.name}</h3>
-                                                <div className="product-price">
-                                                    {product.discount > 0 ? (
-                                                        <>
-                                                            <span className="text-red-500">{(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ</span>
-                                                            <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
-                                                            <p className="product-discount-percentage"> Giảm {product.discount} %</p>
-                                                        </>
-                                                    ) : (
-                                                        <span>{product.price.toLocaleString()}đ</span>
-                                                    )}
+                                                <div className="product-list-category-product-price">
+                                                    {(() => {
+                                                        const minVariant = getMinVariant(product);
+                                                        const minPrice = getMinVariantPrice(product);
+
+                                                        if (minVariant) {
+                                                            const hasDiscount = minVariant.discount > 0;
+                                                            return hasDiscount ? (
+                                                                <>
+                                                                    <div>
+                                                                        <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
+                                                                        <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
+                                                                    </div>
+                                                                    <p className="deal-product-discount-percentage">Giảm {minVariant.discount}%</p>
+                                                                </>
+                                                            ) : (
+                                                                <span>{minPrice.toLocaleString()}đ</span>
+                                                            );
+                                                        } else {
+                                                            const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
+                                                            return hasDiscount ? (
+                                                                <>
+                                                                    <div>
+                                                                        <span className="text-red-500">{product.priceAfterDiscount.toLocaleString()}đ</span>
+                                                                        <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                                                    </div>
+                                                                    <p className="deal-product-discount-percentage">Giảm {product.discount}%</p>
+                                                                </>
+                                                            ) : (
+                                                                <span>{product.price.toLocaleString()}đ</span>
+                                                            );
+                                                        }
+                                                    })()}
                                                 </div>
                                                 {product.productVariants && product.productVariants.length > 0 ? (
                                                     <button
