@@ -25,6 +25,7 @@ import ProductVariantSelector from "./ProductVariantSelector";
 import { DisplayContent } from "../../components/TextEditor";
 import { formatVND, parseVND } from "../../utils/format";
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
+import React, { Suspense } from "react";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
@@ -664,8 +665,7 @@ export default function ProductDetail() {
                         </div>
                     </div>
 
-                    {/* Right Column - Only visible on larger screens */}
-                    <div className="pd-right-column hidden lg:block">
+                    <div className="pd-right-column">
                         <div className="pd-related-products-card">
                             <h3 className="pd-related-products-title">Top sản phẩm bán chạy</h3>
                             <div className="pd-related-products-list">
@@ -743,6 +743,88 @@ export default function ProductDetail() {
                         </div>
                     </div>
                 </div>
+                <div className="pd-right-column pd-right-mobile">
+                    {/* Top sản phẩm bán chạy */}
+                    <div className="pd-related-products-card">
+                        <h3 className="pd-related-products-title">Top sản phẩm bán chạy</h3>
+                        <div className="pd-related-products-list">
+                            {isLoading ? (
+                                <div className="space-y-4">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className="flex space-x-4">
+                                            <div className="w-20 h-20 bg-gray-200 rounded-lg"></div>
+                                            <div className="flex-1 space-y-2">
+                                                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="content-loaded">
+                                    {topSaleProducts.slice(0, 5).map((product) => (
+                                        <div
+                                            key={product.id}
+                                            className="pd-related-product-item"
+                                            onClick={() => handleDetailProduct(product)}
+                                        >
+                                            <div className="pd-related-product-image">
+                                                <img
+                                                    src={product.image ? product.image : noImage}
+                                                    alt={product.name}
+                                                    className="pd-related-product-img"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = noImage;
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="pd-related-product-info">
+                                                <h4 className="pd-related-product-name">{product.name}</h4>
+                                                <div className="pd-related-product-rating">{renderStars(product.averageRating)}</div>
+                                                <div className="pd-related-product-prices">
+                                                    <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
+                                                    <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Chính sách mua hàng */}
+                    <div className="pd-card policy-section">
+                        <h3 className="text-lg font-semibold mb-4">Chính sách mua hàng</h3>
+                        <ul className="space-y-3">
+                            <li className="flex items-start gap-2">
+                                <Truck className="w-5 h-5 text-blue-600 mt-0.5" />
+                                <div>
+                                    <p className="font-medium">Giao hàng miễn phí</p>
+                                    <p className="text-sm text-gray-600">Cho đơn hàng từ 500.000₫</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <Package className="w-5 h-5 text-blue-600 mt-0.5" />
+                                <div>
+                                    <p className="font-medium">Đổi trả dễ dàng</p>
+                                    <p className="text-sm text-gray-600">Trong vòng 30 ngày</p>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+                                <div>
+                                    <p className="font-medium">Bảo hành chính hãng</p>
+                                    <p className="text-sm text-gray-600">Theo chính sách nhà sản xuất</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+
             </div>
         </PageWrapper>
     );

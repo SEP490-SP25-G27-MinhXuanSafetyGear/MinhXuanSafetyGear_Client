@@ -27,8 +27,10 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    align-self: flex-start;
+    align-self: stretch; /* Đảm bảo cột phải chiếm hết chiều cao khả dụng */
 }
+
+
 
 /* Common card styles */
 .pd-card,
@@ -1331,3 +1333,59 @@
         }
     }
 }
+
+
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+    .pd-main-content {
+        flex-direction: column !important;
+    }
+
+    .pd-right-column {
+        display: none !important;
+    }
+
+    .pd-right-mobile {
+        display: block !important;
+        margin-top: 20px;
+    }
+}
+
+
+
+@media (max-width: 1024px) and (orientation: portrait) {
+    .pd-right-mobile .policy-section {
+        display: none !important;
+    }
+}
+
+
+@media (max-width: 1024px) {
+    .pd-main-content {
+        flex-direction: column !important;
+    }
+
+    .pd-right-column {
+        display: none !important;
+    }
+
+    .pd-right-mobile {
+        display: block !important;
+        margin-top: 20px;
+    }
+}
+
+
+@media (min-width: 1025px) {
+    .pd-right-mobile {
+        display: none !important;
+    }
+}
+
+
+@media (max-width: 768px) and (orientation: portrait) {
+    .pd-right-mobile .policy-section {
+        display: none !important;
+    }
+}
+
+
