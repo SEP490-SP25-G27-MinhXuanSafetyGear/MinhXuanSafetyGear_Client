@@ -28,8 +28,10 @@ function Index() {
 
     const fetchTopSaleProducts = async (size) => {
         try{
-            const response = await axios.get(`${BASE_URL}/api/Product/top-sale-product`,{
+            const response = await axios.get(`${BASE_URL}/api/Product/get-products-by-topic`,{
                 params: {
+                    topic:"top_sale",
+                    page:1,
                     size: size
                 }
             });
@@ -39,12 +41,13 @@ function Index() {
             return [];
         }
     }
-    const fetchTopDealProducts = async (size,minDiscount) => {
+    const fetchTopDealProducts = async (size) => {
         try{
-            const response = await axios.get(`${BASE_URL}/api/Product/top-deal`,{
+            const response = await axios.get(`${BASE_URL}/api/Product/get-products-by-topic`,{
                 params: {
-                    size: size,
-                    minDiscountPercent: minDiscount,
+                    topic:"top_deal",
+                    page: 1,
+                    size: size
                 }
             });
             setTopDealProducts(response.data || []);
@@ -55,8 +58,8 @@ function Index() {
 
 
     useEffect(() => {
-        fetchTopDealProducts()
-        fetchTopSaleProducts()
+        fetchTopDealProducts(10)
+        fetchTopSaleProducts(10)
     },[])
 
     return (
