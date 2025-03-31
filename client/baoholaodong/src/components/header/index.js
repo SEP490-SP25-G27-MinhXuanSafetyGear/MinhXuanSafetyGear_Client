@@ -9,6 +9,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [accountDropdownVisible, setAccountDropdownVisible] = useState(false); // Thêm state mới cho dropdown tài khoản
     const [cartCount, setCartCount] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);
     const { user } = useContext(AuthContext);
@@ -80,7 +81,6 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             </p>
                         </div>
                     </div>
-                    {/* Mobile Search Container for scrolled state - Hidden by default */}
                     <div className="mobile-search-container-scrolled w-full md:hidden flex items-center">
                         <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
                         <form className="w-full" onSubmit={handleSearch}>
@@ -93,7 +93,6 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             />
                         </form>
                     </div>
-                    {/* Desktop Search Container */}
                     <div className="search-container w-full md:w-auto mx-4 md:mx-8 flex items-center hidden md:flex">
                         <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
                         <form className="w-full" onSubmit={handleSearch}>
@@ -118,7 +117,11 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                                 </div>
                             </div>
                         </div>
-                        <div className="relative group">
+                        <div
+                            className="relative"
+                            onMouseEnter={() => setAccountDropdownVisible(true)} // Hiển thị khi di chuột vào
+                            onMouseLeave={() => setAccountDropdownVisible(false)} // Ẩn khi chuột rời khỏi
+                        >
                             <div className="flex items-center cursor-pointer">
                                 {user ? (
                                     <img
@@ -144,21 +147,23 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                                     </div>
                                 </div>
                             </div>
-                            <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                                {user ? (
-                                     <>
-                                     <a href={`/order-history/${user.userId}`}className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                                       Lịch sử đơn hàng
-                                     </a>
-                                    <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng xuất</a>
-                                    </>
-                                ) : (
-                                    <>
-                                        <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
-                                        <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
-                                    </>
-                                )}
-                            </div>
+                            {accountDropdownVisible && ( // Chỉ hiển thị khi state là true
+                                <div className="absolute right-0 mt-2 w-48 bg-white border shadow-lg transition-opacity z-50">
+                                    {user ? (
+                                        <>
+                                            <a href={`/order-history/${user.userId}`} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                                                Lịch sử đơn hàng
+                                            </a>
+                                            <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng xuất</a>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <a href="/register" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng ký</a>
+                                            <a href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Đăng nhập</a>
+                                        </>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <div
                             className="relative flex items-center"
@@ -183,7 +188,6 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                         </div>
                     </div>
                 </div>
-                {/* Original Mobile Search Container - For non-scrolled state */}
                 <div className="mobile-search-container w-full md:hidden mx-4 md:mx-8 flex items-center">
                     <FaSearch className="text-white h-5 w-5 mr-2" onClick={handleSearch} />
                     <form className="w-full" onSubmit={handleSearch}>
