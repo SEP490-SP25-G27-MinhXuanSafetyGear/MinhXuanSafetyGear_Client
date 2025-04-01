@@ -183,7 +183,7 @@
 }
 
 /* Tablet Styles (769px–1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1280px) {
     .new-blog-section {
         padding: 30px;
     }

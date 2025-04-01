@@ -130,7 +130,7 @@
 }
 
 /* Responsive cho tablet */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
     .blog-list-container {
         flex-direction: row;
     }

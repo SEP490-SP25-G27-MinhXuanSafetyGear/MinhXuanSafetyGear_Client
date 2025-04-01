@@ -280,6 +280,7 @@
 
     .product-card {
         padding: 12px; /* Slightly smaller padding */
+
     }
 
     .product-image {
@@ -457,7 +458,6 @@
 
     .product-container-best-products {
         grid-template-columns: repeat(5, 1fr);
-        gap: 35px;
     }
 
     .product-image {
