@@ -12,6 +12,26 @@
     overflow: hidden;
 }
 
+.filter-button-new {
+    padding: 8px 16px;
+    background-color: #fff;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: left;
+}
+
+.filter-button-new:hover {
+    background-color: #f5f5f5;
+}
+
+.filter-button-new.selected {
+    background-color: #eff6ff;
+    color: #b50a00;
+    border-color: #ffffff;
+}
+
+
 @media (min-width: 768px) {
     .product-list-category-banner-container {
         height: 16rem;

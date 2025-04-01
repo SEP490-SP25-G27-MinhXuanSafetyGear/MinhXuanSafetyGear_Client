@@ -1,4 +1,4 @@
-﻿import React, { useState, useContext } from "react";
+﻿import React, { useState, useContext, useEffect } from "react";
 import { FaArrowRight, FaCheck, FaStar, FaCog, FaCartPlus } from "react-icons/fa";
 import "./TopSaleProductsStyle.css";
 import noImage from "../../images/no-image-product.jpg";
@@ -7,10 +7,12 @@ import { motion } from "framer-motion";
 import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
 import slugify from "slugify";
+import * as signalR from "@microsoft/signalr";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const getMinVariant = (product) => {
     if (!product.productVariants || product.productVariants.length === 0) return null;
-
     return product.productVariants.reduce((min, variant) => {
         const discount = variant.discount || 0;
         const finalPrice = variant.price - (variant.price * discount / 100);
@@ -30,11 +32,59 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const productsPerPage = 30;
+    const [productList, setProductList] = useState(products); // Thêm state để quản lý danh sách sản phẩm
+    const [hubConnection, setHubConnection] = useState(null);
+    const productsPerPage = 15;
     const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
-    const totalPages = Math.ceil(products.length / productsPerPage);
+    const totalPages = Math.ceil(productList.length / productsPerPage);
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
+
+    // Khởi tạo SignalR
+    useEffect(() => {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(`${BASE_URL}/productHub`)
+            .withAutomaticReconnect()
+            .build();
+
+        connection
+            .start()
+            .then(() => {
+                console.log("Connected to SignalR in TopSaleProducts");
+                setHubConnection(connection);
+            })
+            .catch((err) => console.error("Lỗi khi kết nối SignalR:", err));
+
+        return () => {
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.stop();
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
+
+        const handleProductChange = (updatedProduct) => {
+            setProductList((prevProducts) =>
+                prevProducts.map((product) =>
+                    product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
+                )
+            );
+        };
+
+        hubConnection.on("ProductUpdated", handleProductChange);
+        return () => {
+            if (hubConnection.state === signalR.HubConnectionState.Connected) {
+                hubConnection.off("ProductUpdated", handleProductChange);
+            }
+        };
+    }, [hubConnection]);
+
+    // Cập nhật productList khi props products thay đổi
+    useEffect(() => {
+        setProductList(products);
+    }, [products]);
 
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
@@ -42,7 +92,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
         }
     };
 
-    const sortedProducts = [...products];
+    const sortedProducts = [...productList];
     if (selectedFilter === "Giá tăng dần") {
         sortedProducts.sort((a, b) => getMinVariantPrice(a) - getMinVariantPrice(b));
     } else if (selectedFilter === "Giá giảm dần") {
@@ -110,10 +160,11 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                         transition={{ duration: 0.5, delay: index * 0.1 }}
                     >
                         <div className="product-sale-image-container">
-                            <img onClick={() => { handleDetailProduct(product) }}
-                                 className="product-sale-image"
-                                 src={product.image || noImage}
-                                 alt={product.name}
+                            <img
+                                onClick={() => handleDetailProduct(product)}
+                                className="product-sale-image"
+                                src={product.image || noImage}
+                                alt={product.name}
                             />
                             <div className="product-sale-image-overlay">
                                 <button
@@ -135,7 +186,6 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                                 {(() => {
                                     const minVariant = getMinVariant(product);
                                     const minPrice = getMinVariantPrice(product);
-
                                     if (minVariant) {
                                         const hasDiscount = minVariant.discount > 0;
                                         return hasDiscount ? (
@@ -163,7 +213,15 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                             </div>
                             <div className="product-actions">
                                 <button className="option-button" onClick={() => handleProductClick(product)}>
-                                    {product.productVariants.length > 0 ? <><FaCog className="icon" />Tùy chọn</> : <><FaCartPlus className="icon" />Thêm vào giỏ hàng</>}
+                                    {product.productVariants.length > 0 ? (
+                                        <>
+                                            <FaCog className="icon" />Tùy chọn
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaCartPlus className="icon" />Thêm vào giỏ hàng
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -173,7 +231,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
             <div className="flex justify-center mt-4">
                 <div className="new-blog-read-more">
                     <button className="new-blog-read-more-button">
-                        <div className="new-blog-read-more-text">Xem tất cả   <FaArrowRight className="inline" /></div>
+                        <div className="new-blog-read-more-text">Xem tất cả <FaArrowRight className="inline" /></div>
                     </button>
                 </div>
             </div>

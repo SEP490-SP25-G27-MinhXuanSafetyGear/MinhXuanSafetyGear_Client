@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState, useContext } from "react";
+﻿import React, { useRef, useState, useContext, useEffect } from "react";
 import { FaArrowRight, FaArrowLeft, FaCog, FaCartPlus } from "react-icons/fa";
 import './TopDealProductsStyle.css';
 import ProductPopup from "../../components/productpopup";
@@ -6,10 +6,12 @@ import { CartContext } from "../../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import slugify from "slugify";
 import noImage from "../../images/no-image-product.jpg";
+import * as signalR from "@microsoft/signalr";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const getMinVariant = (product) => {
     if (!product.productVariants || product.productVariants.length === 0) return null;
-
     return product.productVariants.reduce((min, variant) => {
         const discount = variant.discount || 0;
         const finalPrice = variant.price - (variant.price * discount / 100);
@@ -28,8 +30,57 @@ const getMinVariantPrice = (product) => {
 export default function TopDealProducts({ products = [] }) {
     const scrollRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [productList, setProductList] = useState(products); // Thêm state để quản lý danh sách sản phẩm
+    const [hubConnection, setHubConnection] = useState(null);
     const { addToCart } = useContext(CartContext);
     const navigate = useNavigate();
+
+    // Khởi tạo SignalR
+    useEffect(() => {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(`${BASE_URL}/productHub`)
+            .withAutomaticReconnect()
+            .build();
+
+        connection
+            .start()
+            .then(() => {
+                console.log("Connected to SignalR in TopDealProducts");
+                setHubConnection(connection);
+            })
+            .catch((err) => console.error("Lỗi khi kết nối SignalR:", err));
+
+        return () => {
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.stop();
+            }
+        };
+    }, []);
+
+    // Lắng nghe sự kiện ProductUpdated
+    useEffect(() => {
+        if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
+
+        const handleProductChange = (updatedProduct) => {
+            setProductList((prevProducts) =>
+                prevProducts.map((product) =>
+                    product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
+                )
+            );
+        };
+
+        hubConnection.on("ProductUpdated", handleProductChange);
+        return () => {
+            if (hubConnection.state === signalR.HubConnectionState.Connected) {
+                hubConnection.off("ProductUpdated", handleProductChange);
+            }
+        };
+    }, [hubConnection]);
+
+    // Cập nhật productList khi props products thay đổi
+    useEffect(() => {
+        setProductList(products);
+    }, [products]);
 
     const scrollLeft = () => {
         scrollRef.current.scrollBy({ left: -350, behavior: "smooth" });
@@ -82,7 +133,7 @@ export default function TopDealProducts({ products = [] }) {
                     <button className="view-all-button mt-4">Xem tất cả <FaArrowRight className="inline" /></button>
                 </div>
                 <div ref={scrollRef} className="flex overflow-x-auto space-x-5 product-container">
-                    {products.map((product) => (
+                    {productList.map((product) => (
                         <div key={product.id} className="product-discounted-card">
                             <div className="product-discounted-image-container">
                                 <img
@@ -104,36 +155,34 @@ export default function TopDealProducts({ products = [] }) {
                             <div className="product-info">
                                 <h3 className="product-discounted-name">{product.name}</h3>
                                 <div className="product-price">
-                                        {(() => {
-                                            const minVariant = getMinVariant(product);
-                                            const minPrice = getMinVariantPrice(product);
-
-                                            if (minVariant) {
-                                                const hasDiscount = minVariant.discount > 0;
-                                                return hasDiscount ? (
-                                                    <>
-                                                        <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
-                                                        <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
-                                                        <p className="product-discount-percentage">Giảm {minVariant.discount}%</p>
-                                                    </>
-                                                ) : (
-                                                    <span>{minPrice.toLocaleString()}đ</span>
-                                                );
-                                            } else {
-                                                const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
-                                                return hasDiscount ? (
-                                                    <>
-                                                        <span className="text-red-500">{product.priceAfterDiscount.toLocaleString()}đ</span>
-                                                        <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
-                                                        <p className="product-discount-percentage">Giảm {product.discount}%</p>
-                                                    </>
-                                                ) : (
-                                                    <span>{product.price.toLocaleString()}đ</span>
-                                                );
-                                            }
-                                        })()}
+                                    {(() => {
+                                        const minVariant = getMinVariant(product);
+                                        const minPrice = getMinVariantPrice(product);
+                                        if (minVariant) {
+                                            const hasDiscount = minVariant.discount > 0;
+                                            return hasDiscount ? (
+                                                <>
+                                                    <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
+                                                    <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
+                                                    <p className="product-discount-percentage">Giảm {minVariant.discount}%</p>
+                                                </>
+                                            ) : (
+                                                <span>{minPrice.toLocaleString()}đ</span>
+                                            );
+                                        } else {
+                                            const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
+                                            return hasDiscount ? (
+                                                <>
+                                                    <span className="text-red-500">{product.priceAfterDiscount.toLocaleString()}đ</span>
+                                                    <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                                    <p className="product-discount-percentage">Giảm {product.discount}%</p>
+                                                </>
+                                            ) : (
+                                                <span>{product.price.toLocaleString()}đ</span>
+                                            );
+                                        }
+                                    })()}
                                 </div>
-
                                 {product.productVariants && product.productVariants.length > 0 ? (
                                     <button className="option-button" onClick={() => handleProductClick(product)}>
                                         <FaCog className="icon" /> Tùy chọn
