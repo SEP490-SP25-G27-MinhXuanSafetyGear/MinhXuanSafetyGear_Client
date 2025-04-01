@@ -278,7 +278,7 @@
 }
 
 /* Tablet Styles (769px–1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1280px) {
     .deal {
         height: 500px; /* Slightly shorter for tablets */
         background-size: 50%; /* Adjust background size for better visibility */
@@ -467,7 +467,6 @@
     }
 
     .deal-info {
-        margin-left: -100px; /* Keep original negative margin */
         margin-right: 40px;
     }
 

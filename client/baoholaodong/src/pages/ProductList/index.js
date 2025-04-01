@@ -166,7 +166,7 @@ const ProductList = () => {
                                             <button
                                                 key={index}
                                                 onClick={() => setSelectedFilter(filter)}
-                                                className={`filter-button ${selectedFilter === filter ? "selected" : ""}`}
+                                                className={`filter-button-new ${selectedFilter === filter ? "selected" : ""}`}
                                             >
                                                 {filter}
                                                 {selectedFilter === filter && <FaCheck className="ml-2 inline" />}

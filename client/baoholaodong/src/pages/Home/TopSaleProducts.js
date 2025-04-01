@@ -34,7 +34,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [productList, setProductList] = useState(products); // Thêm state để quản lý danh sách sản phẩm
     const [hubConnection, setHubConnection] = useState(null);
-    const productsPerPage = 15;
+    const productsPerPage = 20;
     const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
     const totalPages = Math.ceil(productList.length / productsPerPage);
     const navigate = useNavigate();

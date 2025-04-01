@@ -67,7 +67,7 @@
 }
 
 /* Tablet Styles (769px–1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1280px) {
     .sidebar-overlay {
         z-index: 2000 !important;
         position: fixed !important;
@@ -127,7 +127,6 @@
         display: flex !important; /* Ensure it is visible on tablet */
         align-items: center;
         position: relative;
-        max-width: 400px; /* Limit the width to prevent stretching */
     }
 
     .header-gradient .search-container form {
