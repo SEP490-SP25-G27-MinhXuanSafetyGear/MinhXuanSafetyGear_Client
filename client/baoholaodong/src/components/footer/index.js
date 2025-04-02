@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
-import "./style.css";
 
 const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
@@ -14,24 +13,20 @@ const Footer = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Hàm xử lý loại bỏ HTML từ content
     const stripHtmlTags = (html) => {
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = html;
         return tempDiv.textContent || tempDiv.innerText || "";
     };
 
-    // Gọi API cho từng danh mục
     useEffect(() => {
         const fetchBlogs = async () => {
             setLoading(true);
             try {
                 const contactResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-category/lien-he`);
                 setContactBlogs(contactResponse.data);
-
                 const policyResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-category/chinh-sach`);
                 setPolicyBlogs(policyResponse.data);
-
                 const guideResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-category/huong-dan`);
                 setGuideBlogs(guideResponse.data);
             } catch (err) {
@@ -41,184 +36,98 @@ const Footer = () => {
                 setLoading(false);
             }
         };
-
         fetchBlogs();
     }, []);
 
-    // Hàm điều hướng khi nhấp vào title (cho Chính Sách và Hướng Dẫn)
     const handleViewDetail = (blog) => {
         const blogSlug = blog.slug || toSlug(blog.title);
         navigate(`/blogs/${blogSlug}`);
     };
 
-    // Hàm xử lý liên kết cho phần Liên Hệ
     const getContactLink = (blog) => {
         const titleLower = blog.title.toLowerCase();
         const content = stripHtmlTags(blog.content);
-
-        if (titleLower.includes("địa chỉ")) {
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content)}`;
-        } else if (titleLower.includes("điện thoại")) {
-            return `tel:${content.replace(/\D/g, "")}`;
-        } else if (titleLower.includes("email")) {
-            return `mailto:${content}`;
-        } else if (titleLower.includes("zalo")) {
-            return `https://zalo.me/${content.replace(/\D/g, "")}`;
-        } else {
-            return null;
-        }
+        if (titleLower.includes("địa chỉ")) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content)}`;
+        if (titleLower.includes("điện thoại")) return `tel:${content.replace(/\D/g, "")}`;
+        if (titleLower.includes("email")) return `mailto:${content}`;
+        if (titleLower.includes("zalo")) return `https://zalo.me/${content.replace(/\D/g, "")}`;
+        return null;
     };
 
     return (
-        <div className="footer-container">
-            <div className="footer-content">
-                {/* Logo Section */}
-                <div className="footer-section">
-                    <div className="footer-logo">
-                        <img
-                            src="http://baoholaodongminhxuan.com/images/common/logo1.gif"
-                            alt="Logo"
-                            className="footer-logo-image"
-                        />
+        <footer className="w-full border-t-4 border-red-700 bg-gray-100 text-sm text-gray-700">
+            <div className="max-w-screen-2xl mx-auto py-10 px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                {/* Logo */}
+                <div className="col-span-1 lg:col-span-2 space-y-3">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <img src="http://baoholaodongminhxuan.com/images/common/logo1.gif" alt="Logo" className="w-24 h-32 object-contain" />
                         <div>
-                            <div className="footer-logo-text">BẢO HỘ LAO ĐỘNG MINH XUÂN</div>
-                            <div className="footer-slogan">Luôn đem lại an toàn và hoàn hảo nhất cho bạn!</div>
+                            <p className="text-red-700 text-base font-bold uppercase">Bảo Hộ Lao Động Minh Xuân</p>
+                            <p className="text-red-700 text-sm">Luôn đem lại an toàn và hoàn hảo nhất cho bạn!</p>
                         </div>
                     </div>
-                    <div className="footer-description">
-                        Bảo Hộ Lao Động Minh Xuân - Nhà cung cấp thiết bị bảo hộ lao động chất lượng cao, đảm bảo an toàn tối đa cho người lao động tại Việt Nam.
-                    </div>
-                    <div className="footer-social">
-                        <img src="https://via.placeholder.com/30" alt="Facebook" className="footer-social-icon" />
-                        <img src="https://via.placeholder.com/30" alt="Instagram" className="footer-social-icon" />
-                        <img src="https://via.placeholder.com/30" alt="Shopee" className="footer-social-icon" />
-                        <img src="https://via.placeholder.com/30" alt="Lazada" className="footer-social-icon" />
-                        <img src="https://via.placeholder.com/30" alt="TikTok" className="footer-social-icon" />
-                    </div>
+                    <p className="hidden lg:block text-sm">Bảo Hộ Lao Động Minh Xuân - Nhà cung cấp thiết bị bảo hộ lao động chất lượng cao.</p>
                 </div>
 
-                {/* Contact Section */}
-                <div className="footer-section">
-                    <div className="footer-contact">
-                        <div className="footer-contact-title">Liên Hệ</div>
-                        {loading ? (
-                            <p>Đang tải...</p>
-                        ) : error ? (
-                            <p className="text-red-500">{error}</p>
-                        ) : contactBlogs.length > 0 ? (
-                            contactBlogs.map((blog) => {
-                                const link = getContactLink(blog);
-                                const content = stripHtmlTags(blog.content);
-                                return (
-                                    <div key={blog.postId} className="footer-contact-item">
-                                        {link ? (
-                                            <a href={link} className="footer-link">
-                                                {blog.title}: {content}
-                                            </a>
-                                        ) : (
-                                            <span
-                                                className="footer-link"
-                                                onClick={() => handleViewDetail(blog)}
-                                                style={{ cursor: "pointer" }}
-                                            >
-                                                {blog.title}: {content}
-                                            </span>
-                                        )}
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <p>Không có thông tin liên hệ.</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* Policy Section */}
-                <div className="footer-section">
-                    <div className="footer-policy">
-                        <div className="footer-policy-title">Chính Sách</div>
-                        {loading ? (
-                            <p>Đang tải...</p>
-                        ) : error ? (
-                            <p className="text-red-500">{error}</p>
-                        ) : policyBlogs.length > 0 ? (
-                            policyBlogs.map((blog) => (
-                                <div key={blog.postId} className="footer-policy-item">
-                                    <span
-                                        className="footer-link"
-                                        onClick={() => handleViewDetail(blog)}
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        {blog.title}
-                                    </span>
+                {/* Liên hệ */}
+                <div>
+                    <h4 className="text-red-700 font-bold uppercase mb-2">Liên Hệ</h4>
+                    {loading ? (
+                        <p>Đang tải...</p>
+                    ) : error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : contactBlogs.length ? (
+                        contactBlogs.map((blog) => {
+                            const link = getContactLink(blog);
+                            const content = stripHtmlTags(blog.content);
+                            return (
+                                <div key={blog.postId} className="mb-2">
+                                    {link ? (
+                                        <a href={link} className="hover:underline ">{blog.title}: {content}</a>
+                                    ) : (
+                                        <span className="hover:underline cursor-pointer " onClick={() => handleViewDetail(blog)}>
+                      {blog.title}: {content}
+                    </span>
+                                    )}
                                 </div>
-                            ))
-                        ) : (
-                            <p>Không có chính sách nào.</p>
-                        )}
-                    </div>
+                            );
+                        })
+                    ) : (
+                        <p>Không có thông tin liên hệ.</p>
+                    )}
                 </div>
 
-                {/* Guide Section */}
-                <div className="footer-section">
-                    <div className="footer-guide">
-                        <div className="footer-guide-title">Hướng Dẫn</div>
-                        {loading ? (
-                            <p>Đang tải...</p>
-                        ) : error ? (
-                            <p className="text-red-500">{error}</p>
-                        ) : guideBlogs.length > 0 ? (
-                            guideBlogs.map((blog) => (
-                                <div key={blog.postId} className="footer-guide-item">
-                                    <span
-                                        className="footer-link"
-                                        onClick={() => handleViewDetail(blog)}
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        {blog.title}
-                                    </span>
-                                </div>
-                            ))
-                        ) : (
-                            <p>Không có hướng dẫn nào.</p>
-                        )}
-                    </div>
+                {/* Chính sách */}
+                <div>
+                    <h4 className="text-red-700 font-bold uppercase mb-2">Chính Sách</h4>
+                    {policyBlogs.map((blog) => (
+                        <div key={blog.postId} className="mb-2">
+              <span className="hover:underline cursor-pointer" onClick={() => handleViewDetail(blog)}>
+                {blog.title}
+              </span>
+                        </div>
+                    ))}
                 </div>
 
-                {/* Support Section */}
-                <div className="footer-section">
-                    <div className="footer-support">
-                        <div className="footer-support-title">Hỗ Trợ Thanh Toán</div>
-                        <div className="footer-support-logos">
-                            <img src="https://via.placeholder.com/55x25" alt="MoMo" className="footer-support-logo" />
-                            <img src="https://via.placeholder.com/55x25" alt="ZaloPay" className="footer-support-logo" />
-                            <img src="https://via.placeholder.com/55x25" alt="VNPayQR" className="footer-support-logo" />
-                            <img src="https://via.placeholder.com/55x25" alt="Moca" className="footer-support-logo" />
-                            <img src="https://via.placeholder.com/55x25" alt="Visa" className="footer-support-logo" />
-                            <img src="https://via.placeholder.com/55x25" alt="ATM" className="footer-support-logo" />
+                {/* Hướng dẫn */}
+                <div>
+                    <h4 className="text-red-700 font-bold uppercase mb-2">Hướng Dẫn</h4>
+                    {guideBlogs.map((blog) => (
+                        <div key={blog.postId} className="mb-2">
+              <span className="hover:underline cursor-pointer" onClick={() => handleViewDetail(blog)}>
+                {blog.title}
+              </span>
                         </div>
-                        <div className="footer-certification">
-                            <div className="footer-certification-title">Được Chứng Nhận Bởi</div>
-                            <img
-                                src="https://via.placeholder.com/160x52"
-                                alt="Certification Logo"
-                                className="footer-certification-logo"
-                            />
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
 
-            {/* Bottom Section */}
-            <div className="footer-bottom">
-                <div className="footer-bottom-text">
-                    <span>© Bản quyền thuộc về </span>
-                    <span className="footer-bottom-highlight">Bảo Hộ Lao Động Minh Xuân</span>
-                    <span> | Cung cấp bởi </span>
-                    <span className="footer-bottom-highlight">DTC</span>
-                </div>
+
+            {/* Bottom */}
+            <div className="bg-gradient-to-t from-[#620805] to-[#c7170e] text-white py-4 text-center text-sm">
+                © Bản quyền thuộc về <span className="text-yellow-300 font-semibold">Bảo Hộ Lao Động Minh Xuân</span> | Cung cấp bởi <span className="text-yellow-300 font-semibold">DTC</span>
             </div>
-        </div>
+        </footer>
     );
 };
 

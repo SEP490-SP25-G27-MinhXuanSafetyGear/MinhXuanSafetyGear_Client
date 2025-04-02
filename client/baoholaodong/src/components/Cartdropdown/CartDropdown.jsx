@@ -53,13 +53,14 @@ const CartDropdown = () => {
                                         >
                                             <FontAwesomeIcon icon={faMinus} />
                                         </button>
+                                        <span className="quantity-value">{item.quantity}</span>
                                         <button
                                             className="quantity-btn"
                                             onClick={() => handleQuantityChange(item.id, item.selectedVariant, item.quantity + 1)}
                                         >
                                             <FontAwesomeIcon icon={faPlus} />
                                         </button>
-                                        <span className="quantity-value">{item.quantity}</span>
+
                                     </div>
                                 </div>
                                 <div className="cart-item-price">

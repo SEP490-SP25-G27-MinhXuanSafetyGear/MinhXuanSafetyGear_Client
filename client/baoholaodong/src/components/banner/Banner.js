@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./Banner.css";
 
 const Banner = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,21 +23,29 @@ const Banner = () => {
     };
 
     useEffect(() => {
-        const interval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
-        return () => clearInterval(interval); // Clear interval on component unmount
-    }, [nextSlide]);
+        const interval = setInterval(nextSlide, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
-        <div className="banner-main">
+        <div className="relative w-full h-[300px] md:h-[500px] overflow-hidden">
             {banners.map((banner, index) => (
-                <a href={banner.link} key={index}>
+                <a
+                    href={banner.link}
+                    key={index}
+                    className={`absolute inset-0 transition-opacity duration-700 ${
+                        index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                    }`}
+                >
                     <img
                         src={banner.image}
                         alt={`Slide ${index + 1}`}
-                        className={index === currentIndex ? "active" : ""}
+                        className="w-full h-full object-cover object-center"
                     />
                 </a>
             ))}
+
+
         </div>
     );
 };

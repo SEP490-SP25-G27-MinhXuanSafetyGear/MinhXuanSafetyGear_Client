@@ -19,19 +19,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import * as signalR from "@microsoft/signalr";
 import noImage from "../../images/no-image-product.jpg";
 import { CartContext } from "../../contexts/CartContext";
-import "./style.css";
 import axios from "axios";
 import ProductVariantSelector from "./ProductVariantSelector";
 import { DisplayContent } from "../../components/TextEditor";
-import { formatVND, parseVND } from "../../utils/format";
+import { formatVND } from "../../utils/format";
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
-import React, { Suspense } from "react";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export default function ProductDetail() {
     const { slug } = useParams();
-    const { addToCart, showToast } = useContext(CartContext); // Thêm showToast từ CartContext
+    const { addToCart, showToast } = useContext(CartContext);
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [imageIndex, setImageIndex] = useState(0);
@@ -48,43 +46,9 @@ export default function ProductDetail() {
         star3: 0,
         star4: 0,
         star5: 0,
-        productReviews: [
-            {
-                reviewId: 0,
-                productId: 0,
-                customerId: 0,
-                rating: 0,
-                comment: "",
-                createdAt: "",
-                updatedAt: null,
-                customerName: "",
-                customerImage: "",
-            },
-        ],
+        productReviews: [],
     });
     const [BlogTransport, setBlogTransport] = useState(null);
-
-    const renderStars = (rating) => {
-        const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
-
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
-        }
-        if (hasHalfStar) {
-            stars.push(<StarHalf key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
-        }
-        const remainingStars = 5 - stars.length;
-        for (let i = 0; i < remainingStars; i++) {
-            stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
-        }
-        return stars;
-    };
-
-    const handleDetailProduct = (product) => {
-        navigate(`/products/${product.slug}`, { replace: true });
-    };
 
     const [product, setProduct] = useState({
         id: 0,
@@ -107,65 +71,51 @@ export default function ProductDetail() {
         status: true,
         averageRating: 0,
         qualityCertificate: "",
-        productImages: [
-            {
-                id: 0,
-                fileName: "",
-                image: "",
-                description: null,
-                isPrimary: true,
-            },
-        ],
-        productVariants: [
-            {
-                variantId: 0,
-                productId: 0,
-                size: "",
-                color: "",
-                quantity: 0,
-                price: 0.01,
-                discount: 0,
-                status: true,
-            },
-        ],
+        productImages: [],
+        productVariants: [],
     });
 
+    const renderStars = (rating) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
+        }
+        if (hasHalfStar) {
+            stars.push(<StarHalf key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
+        }
+        for (let i = 0; i < 5 - fullStars - (hasHalfStar ? 1 : 0); i++) {
+            stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
+        }
+        return stars;
+    };
+
+    const handleDetailProduct = (product) => {
+        navigate(`/products/${product.slug}`, { replace: true });
+    };
+
+    // SignalR and API fetch logic remains the same
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
             .withAutomaticReconnect()
             .build();
 
-        connection
-            .start()
-            .then(() => {
-                console.log("Connected to SignalR");
-                setHubConnection(connection);
-            })
-            .catch((err) => console.error("Lỗi khi kết nối SignalR:", err));
+        connection.start()
+            .then(() => setHubConnection(connection))
+            .catch((err) => console.error("SignalR Error:", err));
 
-        return () => {
-            if (connection.state === signalR.HubConnectionState.Connected) {
-                connection.stop();
-            }
-        };
+        return () => connection.stop();
     }, []);
 
     useEffect(() => {
-        if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
-
-        const handleProductChange = (updatedProduct) => {
-            console.log(`Received update for product ID: ${updatedProduct}`);
-            if (updatedProduct.slug === slug) {
-                setProduct(updatedProduct);
-            }
-        };
-        hubConnection.on("ProductUpdated", handleProductChange);
-        return () => {
-            if (hubConnection.state === signalR.HubConnectionState.Connected) {
-                hubConnection.off("ProductUpdated", handleProductChange);
-            }
-        };
+        if (!hubConnection) return;
+        hubConnection.on("ProductUpdated", (updatedProduct) => {
+            if (updatedProduct.slug === slug) setProduct(updatedProduct);
+        });
+        return () => hubConnection.off("ProductUpdated");
     }, [hubConnection, slug]);
 
     useEffect(() => {
@@ -179,11 +129,7 @@ export default function ProductDetail() {
                 setBlogTransport(response.data.blogTransport || null);
                 setReview(response.data.review);
             } catch (error) {
-                if (error.response && error.response.status === 404) {
-                    setTimeout(() => {
-                        navigate("/404");
-                    }, 100);
-                }
+                if (error.response?.status === 404) navigate("/404");
             } finally {
                 setIsLoading(false);
             }
@@ -191,230 +137,187 @@ export default function ProductDetail() {
         fetchData();
     }, [slug]);
 
-    useEffect(() => {
-        if (!isLoading) {
-            const elements = document.querySelectorAll(".content-loaded");
-            elements.forEach((el) => {
-                el.classList.remove("content-loaded");
-                void el.offsetWidth; // Force reflow
-                el.classList.add("content-loaded");
-            });
-        }
-    }, [isLoading]);
-
     const handleAddToCart = () => {
         const availableQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
-
         if (!selectedVariant && product.productVariants.length > 0) {
             showToast("Vui lòng chọn kích thước và màu sắc");
             return;
         }
-
         if (quantity > availableQuantity) {
             showToast("Số lượng vượt quá tồn kho!");
             return;
         }
-
-        const cartItem = {
-            id: product.id,
-            name: product.name,
-            image: product.productImages[0]?.image || noImage,
-            quantity, // Số lượng người dùng chọn từ useState
-            selectedVariant,
-            price: product.price,
-            priceAfterDiscount: product.priceAfterDiscount || product.price,
-            discount: product.discount || 0,
-            quantityInStock: product.quantity, // Thêm tồn kho thực tế
-        };
-
-        addToCart(cartItem);
-        showToast("Sản phẩm đã được thêm vào giỏ hàng");
-    };
-
-    const handleBuyNow = () => {
-        const availableQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
-
-        if (!selectedVariant && product.productVariants.length > 0) {
-            showToast("Vui lòng chọn kích thước và màu sắc");
-            return;
-        }
-
-        if (quantity > availableQuantity) {
-            showToast("Số lượng vượt quá tồn kho!");
-            return;
-        }
-
         const cartItem = {
             id: product.id,
             name: product.name,
             image: product.productImages[0]?.image || noImage,
             quantity,
             selectedVariant,
-            price: product.price, // Giá gốc
-            priceAfterDiscount: product.priceAfterDiscount || product.price, // Giá đã giảm (nếu có)
-            discount: product.discount || 0, // Discount để CartContext tính lại nếu cần
+            price: product.price,
+            priceAfterDiscount: product.priceAfterDiscount || product.price,
+            discount: product.discount || 0,
+            quantityInStock: product.quantity,
         };
-
         addToCart(cartItem);
+        showToast("Sản phẩm đã được thêm vào giỏ hàng");
+    };
 
-        const orderPayload = {
-            customerId: null,
-            customerName: "",
-            customerPhone: "",
-            customerEmail: "",
-            customerAddress: "",
-            paymentMethod: "Cash",
-            orderDetails: [
-                {
+    const handleBuyNow = () => {
+        const availableQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
+        if (!selectedVariant && product.productVariants.length > 0) {
+            showToast("Vui lòng chọn kích thước và màu sắc");
+            return;
+        }
+        if (quantity > availableQuantity) {
+            showToast("Số lượng vượt quá tồn kho!");
+            return;
+        }
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            image: product.productImages[0]?.image || noImage,
+            quantity,
+            selectedVariant,
+            price: product.price,
+            priceAfterDiscount: product.priceAfterDiscount || product.price,
+            discount: product.discount || 0,
+        };
+        addToCart(cartItem);
+        navigate("/confirm-order", {
+            state: {
+                customerId: null,
+                customerName: "",
+                customerPhone: "",
+                customerEmail: "",
+                customerAddress: "",
+                paymentMethod: "Cash",
+                orderDetails: [{
                     index: 0,
                     productId: product.id,
                     productName: product.name,
                     quantity,
-                    price: selectedVariant?.price || product.priceAfterDiscount || product.price, // Ưu tiên giá đã giảm
+                    price: selectedVariant?.price || product.priceAfterDiscount || product.price,
                     image: product.productImages[0]?.image || noImage,
                     variant: selectedVariant || {},
-                },
-            ],
-        };
-        navigate("/confirm-order", { state: orderPayload });
+                }],
+            },
+        });
     };
 
     return (
         <PageWrapper title={product.name || "Chi tiết sản phẩm"}>
-            <div className="pd-container">
+            <div className="min-h-screen bg-gray-50 py-5 w-[90%] mx-auto flex flex-col gap-5">
                 {/* Breadcrumb */}
                 <div className="flex items-center text-sm text-gray-500 mb-4">
-                    <a href="/" className="hover:text-red-600">
-                        Trang chủ
-                    </a>
+                    <a href="/" className="hover:text-red-600">Trang chủ</a>
                     <ChevronRight className="w-4 h-4 mx-1" />
-                    <a href="/products" className="hover:text-red-600">
-                        Sản phẩm
-                    </a>
+                    <a href="/products" className="hover:text-red-600">Sản phẩm</a>
                     <ChevronRight className="w-4 h-4 mx-1" />
                     <span className="text-gray-700 font-medium">{product.name}</span>
                 </div>
 
                 {/* Main Product Card */}
-                <div className="pd-card">
+                <div className="bg-white rounded-lg shadow-md p-5 mb-5">
                     {isLoading ? (
                         <LoadingSkeleton />
                     ) : (
-                        <div className="pd-grid content-loaded">
+                        <div className="flex flex-col lg:flex-row gap-5 animate-fade-in">
                             {/* Product Images */}
-                            <div className="pd-images">
-                                <div className="pd-main-image">
+                            <div className="w-full lg:w-1/2 min-w-[300px]">
+                                <div className="w-full h-[560px] overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center mb-3">
                                     <img
-                                        src={product.productImages.length > 0 ? product.productImages[imageIndex].image : noImage}
+                                        src={product.productImages[imageIndex]?.image || noImage}
                                         alt={product.name}
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = noImage;
-                                        }}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => e.target.src = noImage}
                                     />
                                 </div>
-                                <div className="pd-thumbnails">
-                                    {product.productImages.length > 0
-                                        ? product.productImages.map((img, index) => (
-                                            <div
-                                                key={index}
-                                                className={`pd-thumbnail ${imageIndex === index ? "active" : ""}`}
-                                                onClick={() => setImageIndex(index)}
-                                            >
-                                                <img
-                                                    src={img.image || "/placeholder.svg"}
-                                                    alt={`Ảnh ${index + 1}`}
-                                                    onError={(e) => {
-                                                        e.target.onerror = null;
-                                                        e.target.src = noImage;
-                                                    }}
-                                                />
-                                            </div>
-                                        ))
-                                        : null}
+                                <div className="flex gap-2 overflow-x-auto">
+                                    {product.productImages.map((img, index) => (
+                                        <div
+                                            key={index}
+                                            className={`w-32 h-32 flex-shrink-0 rounded-md overflow-hidden cursor-pointer ${imageIndex === index ? "border-2 border-blue-600" : "border border-gray-200"}`}
+                                            onClick={() => setImageIndex(index)}
+                                        >
+                                            <img
+                                                src={img.image || noImage}
+                                                alt={`Thumbnail ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => e.target.src = noImage}
+                                            />
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
                             {/* Product Info */}
-                            <div className="pd-info">
-                                <h1 className="pd-title">{product.name}</h1>
-                                <div className="pd-rating">
+                            <div className="w-full lg:w-1/2">
+                                <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
+                                <div className="flex items-center gap-2 mb-4">
                                     <div className="flex">{renderStars(product.averageRating)}</div>
-                                    <span className="pd-review-count">({review.totalStar || 0} đánh giá)</span>
+                                    <span className="text-sm text-gray-600">({review.totalStar} đánh giá)</span>
                                     <span className="text-gray-500">|</span>
                                     <span className="text-green-600 font-medium">Đã bán {product.totalSale}</span>
                                 </div>
 
-                                {(() => {
-                                    let basePrice, discount;
-
-                                    if (selectedVariant) {
-                                        basePrice = selectedVariant.price;
-                                        discount = selectedVariant.discount || 0;
-                                    } else if (product.productVariants?.length > 0) {
-                                        const minVariant = product.productVariants.reduce((min, variant) => {
-                                            const discount = variant.discount || 0;
-                                            const finalPrice = variant.price - (variant.price * discount / 100);
-                                            const minPrice = min.price - (min.price * (min.discount || 0) / 100);
-                                            return finalPrice < minPrice ? variant : min;
-                                        });
-                                        basePrice = minVariant.price;
-                                        discount = minVariant.discount || 0;
-                                    } else {
-                                        basePrice = product.price;
-                                        discount = product.discount || 0;
-                                    }
-
-                                    const finalPrice = basePrice - (basePrice * discount / 100);
-
-                                    return (
-                                        <div className="pd-price-section">
-                                            <span className="pd-price">{formatVND(finalPrice)}</span>
-                                            <span className="pd-original-price">{formatVND(basePrice)}</span>
-                                            {discount > 0 && <span className="pd-discount">-{discount}%</span>}
-                                        </div>
-                                    );
-                                })()}
+                                <div className="">
+                                    {(() => {
+                                        const { basePrice, discount, finalPrice } = selectedVariant
+                                            ? { basePrice: selectedVariant.price, discount: selectedVariant.discount || 0, finalPrice: selectedVariant.price * (1 - (selectedVariant.discount || 0) / 100) }
+                                            : product.productVariants.length > 0
+                                                ? product.productVariants.reduce((min, v) => {
+                                                    const final = v.price * (1 - (v.discount || 0) / 100);
+                                                    return final < min.finalPrice ? { basePrice: v.price, discount: v.discount || 0, finalPrice: final } : min;
+                                                }, { basePrice: Infinity, discount: 0, finalPrice: Infinity })
+                                                : { basePrice: product.price, discount: product.discount || 0, finalPrice: product.priceAfterDiscount || product.price };
+                                        return (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl font-bold text-red-600">{formatVND(finalPrice)}</span>
+                                                <span className="text-lg text-gray-500 line-through">{formatVND(basePrice)}</span>
+                                                {discount > 0 && <span className="bg-red-100 text-red-600 text-sm px-2 py-1 rounded-full">-{discount}%</span>}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
 
                                 <ProductVariantSelector product={product} setSelectedVariant={setSelectedVariant} />
 
-                                <div className="pd-quantity-cart">
-                                    <div className="pd-quantity">
+                                <div className="mb-4">
+                                    <div className="flex items-center gap-2 mb-2">
                                         <button
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="pd-quantity-btn"
+                                            className="w-8 h-8 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 disabled:opacity-50"
                                             disabled={quantity <= 1}
-                                        >
-                                            -
-                                        </button>
+                                        >-</button>
                                         <input
                                             type="number"
                                             value={quantity}
-                                            className="pd-quantity-input"
-                                            readOnly // Khóa khả năng nhập tay
+                                            className="w-12 text-center border border-gray-300 rounded p-1"
+                                            readOnly
                                         />
                                         <button
-                                            onClick={() => {
-                                                const maxQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
-                                                setQuantity(Math.min(maxQuantity, quantity + 1));
-                                            }}
-                                            className="pd-quantity-btn"
-                                            disabled={quantity >= (selectedVariant ? selectedVariant.quantity : product.quantity)}
-                                        >
-                                            +
-                                        </button>
-                                        <span className="pd-stock">
-                                        Còn {selectedVariant ? selectedVariant.quantity : product.quantity} sản phẩm
-                                      </span>
+                                            onClick={() => setQuantity(Math.min(selectedVariant?.quantity || product.quantity, quantity + 1))}
+                                            className="w-8 h-8 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 disabled:opacity-50"
+                                            disabled={quantity >= (selectedVariant?.quantity || product.quantity)}
+                                        >+</button>
+                                        <span className="text-sm text-gray-600">
+                                            Còn {selectedVariant?.quantity || product.quantity} sản phẩm
+                                        </span>
                                     </div>
 
-                                    <div className="pd-cart-buttons">
-                                        <button className="pd-cart-btn" onClick={handleAddToCart}>
-                                            <ShoppingCart className="pd-icon" />
-                                            <span>Thêm vào giỏ</span>
+                                    <div className="flex gap-2 flex-wrap">
+                                        <button
+                                            onClick={handleAddToCart}
+                                            className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-yellow-400 hover:text-black transition-colors"
+                                        >
+                                            <ShoppingCart className="w-5 h-5" />
+                                            Thêm vào giỏ
                                         </button>
-                                        <button className="pd-buy-btn" onClick={handleBuyNow}>
-                                            <span>Mua ngay</span>
+                                        <button
+                                            onClick={handleBuyNow}
+                                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-yellow-400 rounded hover:bg-yellow-400 hover:text-red-600 transition-colors"
+                                        >
+                                            Mua ngay
                                         </button>
                                     </div>
 
@@ -424,21 +327,21 @@ export default function ProductDetail() {
                                     </button>
                                 </div>
 
-                                <div className="pd-addinfo">
+                                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                                     {product.freeShip && (
-                                        <div>
-                                            <Truck className="pd-icon-small" />
-                                            <span>Miễn phí vận chuyển</span>
+                                        <div className="flex items-center gap-1">
+                                            <Truck className="w-4 h-4" />
+                                            Miễn phí vận chuyển
                                         </div>
                                     )}
-                                    <div>
-                                        <Package className="pd-icon-small" />
-                                        <span>Đổi trả 30 ngày</span>
+                                    <div className="flex items-center gap-1">
+                                        <Package className="w-4 h-4" />
+                                        Đổi trả 30 ngày
                                     </div>
                                     {product.guarantee > 0 && (
-                                        <div>
-                                            <Shield className="pd-icon-small" />
-                                            <span>Bảo hành {product.guarantee} tháng</span>
+                                        <div className="flex items-center gap-1">
+                                            <Shield className="w-4 h-4" />
+                                            Bảo hành {product.guarantee} tháng
                                         </div>
                                     )}
                                 </div>
@@ -448,36 +351,21 @@ export default function ProductDetail() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="pd-main-content">
+                <div className="flex flex-col lg:flex-row gap-5">
                     {/* Left Column */}
-                    <div className="pd-left-column">
+                    <div className="flex-1 lg:flex-[3] space-y-5">
                         {/* Product Details Tabs */}
-                        <div className="pd-description-card">
+                        <div className="bg-white rounded-lg shadow-md p-5">
                             <div className="flex border-b mb-6">
-                                <button
-                                    className={`px-6 py-3 font-medium ${
-                                        activeTab === "description" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
-                                    }`}
-                                    onClick={() => setActiveTab("description")}
-                                >
-                                    Thông tin sản phẩm
-                                </button>
-                                <button
-                                    className={`px-6 py-3 font-medium ${
-                                        activeTab === "reviews" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
-                                    }`}
-                                    onClick={() => setActiveTab("reviews")}
-                                >
-                                    Đánh giá ({review.totalStar || 0})
-                                </button>
-                                <button
-                                    className={`px-6 py-3 font-medium ${
-                                        activeTab === "shipping" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
-                                    }`}
-                                    onClick={() => setActiveTab("shipping")}
-                                >
-                                    Vận chuyển
-                                </button>
+                                {["description", "reviews", "shipping"].map((tab) => (
+                                    <button
+                                        key={tab}
+                                        className={`px-6 py-3 font-medium ${activeTab === tab ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                        onClick={() => setActiveTab(tab)}
+                                    >
+                                        {tab === "description" ? "Thông tin sản phẩm" : tab === "reviews" ? `Đánh giá (${review.totalStar})` : "Vận chuyển"}
+                                    </button>
+                                ))}
                             </div>
 
                             {isLoading ? (
@@ -487,109 +375,86 @@ export default function ProductDetail() {
                                     <div className="h-4 bg-gray-200 rounded w-2/3"></div>
                                 </div>
                             ) : (
-                                <div className="content-loaded">
+                                <div className="animate-fade-in">
                                     {activeTab === "description" && (
-                                        <div className="pd-description-content">
+                                        <div className="grid md:grid-cols-2 gap-5">
                                             <div>
-                                                <h3 className="pd-subtitle">Mô tả sản phẩm</h3>
+                                                <h3 className="text-lg font-bold mb-2">Mô tả sản phẩm</h3>
                                                 <DisplayContent content={product.description} />
-
-                                                <h3 className="pd-subtitle mt-6">Chất liệu</h3>
-                                                <div className="pd-text-content">
-                                                    <p>{product.material}</p>
-                                                </div>
+                                                <h3 className="text-lg font-bold mt-6 mb-2">Chất liệu</h3>
+                                                <p>{product.material}</p>
                                             </div>
-
                                             <div>
-                                                <h3 className="pd-subtitle">Xuất xứ</h3>
-                                                <div className="pd-text-content">
-                                                    <p>Sản xuất tại: {product.origin}</p>
-                                                </div>
-
-                                                <h3 className="pd-subtitle mt-6">Chứng nhận chất lượng</h3>
+                                                <h3 className="text-lg font-bold mb-2">Xuất xứ</h3>
+                                                <p>Sản xuất tại: {product.origin}</p>
+                                                <h3 className="text-lg font-bold mt-6 mb-2">Chứng nhận chất lượng</h3>
                                                 <DisplayContent content={product.qualityCertificate} />
                                             </div>
                                         </div>
                                     )}
 
                                     {activeTab === "reviews" && (
-                                        <div className="pd-review-content">
-                                            <div className="pd-review-summary">
-                                                <div className="pd-review-average">
-                                                    <div className="pd-review-number">{product.averageRating.toFixed(1)}</div>
-                                                    <div className="pd-review-stars">{renderStars(product.averageRating)}</div>
-                                                    <div className="pd-review-total">{review.totalStar || 0} đánh giá</div>
+                                        <div>
+                                            <div className="flex flex-col md:flex-row gap-6 mb-6">
+                                                <div className="text-center">
+                                                    <div className="text-4xl font-bold text-gray-800">{product.averageRating.toFixed(1)}</div>
+                                                    <div className="flex justify-center gap-1">{renderStars(product.averageRating)}</div>
+                                                    <div className="text-sm text-gray-600">{review.totalStar} đánh giá</div>
                                                 </div>
-
-                                                <div className="pd-review-bars">
+                                                <div className="flex-1 space-y-2">
                                                     {[5, 4, 3, 2, 1].map((star) => (
-                                                        <div key={star} className="pd-review-bar">
-                                                            <span className="pd-review-bar-star">{star}★</span>
-                                                            <div className="pd-bar-bg">
+                                                        <div key={star} className="flex items-center gap-2">
+                                                            <span className="w-8 text-sm text-gray-600">{star}★</span>
+                                                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                                                                 <div
-                                                                    className="pd-bar-fill"
-                                                                    style={{
-                                                                        width: `${
-                                                                            review.totalStar ? (review[`star${star}`] / review.totalStar) * 100 : 0
-                                                                        }%`,
-                                                                    }}
-                                                                ></div>
+                                                                    className="h-full bg-yellow-400"
+                                                                    style={{ width: `${review.totalStar ? (review[`star${star}`] / review.totalStar) * 100 : 0}%` }}
+                                                                />
                                                             </div>
-                                                            <span className="pd-review-percent">
-                                                            {review.totalStar ? ((review[`star${star}`] / review.totalStar) * 100).toFixed(1) : 0}%
-                                                        </span>
+                                                            <span className="w-10 text-right text-sm text-gray-600">
+                                                                {review.totalStar ? ((review[`star${star}`] / review.totalStar) * 100).toFixed(1) : 0}%
+                                                            </span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
 
-                                            <div className="pd-review-list">
-                                                {review.productReviews.length > 0 &&
-                                                    review.productReviews.map(
-                                                        ({ reviewId, customerName, customerImage, rating, createdAt, comment }) => (
-                                                            <div key={reviewId} className="pd-review-item">
-                                                                <div className="pd-review-user">
-                                                                    <img
-                                                                        src={customerImage || noImage}
-                                                                        alt={customerName}
-                                                                        className="pd-review-user-img"
-                                                                        onError={(e) => {
-                                                                            e.target.onerror = null;
-                                                                            e.target.src = noImage;
-                                                                        }}
-                                                                    />
-                                                                    <div>
-                                                                        <div className="pd-user-name">{customerName}</div>
-                                                                        <div className="pd-review-user-rating">
-                                                                            <div className="flex">{renderStars(rating)}</div>
-                                                                            <span className="pd-review-date">
-                                                                            {new Date(createdAt).toLocaleDateString()}
-                                                                        </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <p className="pd-review-comment">{comment}</p>
-                                                                <div className="pd-review-actions">
-                                                                    <button className="pd-review-action-btn">
-                                                                        <ThumbsUp className="w-4 h-4" />
-                                                                        Hữu ích
-                                                                    </button>
-                                                                    <button className="pd-review-action-btn">
-                                                                        <MessageCircle className="w-4 h-4" />
-                                                                        Trả lời
-                                                                    </button>
-                                                                    <button className="pd-review-action-btn">
-                                                                        <Share2 className="w-4 h-4" />
-                                                                        Chia sẻ
-                                                                    </button>
+                                            <div className="space-y-5">
+                                                {review.productReviews.map(({ reviewId, customerName, customerImage, rating, createdAt, comment }) => (
+                                                    <div key={reviewId} className="border-b pb-4">
+                                                        <div className="flex items-center gap-3 mb-2">
+                                                            <img
+                                                                src={customerImage || noImage}
+                                                                alt={customerName}
+                                                                className="w-12 h-12 rounded-full object-cover"
+                                                                onError={(e) => e.target.src = noImage}
+                                                            />
+                                                            <div>
+                                                                <div className="font-bold">{customerName}</div>
+                                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                                    <div className="flex">{renderStars(rating)}</div>
+                                                                    <span>{new Date(createdAt).toLocaleDateString()}</span>
                                                                 </div>
                                                             </div>
-                                                        )
-                                                    )}
+                                                        </div>
+                                                        <p className="text-gray-700">{comment}</p>
+                                                        <div className="flex gap-4 mt-2">
+                                                            <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600">
+                                                                <ThumbsUp className="w-4 h-4" /> Hữu ích
+                                                            </button>
+                                                            <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600">
+                                                                <MessageCircle className="w-4 h-4" /> Trả lời
+                                                            </button>
+                                                            <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600">
+                                                                <Share2 className="w-4 h-4" /> Chia sẻ
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
 
                                             <div className="mt-6 text-center">
-                                                <button className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 font-medium transition-colors">
+                                                <button className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                                                     Xem thêm đánh giá
                                                 </button>
                                             </div>
@@ -598,9 +463,9 @@ export default function ProductDetail() {
 
                                     {activeTab === "shipping" && (
                                         <div className="space-y-4">
-                                            <h3>{BlogTransport.title}</h3>
-                                            <div className="grid md:grid-cols-2 gap-4 mt-4">
-                                                <DisplayContent content={BlogTransport.content} />
+                                            <h3 className="text-xl font-bold">{BlogTransport?.title}</h3>
+                                            <div className="grid md:grid-cols-2 gap-4">
+                                                <DisplayContent content={BlogTransport?.content} />
                                             </div>
                                         </div>
                                     )}
@@ -608,114 +473,102 @@ export default function ProductDetail() {
                             )}
                         </div>
 
-                        {/* Related Products Grid */}
-                        <div className="mb-8">
+                        {/* Related Products */}
+                        <div>
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold">Sản phẩm liên quan</h2>
-                                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center transition-colors">
-                                    Xem tất cả
-                                    <ArrowRight className="w-4 h-4 ml-1" />
+                                <button className="flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                                    Xem tất cả <ArrowRight className="w-4 h-4 ml-1" />
                                 </button>
                             </div>
-
                             {isLoading ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" style={{ minHeight: "300px" }}>
-                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                                        <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-                                            <div className="aspect-square bg-gray-200"></div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    {Array(10).fill().map((_, i) => (
+                                        <div key={i} className="bg-white rounded-lg shadow-sm overflow-hidden animate-pulse">
+                                            <div className="aspect-square bg-gray-200" />
                                             <div className="p-4 space-y-2">
-                                                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                                <div className="h-4 bg-gray-200 rounded w-1/2" />
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 content-loaded">
-                                    {relatedProducts.length > 0 &&
-                                        relatedProducts.map((product) => (
-                                            <div
-                                                key={product.id}
-                                                className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                                                onClick={() => handleDetailProduct(product)}
-                                            >
-                                                <div className="aspect-square overflow-hidden">
-                                                    <img
-                                                        src={product.image ? product.image : noImage}
-                                                        alt={product.name}
-                                                        className="w-full h-full object-cover hover:scale-105 transition-transform"
-                                                        onError={(e) => {
-                                                            e.target.onerror = null;
-                                                            e.target.src = noImage;
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="p-4">
-                                                    <h3 className="font-medium text-gray-900 line-clamp-2 mb-1">{product.name}</h3>
-                                                    <div className="flex items-center mt-1">{renderStars(product.averageRating)}</div>
-                                                    <div className="mt-2 flex items-center gap-2">
-                                                        <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
-                                                        <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
-                                                    </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fade-in">
+                                    {relatedProducts.map((product) => (
+                                        <div
+                                            key={product.id}
+                                            className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
+                                            onClick={() => handleDetailProduct(product)}
+                                        >
+                                            <div className="aspect-square overflow-hidden">
+                                                <img
+                                                    src={product.image || noImage}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover hover:scale-105 transition-transform"
+                                                    onError={(e) => e.target.src = noImage}
+                                                />
+                                            </div>
+                                            <div className="p-4">
+                                                <h3 className="font-medium text-gray-900 line-clamp-2 mb-1">{product.name}</h3>
+                                                <div className="flex items-center mt-1">{renderStars(product.averageRating)}</div>
+                                                <div className="mt-2 flex items-center gap-2">
+                                                    <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
+                                                    <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
                                                 </div>
                                             </div>
-                                        ))}
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="pd-right-column">
-                        <div className="pd-related-products-card">
-                            <h3 className="pd-related-products-title">Top sản phẩm bán chạy</h3>
-                            <div className="pd-related-products-list">
-                                {isLoading ? (
-                                    <div className="space-y-4">
-                                        {[1, 2, 3, 4, 5].map((i) => (
-                                            <div key={i} className="flex space-x-4">
-                                                <div className="w-20 h-20 bg-gray-200 rounded-lg"></div>
-                                                <div className="flex-1 space-y-2">
-                                                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    {/* Right Column */}
+                    <div className="hidden lg:flex flex-col gap-5 flex-1">
+                        <div className="bg-white rounded-lg shadow-md p-5">
+                            <h3 className="text-xl font-bold mb-4">Top sản phẩm bán chạy</h3>
+                            {isLoading ? (
+                                <div className="space-y-4 animate-pulse">
+                                    {Array(5).fill().map((_, i) => (
+                                        <div key={i} className="flex gap-4">
+                                            <div className="w-20 h-20 bg-gray-200 rounded-lg" />
+                                            <div className="flex-1 space-y-2">
+                                                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="space-y-4 animate-fade-in">
+                                    {topSaleProducts.slice(0, 5).map((product) => (
+                                        <div
+                                            key={product.id}
+                                            className="flex gap-3 cursor-pointer hover:-translate-y-1 transition-transform"
+                                            onClick={() => handleDetailProduct(product)}
+                                        >
+                                            <img
+                                                src={product.image || noImage}
+                                                alt={product.name}
+                                                className="w-20 h-20 object-cover rounded-lg"
+                                                onError={(e) => e.target.src = noImage}
+                                            />
+                                            <div>
+                                                <h4 className="font-medium">{product.name}</h4>
+                                                <div className="flex items-center mt-1">{renderStars(product.averageRating)}</div>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
+                                                    <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="content-loaded">
-                                        {topSaleProducts.slice(0, 5).map((product) => (
-                                            <div
-                                                key={product.id}
-                                                className="pd-related-product-item"
-                                                onClick={() => handleDetailProduct(product)}
-                                            >
-                                                <div className="pd-related-product-image">
-                                                    <img
-                                                        src={product.image ? product.image : noImage}
-                                                        alt={product.name}
-                                                        className="pd-related-product-img"
-                                                        onError={(e) => {
-                                                            e.target.onerror = null;
-                                                            e.target.src = noImage;
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="pd-related-product-info">
-                                                    <h4 className="pd-related-product-name">{product.name}</h4>
-                                                    <div className="pd-related-product-rating">{renderStars(product.averageRating)}</div>
-                                                    <div className="pd-related-product-prices">
-                                                        <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
-                                                        <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
-                        <div className="pd-card mt-6">
+                        <div className="bg-white rounded-lg shadow-md p-5">
                             <h3 className="text-lg font-semibold mb-4">Chính sách mua hàng</h3>
                             <ul className="space-y-3">
                                 <li className="flex items-start gap-2">
@@ -743,142 +596,41 @@ export default function ProductDetail() {
                         </div>
                     </div>
                 </div>
-                <div className="pd-right-column pd-right-mobile">
-                    {/* Top sản phẩm bán chạy */}
-                    <div className="pd-related-products-card">
-                        <h3 className="pd-related-products-title">Top sản phẩm bán chạy</h3>
-                        <div className="pd-related-products-list">
-                            {isLoading ? (
-                                <div className="space-y-4">
-                                    {[1, 2, 3, 4, 5].map((i) => (
-                                        <div key={i} className="flex space-x-4">
-                                            <div className="w-20 h-20 bg-gray-200 rounded-lg"></div>
-                                            <div className="flex-1 space-y-2">
-                                                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="content-loaded">
-                                    {topSaleProducts.slice(0, 5).map((product) => (
-                                        <div
-                                            key={product.id}
-                                            className="pd-related-product-item"
-                                            onClick={() => handleDetailProduct(product)}
-                                        >
-                                            <div className="pd-related-product-image">
-                                                <img
-                                                    src={product.image ? product.image : noImage}
-                                                    alt={product.name}
-                                                    className="pd-related-product-img"
-                                                    onError={(e) => {
-                                                        e.target.onerror = null;
-                                                        e.target.src = noImage;
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="pd-related-product-info">
-                                                <h4 className="pd-related-product-name">{product.name}</h4>
-                                                <div className="pd-related-product-rating">{renderStars(product.averageRating)}</div>
-                                                <div className="pd-related-product-prices">
-                                                    <span className="text-red-600 font-medium">{formatVND(product.priceAfterDiscount)}</span>
-                                                    <span className="text-sm text-gray-500 line-through">{formatVND(product.price)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Chính sách mua hàng */}
-                    <div className="pd-card policy-section">
-                        <h3 className="text-lg font-semibold mb-4">Chính sách mua hàng</h3>
-                        <ul className="space-y-3">
-                            <li className="flex items-start gap-2">
-                                <Truck className="w-5 h-5 text-blue-600 mt-0.5" />
-                                <div>
-                                    <p className="font-medium">Giao hàng miễn phí</p>
-                                    <p className="text-sm text-gray-600">Cho đơn hàng từ 500.000₫</p>
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <Package className="w-5 h-5 text-blue-600 mt-0.5" />
-                                <div>
-                                    <p className="font-medium">Đổi trả dễ dàng</p>
-                                    <p className="text-sm text-gray-600">Trong vòng 30 ngày</p>
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
-                                <div>
-                                    <p className="font-medium">Bảo hành chính hãng</p>
-                                    <p className="text-sm text-gray-600">Theo chính sách nhà sản xuất</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-
-
             </div>
         </PageWrapper>
     );
 
-    // Định nghĩa LoadingSkeleton trong cùng file
     function LoadingSkeleton() {
         return (
-            <div>
-                <div className="animate-pulse">
-                    <div className="pd-grid">
-                        <div className="pd-images">
-                            <div className="pd-main-image bg-gray-200" style={{ minHeight: "560px" }}></div>
-                            <div className="pd-thumbnails">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="pd-thumbnail bg-gray-200" style={{ minHeight: "128px" }}></div>
+            <div className="animate-pulse">
+                <div className="flex flex-col lg:flex-row gap-5">
+                    <div className="w-full lg:w-1/2">
+                        <div className="w-full h-[560px] bg-gray-200 rounded-lg" />
+                        <div className="flex gap-2 mt-3">
+                            {Array(4).fill().map((_, i) => (
+                                <div key={i} className="w-32 h-32 bg-gray-200 rounded-md" />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="w-full lg:w-1/2 space-y-6">
+                        <div className="h-8 bg-gray-200 rounded w-3/4" />
+                        <div className="h-4 bg-gray-200 rounded w-32" />
+                        <div className="h-10 bg-gray-200 rounded w-1/2" />
+                        <div className="space-y-2">
+                            <div className="h-4 bg-gray-200 rounded w-24" />
+                            <div className="grid grid-cols-4 gap-2">
+                                {Array(4).fill().map((_, i) => (
+                                    <div key={i} className="h-10 bg-gray-200 rounded" />
                                 ))}
                             </div>
                         </div>
-
-                        <div className="pd-info" style={{ minHeight: "600px" }}>
-                            <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-                            <div className="flex items-center space-x-4 mb-6">
-                                <div className="h-4 bg-gray-200 rounded w-32"></div>
-                            </div>
-
-                            <div className="h-10 bg-gray-200 rounded w-1/2 mb-6"></div>
-
-                            <div className="space-y-6">
-                                <div>
-                                    <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {[1, 2, 3, 4].map((i) => (
-                                            <div key={i} className="h-10 bg-gray-200 rounded"></div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="h-12 bg-gray-200 rounded w-1/3 my-6"></div>
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="h-12 bg-gray-200 rounded"></div>
-                                <div className="h-12 bg-gray-200 rounded"></div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4 pt-6 border-t">
-                                {[1, 2, 3].map((i) => (
-                                    <div key={i} className="h-6 bg-gray-200 rounded"></div>
-                                ))}
-                            </div>
+                        <div className="flex gap-4">
+                            <div className="h-12 bg-gray-200 rounded w-1/3" />
+                            <div className="h-12 bg-gray-200 rounded w-1/3" />
                         </div>
                     </div>
                 </div>
             </div>
         );
-
     }
 }

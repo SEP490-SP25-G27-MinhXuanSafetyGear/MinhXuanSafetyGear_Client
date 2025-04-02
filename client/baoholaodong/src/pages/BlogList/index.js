@@ -4,9 +4,7 @@ import { ChevronRight } from "lucide-react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
-import "./style.css";
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
-
 
 const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
@@ -41,7 +39,6 @@ const BlogList = () => {
                 console.error("Lỗi khi tải danh mục blog", err);
             }
         };
-
         fetchCategories();
     }, []);
 
@@ -74,7 +71,6 @@ const BlogList = () => {
                 setLoading(false);
             }
         };
-
         fetchBlogs();
     }, [categoryId, page]);
 
@@ -98,130 +94,145 @@ const BlogList = () => {
 
     const truncateText = (html, maxLength) => {
         const plainText = stripHtmlTags(html);
-        if (plainText.length <= maxLength) {
-            return plainText;
-        }
-        return plainText.substring(0, maxLength) + "...";
+        return plainText.length <= maxLength
+            ? plainText
+            : plainText.substring(0, maxLength) + "...";
     };
 
     return (
         <PageWrapper title="Danh sách bài viết">
-        <div className="blog-container">
-            <nav className="breadcrumb-blog-list">
-                <a href="/" className="breadcrumb-item">
-                    <FaHome className="breadcrumb-icon" />
-                    Trang chủ
-                </a>
-                <ChevronRight className="breadcrumb-separator" />
-                <span className="breadcrumb-item active">Danh sách bài viết</span>
-            </nav>
+            <div className="container mx-auto">
+                {/* Breadcrumb */}
+                <nav className="flex items-center py-2.5 px-4 sm:px-17 lg:px-6 text-sm">
+                    <a href="/" className="flex items-center text-red-600 hover:underline">
+                        <FaHome className="mr-1" />
+                        Trang chủ
+                    </a>
+                    <ChevronRight className="mx-2.5 text-gray-400" />
+                    <span className="text-black">Danh sách bài viết</span>
+                </nav>
 
-            <div className="blog-list-container">
-                <div className="blog-filter">
-                    <div className="filter-header">
-                        <FaFilter className="filter-icon" />
-                        <span className="filter-title">BỘ LỌC TIN TỨC</span>
-                    </div>
-                    <div className="filter-options">
-                        {filters.map((filter) => (
-                            <label key={filter.id} className="filter-label">
-                                <input
-                                    type="radio"
-                                    name="category"
-                                    checked={categoryId === filter.id}
-                                    onChange={() => handleCategoryChange(filter)}
-                                    className="filter-radio"
-                                />
-                                <span>{filter.name}</span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="blog-list">
-                    <h2 className="all-blog-title">Danh sách bài viết</h2>
-                    {loading ? (
-                        <p>Đang tải dữ liệu...</p>
-                    ) : error ? (
-                        <p className="text-red-500">{error}</p>
-                    ) : blogs.length > 0 ? (
-                        <div className="all-blog-list">
-                            {blogs.map((blog) => (
-                                <div key={blog.postId} className="all-blog-item">
-                                    <div className="new-blog-image-container">
-                                        <img
-                                            src={blog.imageUrl || "https://via.placeholder.com/150"}
-                                            alt={blog.title}
-                                            className="new-blog-image"
-                                        />
-                                        <div className="new-blog-date">
-                                            <FaClock className="new-blog-date-icon" />
-                                            <div className="new-blog-date-text">
-                                                {new Date(blog.createdAt).toLocaleDateString("vi-VN")}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="new-blog-content">
-                                        <h3 className="new-blog-item-title">{blog.title}</h3>
-                                        <p className="new-blog-description">{truncateText(blog.content, 100)}</p>
-                                    </div>
-                                    <div className="new-blog-read-more">
-                                        <button
-                                            className="new-blog-read-more-button"
-                                            onClick={() => handleViewDetail(blog)}
-                                        >
-                                            <div className="new-blog-read-more-text">
-                                                Xem chi tiết <FaArrowRight className="inline" />
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
+                {/* Main content */}
+                <div className="flex flex-col lg:flex-row gap-5 px-2.5 sm:px-12 lg:px-12 py-12">
+                    {/* Filter sidebar */}
+                    <div className="w-full lg:w-72 flex-shrink-0 border border-gray-100 bg-white">
+                        <div className="flex items-center bg-gradient-to-t from-[#620805] to-[#c7170e] text-yellow-400 p-2.5">
+                            <FaFilter className="mr-2" />
+                            <span className="font-bold">BỘ LỌC TIN TỨC</span>
+                        </div>
+                        <div className="p-5">
+                            {filters.map((filter) => (
+                                <label key={filter.id} className="flex items-center mb-2.5 truncate">
+                                    <input
+                                        type="radio"
+                                        name="category"
+                                        checked={categoryId === filter.id}
+                                        onChange={() => handleCategoryChange(filter)}
+                                        className="mr-2 accent-red-600"
+                                    />
+                                    <span>{filter.name}</span>
+                                </label>
                             ))}
                         </div>
-                    ) : (
-                        <p>Không có bài viết nào.</p>
-                    )}
+                    </div>
 
-                    {blogs.length > 0 && (
-                        <div className="flex justify-center mt-6">
-                            <div className="flex items-center space-x-2">
-                                <button
-                                    disabled={page === 1}
-                                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                                    className={`px-4 py-2 rounded-md border ${
-                                        page === 1 ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
-                                    } flex items-center`}
-                                >
-                                    <FaChevronLeft className="mr-1" />
-                                    Trước
-                                </button>
-                                {[...Array(totalPages)].map((_, index) => (
-                                    <button
-                                        key={index + 1}
-                                        onClick={() => setPage(index + 1)}
-                                        className={`px-4 py-2 rounded-md border ${
-                                            page === index + 1 ? "bg-red-600 text-white" : "hover:bg-gray-100"
-                                        }`}
+                    {/* Blog list */}
+                    <div className="flex-1">
+                        <h2 className="text-xl md:text-2xl font-bold text-[#b50a00] relative inline-block after:block after:w-1/3 after:h-1 after:bg-yellow-400 after:mt-1">
+                            Danh sách bài viết
+                        </h2>
+
+                        {loading ? (
+                            <p className="text-center text-gray-500 mt-4">Đang tải dữ liệu...</p>
+                        ) : error ? (
+                            <p className="text-red-500 text-center mt-4">{error}</p>
+                        ) : blogs.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
+                                {blogs.map((blog) => (
+                                    <div
+                                        key={blog.postId}
+                                        className="flex flex-col justify-between bg-white border shadow hover:-translate-y-1 transition-transform duration-300 h-full rounded overflow-hidden"
                                     >
-                                        {index + 1}
-                                    </button>
+                                        {/* Hình ảnh */}
+                                        <div className="relative w-full h-[200px]">
+                                            <img
+                                                src={blog.imageUrl || "https://via.placeholder.com/150"}
+                                                alt={blog.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute bottom-2 left-2 bg-white/80 px-3 py-1 text-sm flex items-center gap-1 rounded">
+                                                <FaClock className="text-gray-600" />
+                                                <span className="text-gray-700 text-xs">
+                          {new Date(blog.createdAt).toLocaleDateString("vi-VN")}
+                        </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Nội dung */}
+                                        <div className="p-4 flex flex-col gap-2 flex-grow">
+                                            <h3 className="text-base font-semibold text-gray-800 line-clamp-2">
+                                                {blog.title}
+                                            </h3>
+                                            <p className="text-sm text-gray-600 line-clamp-3">
+                                                {truncateText(blog.content, 100)}
+                                            </p>
+                                        </div>
+
+                                        {/* Xem chi tiết */}
+                                        <div className="px-4 pb-4">
+                                            <button
+                                                onClick={() => handleViewDetail(blog)}
+                                                className="w-full bg-[#b50a00] text-white font-semibold py-2 text-sm rounded-md hover:bg-yellow-400 hover:text-[#b50a00] transition-all duration-300"
+                                            >
+                                                Xem chi tiết <FaArrowRight className="inline ml-1" />
+                                            </button>
+                                        </div>
+                                    </div>
                                 ))}
-                                <button
-                                    disabled={page === totalPages}
-                                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                                    className={`px-4 py-2 rounded-md border ${
-                                        page === totalPages ? "text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"
-                                    } flex items-center`}
-                                >
-                                    Sau
-                                    <FaChevronRight className="ml-1" />
-                                </button>
                             </div>
-                        </div>
-                    )}
+                        ) : (
+                            <p className="text-center text-gray-500 mt-4">Không có bài viết nào.</p>
+                        )}
+
+                        {/* Pagination */}
+                        {blogs.length > 0 && (
+                            <div className="flex justify-center mt-6">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        disabled={page === 1}
+                                        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                                        className="flex items-center px-4 py-2 bg-[#b50a00] text-white rounded-md disabled:bg-gray-300 hover:bg-yellow-400 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <FaChevronLeft className="mr-1" />
+                                        Trước
+                                    </button>
+                                    {[...Array(totalPages)].map((_, index) => (
+                                        <button
+                                            key={index + 1}
+                                            onClick={() => setPage(index + 1)}
+                                            className={`px-4 py-2 border rounded-md ${
+                                                page === index + 1
+                                                    ? "bg-[#b50a00] text-white"
+                                                    : "hover:bg-gray-100"
+                                            }`}
+                                        >
+                                            {index + 1}
+                                        </button>
+                                    ))}
+                                    <button
+                                        disabled={page === totalPages}
+                                        onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                                        className="flex items-center px-4 py-2 bg-[#b50a00] text-white rounded-md disabled:bg-gray-300 hover:bg-yellow-400 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        Sau
+                                        <FaChevronRight className="ml-1" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
         </PageWrapper>
     );
 };

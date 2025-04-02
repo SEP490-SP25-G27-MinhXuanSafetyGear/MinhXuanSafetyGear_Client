@@ -128,7 +128,7 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
     }
 
     return (
-        <div className="p-4 rounded-lg mb-4">
+        <div className="pt-3  rounded-lg mb-4">
             <div className="mb-4">
                 <p className="font-semibold mb-2">Màu sắc:</p>
                 <div className="flex flex-wrap gap-2">
