@@ -1,12 +1,12 @@
-﻿import React, { useRef, useState, useContext, useEffect } from "react";
-import { FaArrowRight, FaArrowLeft, FaCog, FaCartPlus } from "react-icons/fa";
-import './TopDealProductsStyle.css';
-import ProductPopup from "../../components/productpopup";
+﻿import React, { useState, useEffect, useRef, useContext } from "react";
+import { FaArrowLeft, FaArrowRight, FaCog, FaCartPlus } from "react-icons/fa";
 import { CartContext } from "../../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import ProductPopup from "../../components/productpopup";
 import slugify from "slugify";
 import noImage from "../../images/no-image-product.jpg";
 import * as signalR from "@microsoft/signalr";
+import './TopDealProductsStyle.css';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
@@ -14,8 +14,8 @@ const getMinVariant = (product) => {
     if (!product.productVariants || product.productVariants.length === 0) return null;
     return product.productVariants.reduce((min, variant) => {
         const discount = variant.discount || 0;
-        const finalPrice = variant.price - (variant.price * discount / 100);
-        const minPrice = min.price - (min.price * (min.discount || 0) / 100);
+        const finalPrice = variant.price - (variant.price * discount) / 100;
+        const minPrice = min.price - (min.price * (min.discount || 0)) / 100;
         return finalPrice < minPrice ? variant : min;
     });
 };
@@ -24,18 +24,17 @@ const getMinVariantPrice = (product) => {
     const variant = getMinVariant(product);
     if (!variant) return product.priceAfterDiscount || product.price;
     const discount = variant.discount || 0;
-    return variant.price - (variant.price * discount / 100);
+    return variant.price - (variant.price * discount) / 100;
 };
 
 export default function TopDealProducts({ products = [] }) {
     const scrollRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [productList, setProductList] = useState(products); // Thêm state để quản lý danh sách sản phẩm
+    const [productList, setProductList] = useState(products);
     const [hubConnection, setHubConnection] = useState(null);
     const { addToCart } = useContext(CartContext);
     const navigate = useNavigate();
 
-    // Khởi tạo SignalR
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -45,57 +44,34 @@ export default function TopDealProducts({ products = [] }) {
         connection
             .start()
             .then(() => {
-                console.log("Connected to SignalR in TopDealProducts");
                 setHubConnection(connection);
             })
-            .catch((err) => console.error("Lỗi khi kết nối SignalR:", err));
+            .catch((err) => console.error("SignalR error:", err));
 
         return () => {
-            if (connection.state === signalR.HubConnectionState.Connected) {
-                connection.stop();
-            }
+            if (connection.state === signalR.HubConnectionState.Connected) connection.stop();
         };
     }, []);
 
-    // Lắng nghe sự kiện ProductUpdated
     useEffect(() => {
         if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
 
         const handleProductChange = (updatedProduct) => {
-            setProductList((prevProducts) =>
-                prevProducts.map((product) =>
-                    product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
-                )
+            setProductList((prev) =>
+                prev.map((p) => (p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p))
             );
         };
 
         hubConnection.on("ProductUpdated", handleProductChange);
-        return () => {
-            if (hubConnection.state === signalR.HubConnectionState.Connected) {
-                hubConnection.off("ProductUpdated", handleProductChange);
-            }
-        };
+        return () => hubConnection.off("ProductUpdated", handleProductChange);
     }, [hubConnection]);
 
-    // Cập nhật productList khi props products thay đổi
     useEffect(() => {
         setProductList(products);
     }, [products]);
 
-    const scrollLeft = () => {
-        scrollRef.current.scrollBy({ left: -350, behavior: "smooth" });
-    };
-
-    const scrollRight = () => {
-        scrollRef.current.scrollBy({ left: 350, behavior: "smooth" });
-    };
-
-    const handleProductClick = (product) => {
-        setSelectedProduct(product);
-    };
-
-    const handleClosePopup = () => {
-        setSelectedProduct(null);
+    const scroll = (dir) => {
+        scrollRef.current?.scrollBy({ left: dir === "left" ? -350 : 350, behavior: "smooth" });
     };
 
     const handleAddToCart = (product) => {
@@ -113,91 +89,77 @@ export default function TopDealProducts({ products = [] }) {
         addToCart(cartItem);
     };
 
-    const handleDetailProduct = (product) => {
-        navigate(`/products/${product.slug}`);
-    };
-
     return (
-        <div className="deal">
-            <div className="container flex">
-                <div className="deal-info flex flex-col items-center">
-                    <h2 className="deal-title-text"><span className="highlight">"BÃO</span> DEAL" GIẢM GIÁ</h2>
-                    <div className="navigate-button-container">
-                        <button onClick={scrollLeft} className="navigate-button">
-                            <FaArrowLeft />
-                        </button>
-                        <button onClick={scrollRight} className="navigate-button">
-                            <FaArrowRight />
+        <div className="top-deal-container">
+            <div className="top-deal-content-wrapper">
+                <div className="top-deal-flex-container">
+                    <div className="top-deal-header-section">
+                        <h2 className="top-deal-title">
+                            <span className="top-deal-title-highlight">"BÃO</span> DEAL" GIẢM GIÁ
+                        </h2>
+                        <div className="top-deal-button-group">
+                            <button onClick={() => scroll("left")} className="top-deal-scroll-button">
+                                <FaArrowLeft />
+                            </button>
+                            <button onClick={() => scroll("right")} className="top-deal-scroll-button">
+                                <FaArrowRight />
+                            </button>
+                        </div>
+                        <button className="top-deal-view-all-button">
+                            <span>Xem tất cả <FaArrowRight className="inline ml-1" /></span>
+                            <span></span>
                         </button>
                     </div>
-                    <button className="view-all-button mt-4">Xem tất cả <FaArrowRight className="inline" /></button>
-                </div>
-                <div ref={scrollRef} className="flex overflow-x-auto space-x-5 product-container">
-                    {productList.map((product) => (
-                        <div key={product.id} className="product-discounted-card">
-                            <div className="product-discounted-image-container">
-                                <img
-                                    src={product.image || noImage}
-                                    alt={product.name}
-                                    className="product-discounted-image"
-                                    onClick={() => handleDetailProduct(product)}
-                                    style={{ cursor: 'pointer' }}
-                                />
-                                <div className="product-discounted-image-overlay">
+
+                    <div ref={scrollRef} className="top-deal-product-scroll">
+                        {productList.map((product) => {
+                            const minVariant = getMinVariant(product);
+                            const minPrice = getMinVariantPrice(product);
+                            const hasDiscount = minVariant?.discount || product.discount;
+
+                            return (
+                                <div key={product.id} className="top-deal-product-card">
+                                    <div className="top-deal-image-container">
+                                        <img
+                                            src={product.image || noImage}
+                                            alt={product.name}
+                                            className="top-deal-product-image"
+                                            onClick={() => navigate(`/products/${product.slug}`)}
+                                        />
+                                        <div className="top-deal-image-overlay">
+                                            <button
+                                                onClick={() => navigate(`/products/${product.slug}`)}
+                                                className="top-deal-detail-button"
+                                            >
+                                                Xem chi tiết
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <h3 className="top-deal-product-title">{product.name}</h3>
+                                    <div className="top-deal-price-container">
+                                        {hasDiscount ? (
+                                            <>
+                                                <span className="top-deal-price-discounted">{minPrice.toLocaleString()}đ</span>
+                                                <span className="top-deal-price-original">{minVariant?.price?.toLocaleString() || product.price?.toLocaleString()}đ</span>
+                                                <p className="top-deal-discount-text">Giảm {minVariant?.discount || product.discount}%</p>
+                                            </>
+                                        ) : (
+                                            <span className="top-deal-price-normal">{minPrice.toLocaleString()}đ</span>
+                                        )}
+                                    </div>
                                     <button
-                                        className="product-discounted-view-details-button"
-                                        onClick={() => handleDetailProduct(product)}
+                                        className="top-deal-add-to-cart-button"
+                                        onClick={() => (product.productVariants?.length > 0 ? setSelectedProduct(product) : handleAddToCart(product))}
                                     >
-                                        Xem chi tiết
+                                        {product.productVariants?.length > 0 ? <><FaCog /> Tùy chọn</> : <><FaCartPlus /> Thêm vào giỏ hàng</>}
                                     </button>
                                 </div>
-                            </div>
-                            <div className="product-info">
-                                <h3 className="product-discounted-name">{product.name}</h3>
-                                <div className="product-price">
-                                    {(() => {
-                                        const minVariant = getMinVariant(product);
-                                        const minPrice = getMinVariantPrice(product);
-                                        if (minVariant) {
-                                            const hasDiscount = minVariant.discount > 0;
-                                            return hasDiscount ? (
-                                                <>
-                                                    <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
-                                                    <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
-                                                    <p className="product-discount-percentage">Giảm {minVariant.discount}%</p>
-                                                </>
-                                            ) : (
-                                                <span>{minPrice.toLocaleString()}đ</span>
-                                            );
-                                        } else {
-                                            const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
-                                            return hasDiscount ? (
-                                                <>
-                                                    <span className="text-red-500">{product.priceAfterDiscount.toLocaleString()}đ</span>
-                                                    <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
-                                                    <p className="product-discount-percentage">Giảm {product.discount}%</p>
-                                                </>
-                                            ) : (
-                                                <span>{product.price.toLocaleString()}đ</span>
-                                            );
-                                        }
-                                    })()}
-                                </div>
-                                {product.productVariants && product.productVariants.length > 0 ? (
-                                    <button className="option-button" onClick={() => handleProductClick(product)}>
-                                        <FaCog className="icon" /> Tùy chọn
-                                    </button>
-                                ) : (
-                                    <button className="option-button" onClick={() => handleAddToCart(product)}>
-                                        <FaCartPlus className="icon" /> Thêm vào giỏ hàng
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
-            {selectedProduct && <ProductPopup product={selectedProduct} onClose={handleClosePopup} />}
+            {selectedProduct && <ProductPopup product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
         </div>
     );
 }

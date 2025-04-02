@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./style.css";
 import { FaArrowRight, FaArrowLeft, FaClock } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -17,7 +16,6 @@ const NewBlog = () => {
     const sliderRef = useRef(null);
     const navigate = useNavigate();
 
-    // Hàm xử lý loại bỏ HTML và rút gọn nội dung
     const stripHtmlTags = (html) => {
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = html;
@@ -26,35 +24,26 @@ const NewBlog = () => {
 
     const truncateText = (html, maxLength) => {
         const plainText = stripHtmlTags(html);
-        if (plainText.length <= maxLength) {
-            return plainText;
-        }
-        return plainText.substring(0, maxLength) + "...";
+        return plainText.length <= maxLength
+            ? plainText
+            : plainText.substring(0, maxLength) + "...";
     };
 
-    // Gọi API để lấy danh sách bài blog theo danh mục "Kiến Thức An Toàn Lao Động"
     useEffect(() => {
         const fetchBlogs = async () => {
             setLoading(true);
             try {
-                // Lấy danh sách danh mục
-                const categoriesResponse = await axios.get(`${API_BASE}/api/BlogPost/get-blog-categories`);
-                const categories = categoriesResponse.data;
-
-                // Tìm danh mục "KIẾN THỨC AN TOÀN LAO ĐỘNG"
-                const targetCategory = categories.find(
+                const categoriesResponse = await axios.get(
+                    `${API_BASE}/api/BlogPost/get-blog-categories`
+                );
+                const targetCategory = categoriesResponse.data.find(
                     (cat) => cat.name === "KIẾN THỨC AN TOÀN LAO ĐỘNG"
                 );
-                if (!targetCategory) {
-                    throw new Error("Không tìm thấy danh mục 'KIẾN THỨC AN TOÀN LAO ĐỘNG'");
-                }
+                if (!targetCategory) throw new Error("Không tìm thấy danh mục");
 
-                // Tạo slug từ tên danh mục
-                const categorySlug = toSlug(targetCategory.name);
-
-                // Gọi API lấy bài viết theo slug
+                const slug = toSlug(targetCategory.name);
                 const blogsResponse = await axios.get(
-                    `${API_BASE}/api/BlogPost/get-blog-by-category/${categorySlug}`
+                    `${API_BASE}/api/BlogPost/get-blog-by-category/${slug}`
                 );
                 setBlogs(blogsResponse.data);
             } catch (err) {
@@ -64,11 +53,9 @@ const NewBlog = () => {
                 setLoading(false);
             }
         };
-
         fetchBlogs();
     }, []);
 
-    // Hàm điều hướng khi nhấp "Xem chi tiết"
     const handleViewDetail = (blog) => {
         const blogSlug = blog.slug || toSlug(blog.title);
         navigate(`/blogs/${blogSlug}`);
@@ -81,76 +68,82 @@ const NewBlog = () => {
         slidesToShow: 4,
         slidesToScroll: 1,
         prevArrow: (
-            <button className="new-blog-nav-button">
+            <button className="bg-[#b50a00] text-white px-3 py-2 rounded hover:bg-yellow-400 disabled:bg-gray-300">
                 <FaArrowLeft />
             </button>
         ),
         nextArrow: (
-            <button className="new-blog-nav-button">
+            <button className="bg-[#b50a00] text-white px-3 py-2 rounded hover:bg-yellow-400 disabled:bg-gray-300">
                 <FaArrowRight />
             </button>
         ),
         responsive: [
-            {
-                breakpoint: 1024,
-                settings: { slidesToShow: 2, slidesToScroll: 1 },
-            },
-            {
-                breakpoint: 768,
-                settings: { slidesToShow: 1, slidesToScroll: 1 },
-            },
+            { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1 } },
+            { breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1 } },
         ],
     };
 
     return (
-        <section className="new-blog-section">
-            <div className="new-blog-title-container">
-                <h2 className="new-blog-title">KIẾN THỨC AN TOÀN LAO ĐỘNG</h2>
+        <section className="py-10 bg-[#f9f9f9]">
+            {/* Tiêu đề ra ngoài container để sát trái màn hình */}
+            <div className="px-4 mb-4">
+                <h2 className="text-xl md:text-2xl font-bold text-[#b50a00] text-left relative inline-block after:block after:w-1/3 after:h-1 after:bg-yellow-400 after:mt-1 after:clip-path-[polygon(0%_0%,100%_0%,calc(100%-4px)_100%,0%_100%)]">
+                    KIẾN THỨC AN TOÀN LAO ĐỘNG
+                </h2>
             </div>
 
-            {loading ? (
-                <p className="text-center text-gray-500">Đang tải dữ liệu...</p>
-            ) : error ? (
-                <p className="text-red-500 text-center">{error}</p>
-            ) : blogs.length > 0 ? (
-                <Slider {...settings} ref={sliderRef} className="blog-slider">
-                    {blogs.map((blog) => (
-                        <div key={blog.postId} className="new-blog-item">
-                            <div className="new-blog-image-container">
-                                <img
-                                    src={blog.imageUrl || "https://via.placeholder.com/150"}
-                                    alt={blog.title}
-                                    className="new-blog-image"
-                                />
-                                <div className="new-blog-date">
-                                    <FaClock className="new-blog-date-icon" />
-                                    <div className="new-blog-date-text">
-                                        {new Date(blog.createdAt).toLocaleDateString("vi-VN")}
+            <div className="max-w-7xl mx-auto px-4">
+                {loading ? (
+                    <p className="text-center text-gray-500">Đang tải dữ liệu...</p>
+                ) : error ? (
+                    <p className="text-red-500 text-center">{error}</p>
+                ) : blogs.length > 0 ? (
+                    <Slider {...settings} ref={sliderRef}>
+                        {blogs.map((blog) => (
+                            <div key={blog.postId} className="px-2">
+                                <div className="flex flex-col justify-between bg-white border shadow hover:-translate-y-1 transition-transform duration-300 h-full rounded overflow-hidden">
+                                    {/* Hình ảnh */}
+                                    <div className="relative w-full h-[200px]">
+                                        <img
+                                            src={blog.imageUrl || "https://via.placeholder.com/150"}
+                                            alt={blog.title}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute bottom-2 left-2 bg-white/80 px-3 py-1 text-sm flex items-center gap-1 rounded">
+                                            <FaClock className="text-gray-600" />
+                                            <span className="text-gray-700 text-xs">
+                        {new Date(blog.createdAt).toLocaleDateString("vi-VN")}
+                      </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Nội dung */}
+                                    <div className="p-4 flex flex-col gap-2 flex-grow">
+                                        <h3 className="text-base font-semibold text-gray-800 line-clamp-2">
+                                            {blog.title}
+                                        </h3>
+                                        <p className="text-sm text-gray-600 line-clamp-3">
+                                            {truncateText(blog.content, 100)}
+                                        </p>
+                                    </div>
+
+                                    {/* Xem chi tiết */}
+                                    <div className="px-4 pb-4">
+                                        <button
+                                            onClick={() => handleViewDetail(blog)}
+                                            className="w-full bg-[#b50a00] text-white font-semibold py-2 text-sm rounded-md hover:bg-yellow-400 hover:text-[#b50a00] transition-all duration-300 clip-path-[polygon(8px_0%,100%_0%,calc(100%-8px)_100%,0%_100%)]"
+                                        >
+                                            Xem chi tiết <FaArrowRight className="inline ml-1" />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <div className="new-blog-content">
-                                <h3 className="new-blog-item-title">{blog.title}</h3>
-                                <p className="new-blog-description">
-                                    {truncateText(blog.content, 100)}
-                                </p>
-                            </div>
-                            <div className="new-blog-read-more">
-                                <button
-                                    className="new-blog-read-more-button"
-                                    onClick={() => handleViewDetail(blog)}
-                                >
-                                    <div className="new-blog-read-more-text">
-                                        Xem chi tiết <FaArrowRight className="inline" />
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </Slider>
-            ) : (
-                <p className="text-center text-gray-500">Không có bài viết nào.</p>
-            )}
+                        ))}
+                    </Slider>
+                ) : (
+                    <p className="text-center text-gray-500">Không có bài viết nào.</p>
+                )}
+            </div>
         </section>
     );
 };

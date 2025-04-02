@@ -18,8 +18,7 @@ import { CustomerProductContext } from "../../contexts/CustomerProductContext"
 import { CartContext } from "../../contexts/CartContext"
 import { toSlug } from "../../utils/SlugUtils"
 import ProductPopup from "../../components/productpopup"
-import "./ProductListCategory.css"
-import PageWrapper from "../../components/pageWrapper/PageWrapper";
+import PageWrapper from "../../components/pageWrapper/PageWrapper"
 
 const useQuery = () => new URLSearchParams(useLocation().search)
 
@@ -43,7 +42,7 @@ const getMinVariantPrice = (product) => {
 const ProductListCategory = () => {
     const { group, cate, slug } = useParams()
     const query = useQuery()
-    const [selectedFilter, setSelectedFilter] = useState(null); // Thay selectedFilters bằng selectedFilter
+    const [selectedFilter, setSelectedFilter] = useState(null)
     const [products, setProducts] = useState([])
     const { groupCategories, getProductPage } = useContext(CustomerProductContext)
     const { addToCart } = useContext(CartContext)
@@ -55,19 +54,11 @@ const ProductListCategory = () => {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [expandedGroups, setExpandedGroups] = useState({})
-    const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"]; // Thêm filters mới
+    const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"]
 
-    const handleOpenPopup = (product) => {
-        setSelectedProduct(product);
-    }
-
-    const handleNavigateToDetail = (product) => {
-        navigate(`/products/${product.slug}`);
-    }
-
-    const handleClosePopup = () => {
-        setSelectedProduct(null)
-    }
+    const handleOpenPopup = (product) => setSelectedProduct(product)
+    const handleNavigateToDetail = (product) => navigate(`/products/${product.slug}`)
+    const handleClosePopup = () => setSelectedProduct(null)
 
     const handleAddToCart = (product) => {
         const cartItem = {
@@ -85,10 +76,7 @@ const ProductListCategory = () => {
     };
 
     const toggleGroupExpand = (groupId) => {
-        setExpandedGroups((prev) => ({
-            ...prev,
-            [groupId]: !prev[groupId],
-        }))
+        setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }))
     }
 
     useEffect(() => {
@@ -120,12 +108,8 @@ const ProductListCategory = () => {
                 }
             }
         }
-
         fetchProducts()
-
-        return () => {
-            isMounted = false
-        }
+        return () => { isMounted = false }
     }, [group, cate, currentPage, pageSize, groupCategories, selectedFilter])
 
     const getCurrentCategoryName = () => {
@@ -139,62 +123,63 @@ const ProductListCategory = () => {
 
     return (
         <PageWrapper title={getCurrentCategoryName() || "Danh sách sản phẩm"}>
-            <div className="product-list-category-container">
-                <div className="product-list-category-banner-container">
+            <div className="bg-gray-100 min-h-screen">
+                <div className="relative w-full h-48 md:h-64 lg:h-80 overflow-hidden">
                     <img
                         src="https://img.freepik.com/premium-photo/personal-protective-equipment-safety-banner-with-place-text_106035-3441.jpg"
                         alt="Banner"
-                        className="product-list-category-banner-image"
+                        className="w-full h-full object-cover"
                     />
-                    <div className="product-list-category-banner-overlay">
-                        <h1 className="product-list-category-banner-title">{getCurrentCategoryName() || "Sản phẩm"}</h1>
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <h1 className="text-white text-2xl md:text-4xl font-bold text-center px-4">
+                            {getCurrentCategoryName() || "Sản phẩm"}
+                        </h1>
                     </div>
                 </div>
 
-                <div className="product-list-category-mobile-filter-toggle">
+                <div className="sticky top-0 z-10 bg-white shadow-md p-4 lg:hidden">
                     <button
                         onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                        className="product-list-category-mobile-filter-button"
+                        className="flex items-center justify-between w-full p-2 bg-gray-100 rounded-lg"
                     >
-                    <span className="product-list-category-filter-button-text">
-                        <FaFilter className="product-list-category-filter-icon" />
-                        Bộ lọc sản phẩm
-                    </span>
-                        <FaAngleDown className={`product-list-category-filter-arrow ${mobileFiltersOpen ? "rotate-180" : ""}`} />
+                        <span className="flex items-center">
+                            <FaFilter className="mr-2" />
+                            Bộ lọc sản phẩm
+                        </span>
+                        <FaAngleDown className={`transition-transform ${mobileFiltersOpen ? "rotate-180" : ""}`} />
                     </button>
                 </div>
 
-                <div className="product-list-category-main-content">
-                    <div className="product-list-category-content-wrapper">
-                        <div className={`product-list-category-filter-section ${mobileFiltersOpen ? "block" : "hidden"} lg:block`}>
-                            <div className="product-list-category-filter-container">
-                                <div className="product-list-category-filter-header">
-                                    <FaFilter className="product-list-category-filter-icon" />
-                                    <span className="product-list-category-filter-title">BỘ LỌC SẢN PHẨM</span>
+                <div className="max-w-7xl mx-auto px-4 py-6">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+                        <div className={`w-full lg:w-1/4 xl:w-1/5 ${mobileFiltersOpen ? "block" : "hidden"} lg:block`}>
+                            <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-20">
+                                <div className="bg-gradient-to-t from-[#4a0403] to-[#a50d0b] text-yellow-400 p-4 flex items-center">
+                                    <FaFilter className="mr-2" />
+                                    <span className="font-semibold">BỘ LỌC SẢN PHẨM</span>
                                 </div>
 
-                                <div className="product-list-category-search-section">
-                                    <div className="product-list-category-search-wrapper">
+                                <div className="p-4 border-b border-gray-200">
+                                    <div className="relative">
                                         <input
                                             type="text"
                                             placeholder="Tìm kiếm sản phẩm..."
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="product-list-category-search-input"
+                                            className="w-full p-2 pl-10 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-red-600"
                                         />
-                                        <FaSearch className="product-list-category-search-icon" />
+                                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                     </div>
                                 </div>
 
-                                {/* Thay checkbox bằng nút filter */}
-                                <div className="product-list-category-price-filter-section">
-                                    <h3 className="product-list-category-section-title">Sắp xếp theo</h3>
+                                <div className="p-4 border-b border-gray-200">
+                                    <h3 className="font-semibold mb-3 text-gray-600">Sắp xếp theo</h3>
                                     <div className="flex flex-col gap-2">
                                         {filters.map((filter, index) => (
                                             <button
                                                 key={index}
                                                 onClick={() => setSelectedFilter(filter)}
-                                                className={`filter-button-new ${selectedFilter === filter ? "selected" : ""}`}
+                                                className={`px-4 py-2 bg-white rounded cursor-pointer transition-all text-left ${selectedFilter === filter ? "bg-blue-50 text-red-600" : "hover:bg-gray-100"}`}
                                             >
                                                 {filter}
                                                 {selectedFilter === filter && <FaCheck className="ml-2 inline" />}
@@ -203,34 +188,34 @@ const ProductListCategory = () => {
                                     </div>
                                 </div>
 
-                                <div className="product-list-category-category-section">
-                                    <h3 className="product-list-category-section-title">Loại Sản Phẩm</h3>
-                                    <div className="product-list-category-category-options">
+                                <div className="p-4">
+                                    <h3 className="font-semibold mb-3 text-gray-600">Loại Sản Phẩm</h3>
+                                    <div className="flex flex-col gap-2">
                                         {groupCategories.map((groupItem) => (
-                                            <div key={groupItem.groupId} className="product-list-category-category-group">
+                                            <div key={groupItem.groupId}>
                                                 <div
-                                                    className={`product-list-category-category-group-header ${Number.parseInt(group) === groupItem.groupId ? "active" : ""}`}
+                                                    className={`flex items-center justify-between p-2 rounded cursor-pointer ${Number.parseInt(group) === groupItem.groupId ? "bg-blue-50 text-red-600 font-medium" : "hover:bg-gray-100"}`}
                                                     onClick={() => toggleGroupExpand(groupItem.groupId)}
                                                 >
-                                                <span
-                                                    className="product-list-category-group-name"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        navigate(`/products/${groupItem.groupId}/0/${toSlug(groupItem.groupName)}`)
-                                                    }}
-                                                >
-                                                    {groupItem.groupName}
-                                                </span>
+                                                    <span
+                                                        className="flex-1"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            navigate(`/products/${groupItem.groupId}/0/${toSlug(groupItem.groupName)}`)
+                                                        }}
+                                                    >
+                                                        {groupItem.groupName}
+                                                    </span>
                                                     <FaAngleDown
-                                                        className={`product-list-category-group-arrow ${expandedGroups[groupItem.groupId] ? "rotate-180" : ""}`}
+                                                        className={`transition-transform ${expandedGroups[groupItem.groupId] ? "rotate-180" : ""}`}
                                                     />
                                                 </div>
                                                 {expandedGroups[groupItem.groupId] && (
-                                                    <div className="product-list-category-subcategory-list">
+                                                    <div className="ml-4 mt-1 flex flex-col gap-1 border-l-2 border-gray-200 pl-2">
                                                         {groupItem.categories.map((category) => (
                                                             <div
                                                                 key={category.categoryId}
-                                                                className={`product-list-category-subcategory-item ${Number.parseInt(group) === groupItem.groupId && Number.parseInt(cate) === category.categoryId ? "active" : ""}`}
+                                                                className={`p-2 rounded cursor-pointer ${Number.parseInt(group) === groupItem.groupId && Number.parseInt(cate) === category.categoryId ? "bg-blue-50 text-red-600 font-medium" : "hover:bg-gray-100"}`}
                                                                 onClick={() => navigate(`/products/${groupItem.groupId}/${category.categoryId}/${toSlug(groupItem.groupName)}`)}
                                                             >
                                                                 {category.categoryName}
@@ -245,19 +230,19 @@ const ProductListCategory = () => {
                             </div>
                         </div>
 
-                        <div className="product-list-category-product-section">
+                        <div className="w-full lg:w-3/4 xl:w-4/5">
                             {products.length === 0 ? (
-                                <div className="product-list-category-empty-product-container">
-                                    <FaRegFrown className="product-list-category-empty-icon" />
-                                    <h3 className="product-list-category-empty-title">Không tìm thấy sản phẩm</h3>
-                                    <p className="product-list-category-empty-message">
+                                <div className="bg-white rounded-lg shadow-md p-12 flex flex-col items-center justify-center">
+                                    <FaRegFrown className="text-gray-400 w-16 h-16 mb-4" />
+                                    <h3 className="text-xl font-medium text-gray-500 mb-2">Không tìm thấy sản phẩm</h3>
+                                    <p className="text-gray-400 text-center">
                                         Không có sản phẩm nào phù hợp với tiêu chí tìm kiếm của bạn.
                                     </p>
                                 </div>
                             ) : (
                                 <>
                                     <motion.div
-                                        className="product-list-category-product-grid"
+                                        className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                                         initial="hidden"
                                         animate="visible"
                                         exit="exit"
@@ -270,31 +255,33 @@ const ProductListCategory = () => {
                                         {products.map((product) => (
                                             <motion.div
                                                 key={product.id}
-                                                className="product-list-category-product-card"
+                                                className="bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl"
                                                 variants={{
                                                     hidden: { opacity: 0, y: 20 },
                                                     visible: { opacity: 1, y: 0 },
                                                 }}
+
                                                 transition={{ duration: 0.3 }}
-                                            >
-                                                <div className="product-list-category-product-image-container">
+                                                whileHover={{ y: -8, transition: { duration: 0.05, ease: "easeOut" } }}>
+
+                                                <div className="relative overflow-hidden">
                                                     <img
                                                         src={product.image || "/placeholder.svg"}
                                                         alt={product.name}
-                                                        className="product-list-category-product-image"
+                                                        className="w-full h-48 object-cover transition-transform hover:scale-110"
                                                     />
-                                                    <div className="product-list-category-image-overlay">
+                                                    <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity flex items-center justify-center hover:opacity-100">
                                                         <button
-                                                            className="product-list-category-view-details-button"
+                                                            className="bg-white text-gray-800 px-4 py-2 rounded-full font-medium translate-y-4 transition-transform hover:translate-y-0"
                                                             onClick={() => handleNavigateToDetail(product)}
                                                         >
                                                             Xem chi tiết
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div className="product-list-category-product-info">
-                                                    <h3 className="product-list-category-product-name">{product.name}</h3>
-                                                    <div className="product-list-category-product-price">
+                                                <div className="p-4">
+                                                    <h3 className="font-medium text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
+                                                    <div className="text-red-600 font-bold mb-3 min-h-[50px]">
                                                         {(() => {
                                                             const minVariant = getMinVariant(product);
                                                             const minPrice = getMinVariantPrice(product);
@@ -303,10 +290,10 @@ const ProductListCategory = () => {
                                                                 return hasDiscount ? (
                                                                     <>
                                                                         <div>
-                                                                            <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
+                                                                            <span className="text-red-600">{minPrice.toLocaleString()}đ</span>
                                                                             <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
                                                                         </div>
-                                                                        <p className="deal-product-discount-percentage">Giảm {minVariant.discount}%</p>
+                                                                        <p className="text-yellow-600">Giảm {minVariant.discount}%</p>
                                                                     </>
                                                                 ) : (
                                                                     <span>{minPrice.toLocaleString()}đ</span>
@@ -316,10 +303,10 @@ const ProductListCategory = () => {
                                                                 return hasDiscount ? (
                                                                     <>
                                                                         <div>
-                                                                            <span className="text-red-500">{product.priceAfterDiscount.toLocaleString()}đ</span>
+                                                                            <span className="text-red-600">{product.priceAfterDiscount.toLocaleString()}đ</span>
                                                                             <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
                                                                         </div>
-                                                                        <p className="deal-product-discount-percentage">Giảm {product.discount}%</p>
+                                                                        <p className="text-yellow-600">Giảm {product.discount}%</p>
                                                                     </>
                                                                 ) : (
                                                                     <span>{product.price.toLocaleString()}đ</span>
@@ -329,18 +316,18 @@ const ProductListCategory = () => {
                                                     </div>
                                                     {product.productVariants && product.productVariants.length > 0 ? (
                                                         <button
-                                                            className="product-list-category-options-button"
+                                                            className="w-full p-2 rounded-lg flex items-center justify-center bg-red-700 text-white hover:bg-red-800 transition-colors"
                                                             onClick={() => handleOpenPopup(product)}
                                                         >
-                                                            <FaCog className="product-list-category-button-icon" />
+                                                            <FaCog className="mr-2" />
                                                             <span>Tùy chọn</span>
                                                         </button>
                                                     ) : (
                                                         <button
-                                                            className="product-list-category-add-to-cart-button"
+                                                            className="w-full p-2 rounded-lg flex items-center justify-center bg-red-700 text-white hover:bg-red-800 transition-colors"
                                                             onClick={() => handleAddToCart(product)}
                                                         >
-                                                            <FaCartPlus className="product-list-category-button-icon" />
+                                                            <FaCartPlus className="mr-2" />
                                                             <span>Thêm vào giỏ</span>
                                                         </button>
                                                     )}
@@ -350,30 +337,30 @@ const ProductListCategory = () => {
                                     </motion.div>
 
                                     {totalPages > 0 && (
-                                        <div className="product-list-category-pagination-container">
-                                            <div className="product-list-category-pagination-buttons">
+                                        <div className="mt-8 flex justify-center">
+                                            <div className="flex items-center gap-1">
                                                 <button
-                                                    onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
+                                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                                     disabled={currentPage === 1}
-                                                    className={`product-list-category-pagination-button ${currentPage === 1 ? "disabled" : ""}`}
+                                                    className={`px-4 py-2 rounded bg-white text-gray-600 border border-gray-200 ${currentPage === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"}`}
                                                 >
-                                                    <FaChevronLeft className="product-list-category-pagination-icon" />
+                                                    <FaChevronLeft className="w-4 h-4" />
                                                 </button>
                                                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                                                     <button
                                                         key={page}
                                                         onClick={() => setCurrentPage(Number(page))}
-                                                        className={`product-list-category-pagination-button ${currentPage === page ? "active" : ""}`}
+                                                        className={`px-4 py-2 rounded bg-white text-yellow-600 border border-gray-200 ${currentPage === page ? "bg-red-600 text-white" : "hover:bg-gray-100"}`}
                                                     >
                                                         {page}
                                                     </button>
                                                 ))}
                                                 <button
-                                                    onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
+                                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                                                     disabled={currentPage === totalPages}
-                                                    className={`product-list-category-pagination-button ${currentPage === totalPages ? "disabled" : ""}`}
+                                                    className={`px-4 py-2 rounded bg-white text-gray-600 border border-gray-200 ${currentPage === totalPages ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"}`}
                                                 >
-                                                    <FaChevronRight className="product-list-category-pagination-icon" />
+                                                    <FaChevronRight className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </div>

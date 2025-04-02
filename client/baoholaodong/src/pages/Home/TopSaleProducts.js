@@ -1,12 +1,10 @@
 ﻿import React, { useState, useContext, useEffect } from "react";
 import { FaArrowRight, FaCheck, FaStar, FaCog, FaCartPlus } from "react-icons/fa";
-import "./TopSaleProductsStyle.css";
 import noImage from "../../images/no-image-product.jpg";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
-import slugify from "slugify";
 import * as signalR from "@microsoft/signalr";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
@@ -15,8 +13,8 @@ const getMinVariant = (product) => {
     if (!product.productVariants || product.productVariants.length === 0) return null;
     return product.productVariants.reduce((min, variant) => {
         const discount = variant.discount || 0;
-        const finalPrice = variant.price - (variant.price * discount / 100);
-        const minPrice = min.price - (min.price * (min.discount || 0) / 100);
+        const finalPrice = variant.price - (variant.price * discount) / 100;
+        const minPrice = min.price - (min.price * (min.discount || 0)) / 100;
         return finalPrice < minPrice ? variant : min;
     });
 };
@@ -25,14 +23,14 @@ const getMinVariantPrice = (product) => {
     const variant = getMinVariant(product);
     if (!variant) return product.priceAfterDiscount || product.price;
     const discount = variant.discount || 0;
-    return variant.price - (variant.price * discount / 100);
+    return variant.price - (variant.price * discount) / 100;
 };
 
 const TopSaleProducts = ({ products = [], title = "" }) => {
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [productList, setProductList] = useState(products); // Thêm state để quản lý danh sách sản phẩm
+    const [productList, setProductList] = useState(products);
     const [hubConnection, setHubConnection] = useState(null);
     const productsPerPage = 20;
     const filters = ["Giá tăng dần", "Giá giảm dần", "Rating"];
@@ -40,7 +38,6 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
 
-    // Khởi tạo SignalR
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -49,16 +46,11 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
 
         connection
             .start()
-            .then(() => {
-                console.log("Connected to SignalR in TopSaleProducts");
-                setHubConnection(connection);
-            })
-            .catch((err) => console.error("Lỗi khi kết nối SignalR:", err));
+            .then(() => setHubConnection(connection))
+            .catch(console.error);
 
         return () => {
-            if (connection.state === signalR.HubConnectionState.Connected) {
-                connection.stop();
-            }
+            if (connection.state === signalR.HubConnectionState.Connected) connection.stop();
         };
     }, []);
 
@@ -66,31 +58,18 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
         if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
 
         const handleProductChange = (updatedProduct) => {
-            setProductList((prevProducts) =>
-                prevProducts.map((product) =>
-                    product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
-                )
+            setProductList((prev) =>
+                prev.map((p) => (p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p))
             );
         };
 
         hubConnection.on("ProductUpdated", handleProductChange);
-        return () => {
-            if (hubConnection.state === signalR.HubConnectionState.Connected) {
-                hubConnection.off("ProductUpdated", handleProductChange);
-            }
-        };
+        return () => hubConnection.off("ProductUpdated", handleProductChange);
     }, [hubConnection]);
 
-    // Cập nhật productList khi props products thay đổi
     useEffect(() => {
         setProductList(products);
     }, [products]);
-
-    const handlePageChange = (page) => {
-        if (page > 0 && page <= totalPages) {
-            setCurrentPage(page);
-        }
-    };
 
     const sortedProducts = [...productList];
     if (selectedFilter === "Giá tăng dần") {
@@ -107,7 +86,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     );
 
     const handleDetailProduct = (product) => {
-        window.location.href = `/products/${product.slug}`;
+        navigate(`/products/${product.slug}`);
     };
 
     const handleProductClick = (product) => {
@@ -134,107 +113,107 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     };
 
     return (
-        <main className="container mx-auto p-4">
-            <div className="flex justify-between items-center mb-4 filter-container" style={{ marginTop: "30px" }}>
-                <h2 className="best-products">{title}</h2>
-                <div className="flex space-x-4">
-                    {filters.map((filter, index) => (
+        <main className="w-full max-w-screen-2xl mx-auto px-4 py-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <h2 className="text-xl md:text-2xl font-bold text-red-700 relative inline-block uppercase">
+                    {title}
+                    <span className="absolute bottom-0 left-0 w-1/4 h-[3px] bg-yellow-400 -mb-1"></span>
+                </h2>
+
+                <div className="flex flex-wrap gap-2">
+                    {filters.map((filter, idx) => (
                         <button
-                            key={index}
+                            key={idx}
                             onClick={() => setSelectedFilter(filter)}
-                            className={`filter-button ${selectedFilter === filter ? "selected" : ""}`}
+                            className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 
+              ${selectedFilter === filter ? 'bg-red-700 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
                         >
-                            {filter}
-                            {selectedFilter === filter && <FaCheck className="ml-2 inline" />}
+                            {filter} {selectedFilter === filter && <FaCheck className="inline ml-1" />}
                         </button>
                     ))}
                 </div>
             </div>
-            <div className="product-container-best-products">
-                {currentProducts.map((product, index) => (
-                    <motion.div
-                        key={index}
-                        className="product-card"
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                    >
-                        <div className="product-sale-image-container">
-                            <img
-                                onClick={() => handleDetailProduct(product)}
-                                className="product-sale-image"
-                                src={product.image || noImage}
-                                alt={product.name}
-                            />
-                            <div className="product-sale-image-overlay">
-                                <button
-                                    className="product-sale-view-details-button"
+
+            <div className="-mx-4 px-4 py-5 flex gap-4 overflow-x-auto scrollbar-hide lg:grid lg:grid-cols-4 xl:grid-cols-5 lg:gap-4 lg:overflow-visible">
+                {currentProducts.map((product, idx) => {
+                    const minVariant = getMinVariant(product);
+                    const minPrice = getMinVariantPrice(product);
+                    const hasDiscount = minVariant?.discount > 0 || (product.discount && product.priceAfterDiscount < product.price);
+
+                    return (
+                        <motion.div
+                            key={product.id}
+                            className="w-[250px] flex-shrink-0 lg:w-auto group bg-white rounded-lg shadow-[0_0_10px_black] overflow-hidden cursor-pointer transition-transform duration-300"
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            whileHover={{ y: -8, transition: { duration: 0.05, ease: "easeOut" } }}
+                        >
+                            <div className="relative overflow-hidden">
+                                <img
+                                    src={product.image || noImage}
+                                    alt={product.name}
                                     onClick={() => handleDetailProduct(product)}
-                                >
-                                    Xem chi tiết
-                                </button>
+                                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                    <button
+                                        onClick={() => handleDetailProduct(product)}
+                                        className="bg-white text-gray-800 text-sm px-4 py-1 rounded-full font-medium"
+                                    >
+                                        Xem chi tiết
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div className="product-info">
-                            <div className="product-rating">
-                                {Array.from({ length: product.averageRating }, (_, i) => (
-                                    <FaStar key={i} />
-                                ))}
-                            </div>
-                            <div className="product-name">{product.name}</div>
-                            <div className="product-price">
-                                {(() => {
-                                    const minVariant = getMinVariant(product);
-                                    const minPrice = getMinVariantPrice(product);
-                                    if (minVariant) {
-                                        const hasDiscount = minVariant.discount > 0;
-                                        return hasDiscount ? (
-                                            <>
-                                                <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
-                                                <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
-                                                <p className="product-discount-percentage">Giảm {minVariant.discount}%</p>
-                                            </>
-                                        ) : (
-                                            <span>{minPrice.toLocaleString()}đ</span>
-                                        );
-                                    } else {
-                                        const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
-                                        return hasDiscount ? (
-                                            <>
-                                                <span className="text-red-500">{product.priceAfterDiscount.toLocaleString()}đ</span>
-                                                <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
-                                                <p className="product-discount-percentage">Giảm {product.discount}%</p>
-                                            </>
-                                        ) : (
-                                            <span>{product.price.toLocaleString()}đ</span>
-                                        );
-                                    }
-                                })()}
-                            </div>
-                            <div className="product-actions">
-                                <button className="option-button" onClick={() => handleProductClick(product)}>
-                                    {product.productVariants.length > 0 ? (
+
+                            <div className="p-3 flex flex-col gap-2">
+                                <div className="flex text-yellow-400 text-sm justify-start">
+                                    {Array.from({ length: product.averageRating }, (_, i) => <FaStar key={i} />)}
+                                </div>
+
+                                <h3 className="text-sm font-semibold line-clamp-2 text-left">{product.name}</h3>
+
+                                <div className="text-sm text-left min-h-[48px]">
+                                    {hasDiscount ? (
                                         <>
-                                            <FaCog className="icon" />Tùy chọn
+                                            <span className="text-red-600 font-bold">{minPrice.toLocaleString()}đ</span>
+                                            <span className="text-gray-400 line-through ml-2 text-sm">
+                        {minVariant?.price?.toLocaleString() || product.price.toLocaleString()}đ
+                      </span>
+                                            <p className="text-yellow-600 text-xs font-semibold mt-1">
+                                                Giảm {minVariant?.discount || product.discount}%
+                                            </p>
                                         </>
                                     ) : (
-                                        <>
-                                            <FaCartPlus className="icon" />Thêm vào giỏ hàng
-                                        </>
+                                        <span className="text-red-600 font-bold">{minPrice.toLocaleString()}đ</span>
+                                    )}
+                                </div>
+
+                                <button
+                                    className="mt-auto text-sm bg-red-700 text-white w-full py-2 rounded hover:bg-red-800 transition"
+                                    onClick={() => handleProductClick(product)}
+                                >
+                                    {product.productVariants.length > 0 ? (
+                                        <span className="flex items-center justify-center gap-1">
+                      <FaCog /> Tùy chọn
+                    </span>
+                                    ) : (
+                                        <span className="flex items-center justify-center gap-1">
+                      <FaCartPlus /> Thêm vào giỏ hàng
+                    </span>
                                     )}
                                 </button>
                             </div>
-                        </div>
-                    </motion.div>
-                ))}
+                        </motion.div>
+                    );
+                })}
             </div>
-            <div className="flex justify-center mt-4">
-                <div className="new-blog-read-more">
-                    <button className="new-blog-read-more-button">
-                        <div className="new-blog-read-more-text">Xem tất cả <FaArrowRight className="inline" /></div>
-                    </button>
-                </div>
+
+            <div className="flex justify-center mt-8">
+                <button className="px-6 py-2 bg-red-700 text-white rounded-full font-bold uppercase tracking-wide hover:bg-yellow-400 hover:text-red-700 transition">
+                    Xem tất cả <FaArrowRight className="inline ml-1" />
+                </button>
             </div>
+
             {selectedProduct && <ProductPopup product={selectedProduct} onClose={handleClosePopup} />}
         </main>
     );
