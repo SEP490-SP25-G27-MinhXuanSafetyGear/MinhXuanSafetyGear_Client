@@ -6,7 +6,6 @@ import { formatVND } from "../../utils/format"
 import axios from "axios"
 import { AuthContext } from "../../contexts/AuthContext"
 import { CreditCard, Truck, MapPin, Phone, Mail, User, DollarSign, CheckCircle } from "lucide-react"
-import "./style.css"
 import PageWrapper from "../../components/pageWrapper/PageWrapper"
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
@@ -53,7 +52,6 @@ export function ConfirmOrder() {
                 })),
             }
             const response = await axios.post(`${BASE_URL}/api/Order/calculate-order`, newOrder)
-            console.log(response.data)
             setCalculatedOrder(response.data)
         } catch (error) {
             console.error("Lỗi tính toán đơn hàng:", error)
@@ -105,7 +103,6 @@ export function ConfirmOrder() {
 
             setTimeout(() => {
                 setTruckAnimation(false)
-
                 setRotatePage(true)
                 setTimeout(() => {
                     setOrderSuccess(true)
@@ -130,42 +127,110 @@ export function ConfirmOrder() {
     if (orderSuccess) {
         return (
             <PageWrapper title="Đặt hàng thành công">
-                <div className="confirm-container">
-                    <div className="confirm-success-card">
-                        <div className="confirm-success-header">
-                            <h1 className="confirm-success-title">
-                                <CheckCircle className="confirm-icon" />
+                <div className="max-w-5xl mx-auto px-4 py-8">
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+
+                        {/* HEADER: nền xanh lá và icon thành công */}
+                        <div className="bg-gradient-to-r from-green-500 to-green-700 p-6">
+                            <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center">
+                                <CheckCircle className="w-6 h-6 mr-2" />
                                 Đặt hàng thành công
                             </h1>
                         </div>
-                        <div className="confirm-success-content">
-                            <div className="confirm-success-icon">
-                                <CheckCircle className="confirm-icon-large" />
+
+                        {/* BODY */}
+                        <div className="p-6 md:p-8 space-y-6">
+                            {/* Lời cảm ơn */}
+                            <p className="text-lg text-gray-700 leading-relaxed">
+                                Cảm ơn quý khách đã đặt hàng tại website{" "}
+                                <span className="font-semibold text-blue-600">baoholaodongminhxuan.com</span>. <br />
+                                Chúng tôi sẽ liên hệ lại với quý khách trong thời gian sớm nhất có thể!
+                            </p>
+
+                            {/* Thông tin khách */}
+                            <div>
+                                <h2 className="text-lg font-semibold underline mb-2">Thông tin khách hàng</h2>
+                                <p className="text-gray-700">{customerInfo.customerName}</p>
+                                <p className="text-gray-700">Điện thoại: {customerInfo.customerPhone}</p>
+                                <p className="text-gray-700">Email: {customerInfo.customerEmail}</p>
+                                <p className="text-gray-700">Địa chỉ: {customerInfo.customerAddress}</p>
                             </div>
-                            <h2 className="confirm-thank-you">Cảm ơn bạn đã đặt hàng!</h2>
-                            <p className="confirm-order-message">{orderMessage}</p>
-                            <div className="confirm-order-info">
-                                <h3 className="confirm-info-title">Thông tin đơn hàng</h3>
-                                <p>Họ tên: {customerInfo.customerName}</p>
-                                <p>Số điện thoại: {customerInfo.customerPhone}</p>
-                                <p>Địa chỉ: {customerInfo.customerAddress}</p>
-                                <p>
-                                    Phương thức thanh toán: {customerInfo.paymentMethod === "Cash" ? "Tiền mặt" : "Thanh toán online"}
-                                </p>
-                                <p>Đã bao gồm thuế: {isTaxIncluded ? "Có" : "Không"}</p>
-                                <p className="confirm-total">Tổng tiền: {formatVND(calculatedOrder.totalAmount ?? totalAmount)}</p>
+
+                            {/* Bảng đơn hàng */}
+                            <div>
+                                <h2 className="text-lg font-semibold underline mb-4">Thông tin đơn hàng</h2>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full border border-collapse text-sm text-left">
+                                        <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="border px-3 py-2">Sản phẩm</th>
+                                            <th className="border px-3 py-2 text-center">Size</th>
+                                            <th className="border px-3 py-2 text-center">Đơn giá</th>
+                                            <th className="border px-3 py-2 text-center">SL</th>
+                                            <th className="border px-3 py-2 text-center">Thuế (%)</th>
+                                            <th className="border px-3 py-2 text-right">Thành tiền</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {calculatedOrder.orderDetails?.map(
+                                            (
+                                                {
+                                                    productId,
+                                                    productName,
+                                                    size,
+                                                    quantity,
+                                                    totalPrice,
+                                                    productTax,
+                                                    productPrice,
+                                                },
+                                                index
+                                            ) => (
+                                                <tr key={`${productId}-${index}`} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                                                    <td className="border px-3 py-2">{productName}</td>
+                                                    <td className="border px-3 py-2 text-center">{size || "N/A"}</td>
+                                                    <td className="border px-3 py-2 text-center">{formatVND(productPrice)}</td>
+                                                    <td className="border px-3 py-2 text-center">{quantity}</td>
+                                                    <td className="border px-3 py-2 text-center">{productTax}%</td>
+                                                    <td className="border px-3 py-2 text-right">{formatVND(totalPrice)}</td>
+                                                </tr>
+                                            )
+                                        )}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Thuế + Tổng */}
+                                <div className="flex items-center mt-4 space-x-2">
+                                    <input type="checkbox" checked={isTaxIncluded} readOnly className="w-5 h-5" />
+                                    <span className="text-base">Thuế giá trị gia tăng</span>
+                                </div>
+
+                                <div className="text-right text-lg font-bold mt-4">
+                                    Tổng:{" "}
+                                    <span className="text-red-600">
+                                      {formatVND(calculatedOrder.totalAmount)}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="confirm-button-group">
-                                <button onClick={() => (window.location.href = "/")} className="confirm-btn-continue">
+
+                            {/* Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 border-t border-gray-200">
+                                <button
+                                    onClick={() => (window.location.href = "/")}
+                                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                >
                                     Tiếp tục mua sắm
                                 </button>
-                                <button onClick={() => (window.location.href = "/account/orders")} className="confirm-btn-view-order">
+                                <button
+                                    onClick={() => (window.location.href = "/account/orders")}
+                                    className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                                >
                                     Xem đơn hàng của tôi
                                 </button>
                                 {customerInfo.paymentMethod === "Online" && invoiceNumber && (
                                     <button
                                         onClick={() => (window.location.href = `/checkout?invoiceNumber=${invoiceNumber}`)}
-                                        className="confirm-btn-pay-now"
+                                        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
                                     >
                                         Thanh toán ngay
                                     </button>
@@ -175,26 +240,28 @@ export function ConfirmOrder() {
                     </div>
                 </div>
             </PageWrapper>
+
         )
     }
 
+
     return (
         <PageWrapper title="Xác nhận đơn hàng">
-            <div className={`confirm-container ${rotatePage ? "confirm-rotate" : ""}`}>
-                <div className="confirm-order-card">
-                    <div className="confirm-order-header">
-                        <h1 className="confirm-order-title">
-                            <Truck className={`confirm-icon ${truckAnimation ? "confirm-truck-move" : ""}`} />
+            <div className={`max-w-5xl mx-auto px-4 py-8 ${rotatePage ? "animate-[confirm-page-rotate_1s_ease-in-out_forwards]" : ""}`}>
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div className="bg-gradient-to-t from-red-900 to-red-600 p-6">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center">
+                            <Truck className={`w-6 h-6 mr-2 ${truckAnimation ? "animate-[confirm-truck-slide_1.5s_ease-in-out_forwards]" : ""}`} />
                             Xác nhận đơn hàng
                         </h1>
                     </div>
-                    <div className="confirm-order-content">
-                        <div className="confirm-section">
-                            <h2 className="confirm-section-title">Thông tin giao hàng</h2>
-                            <div className="confirm-grid">
-                                <div className="confirm-input-group">
-                                    <label className="confirm-label">
-                                        <User className="confirm-icon-small" />
+                    <div className="p-6 md:p-8">
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-4">Thông tin giao hàng</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex flex-col">
+                                    <label className="text-sm font-medium text-gray-700 flex items-center">
+                                        <User className="w-4 h-4 mr-1" />
                                         Họ tên
                                     </label>
                                     <input
@@ -202,14 +269,14 @@ export function ConfirmOrder() {
                                         name="customerName"
                                         value={customerInfo.customerName}
                                         onChange={handleInputChange}
-                                        className="confirm-input"
+                                        className="mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                         placeholder="Nhập họ tên người nhận"
                                         required
                                     />
                                 </div>
-                                <div className="confirm-input-group">
-                                    <label className="confirm-label">
-                                        <Mail className="confirm-icon-small" />
+                                <div className="flex flex-col">
+                                    <label className="text-sm font-medium text-gray-700 flex items-center">
+                                        <Mail className="w-4 h-4 mr-1" />
                                         Email
                                     </label>
                                     <input
@@ -217,13 +284,13 @@ export function ConfirmOrder() {
                                         name="customerEmail"
                                         value={customerInfo.customerEmail}
                                         onChange={handleInputChange}
-                                        className="confirm-input"
+                                        className="mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                         placeholder="Nhập email"
                                     />
                                 </div>
-                                <div className="confirm-input-group">
-                                    <label className="confirm-label">
-                                        <Phone className="confirm-icon-small" />
+                                <div className="flex flex-col">
+                                    <label className="text-sm font-medium text-gray-700 flex items-center">
+                                        <Phone className="w-4 h-4 mr-1" />
                                         Số điện thoại
                                     </label>
                                     <input
@@ -231,14 +298,14 @@ export function ConfirmOrder() {
                                         name="customerPhone"
                                         value={customerInfo.customerPhone}
                                         onChange={handleInputChange}
-                                        className="confirm-input"
+                                        className="mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                         placeholder="Nhập số điện thoại"
                                         required
                                     />
                                 </div>
-                                <div className="confirm-input-group">
-                                    <label className="confirm-label">
-                                        <MapPin className="confirm-icon-small" />
+                                <div className="flex flex-col">
+                                    <label className="text-sm font-medium text-gray-700 flex items-center">
+                                        <MapPin className="w-4 h-4 mr-1" />
                                         Địa chỉ giao hàng
                                     </label>
                                     <input
@@ -246,21 +313,23 @@ export function ConfirmOrder() {
                                         name="customerAddress"
                                         value={customerInfo.customerAddress}
                                         onChange={handleInputChange}
-                                        className="confirm-input"
+                                        className="mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                         placeholder="Nhập địa chỉ giao hàng"
                                         required
                                     />
                                 </div>
                             </div>
                         </div>
-                        <div className="confirm-section">
-                            <h2 className="confirm-section-title">
-                                <CreditCard className="confirm-icon" />
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-4 flex items-center">
+                                <CreditCard className="w-5 h-5 mr-2" />
                                 Phương thức thanh toán
                             </h2>
-                            <div className="confirm-payment-options">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <label
-                                    className={`confirm-payment-option ${customerInfo.paymentMethod === "Cash" ? "confirm-active" : ""}`}
+                                    className={`flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-200 transition-all ${
+                                        customerInfo.paymentMethod === "Cash" ? "border-red-500 bg-blue-50" : ""
+                                    }`}
                                 >
                                     <input
                                         type="radio"
@@ -268,16 +337,18 @@ export function ConfirmOrder() {
                                         value="Cash"
                                         checked={customerInfo.paymentMethod === "Cash"}
                                         onChange={() => setCustomerInfo({ ...customerInfo, paymentMethod: "Cash" })}
-                                        className="confirm-radio"
+                                        className="w-4 h-4 text-red-500 mr-3"
                                     />
-                                    <DollarSign className="confirm-icon" />
+                                    <DollarSign className="w-5 h-5 text-red-500 mr-2" />
                                     <div>
-                                        <p className="confirm-payment-title">Tiền mặt</p>
-                                        <p className="confirm-payment-desc">Thanh toán khi nhận hàng</p>
+                                        <p className="font-medium">Tiền mặt</p>
+                                        <p className="text-sm text-gray-500">Thanh toán khi nhận hàng</p>
                                     </div>
                                 </label>
                                 <label
-                                    className={`confirm-payment-option ${customerInfo.paymentMethod === "Online" ? "confirm-active" : ""}`}
+                                    className={`flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-200 transition-all ${
+                                        customerInfo.paymentMethod === "Online" ? "border-red-500 bg-blue-50" : ""
+                                    }`}
                                 >
                                     <input
                                         type="radio"
@@ -285,32 +356,34 @@ export function ConfirmOrder() {
                                         value="Online"
                                         checked={customerInfo.paymentMethod === "Online"}
                                         onChange={() => setCustomerInfo({ ...customerInfo, paymentMethod: "Online" })}
-                                        className="confirm-radio"
+                                        className="w-4 h-4 text-red-500 mr-3"
                                     />
-                                    <CreditCard className="confirm-icon" />
+                                    <CreditCard className="w-5 h-5 text-red-500 mr-2" />
                                     <div>
-                                        <p className="confirm-payment-title">Thanh toán online</p>
-                                        <p className="confirm-payment-desc">Chuyển khoản qua cổng thanh toán</p>
+                                        <p className="font-medium">Thanh toán online</p>
+                                        <p className="text-sm text-gray-500">Chuyển khoản qua cổng thanh toán</p>
                                     </div>
                                 </label>
                             </div>
                         </div>
-                        <div className="confirm-section">
-                            <h2 className="confirm-section-title">Chi tiết sản phẩm</h2>
-                            <div className="confirm-table-wrapper">
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold text-gray-800 pb-2 mb-4">
+                                Thông tin đơn hàng
+                                <span className="block h-1 w-24 bg-red-500 border-b-2 border-dashed border-red-500"></span>
+                            </h2>
+                            <div className="overflow-x-auto">
                                 {!calculatedOrder.orderDetails ? (
-                                    <div className="confirm-loading">Đang tính toán đơn hàng...</div>
+                                    <div className="text-center py-5 text-gray-600">Đang tính toán đơn hàng...</div>
                                 ) : (
-                                    <table className="confirm-order-table">
+                                    <table className="w-full border-collapse">
                                         <thead>
-                                        <tr>
-                                            <th>Sản phẩm</th>
-                                            <th>Size</th>
-                                            <th>Màu</th>
-                                            <th>SL</th>
-                                            <th>Đơn giá</th>
-                                            <th>Thuế</th>
-                                            <th>Thành tiền</th>
+                                        <tr className="bg-gray-50">
+                                            <th className="p-3 text-left font-medium text-gray-700">Sản phẩm</th>
+                                            <th className="p-3 text-center font-medium text-gray-700">Size</th>
+                                            <th className="p-3 text-center font-medium text-gray-700">Đơn giá</th>
+                                            <th className="p-3 text-center font-medium text-gray-700">SL</th>
+                                            <th className="p-3 text-center font-medium text-gray-700">Thuế (%)</th>
+                                            <th className="p-3 text-right font-medium text-gray-700">Thành tiền</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -331,24 +404,23 @@ export function ConfirmOrder() {
                                             ) => (
                                                 <tr
                                                     key={`${productId}-${index}`}
-                                                    className={index % 2 === 0 ? "confirm-even" : "confirm-odd"}
+                                                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                                                 >
-                                                    <td>
-                                                        <div className="confirm-product-info">
+                                                    <td className="p-4">
+                                                        <div className="flex items-center">
                                                             <img
                                                                 src={productImage || "/placeholder.svg"}
                                                                 alt={productName}
-                                                                className="confirm-product-img"
+                                                                className="w-16 h-16 object-cover rounded-md border border-gray-200 mr-3"
                                                             />
                                                             <span>{productName}</span>
                                                         </div>
                                                     </td>
-                                                    <td>{size || "N/A"}</td>
-                                                    <td>{color || "N/A"}</td>
-                                                    <td>{quantity}</td>
-                                                    <td>{formatVND(productPrice)}</td>
-                                                    <td>{`${productTax}%`}</td>
-                                                    <td>{formatVND(totalPrice)}</td>
+                                                    <td className="p-4 text-center">{size || "N/A"}</td>
+                                                    <td className="p-4 text-center">{formatVND(productPrice)}</td>
+                                                    <td className="p-4 text-center">{quantity}</td>
+                                                    <td className="p-4 text-center">{`${productTax}%`}</td>
+                                                    <td className="p-4 text-right font-semibold">{formatVND(totalPrice)}</td>
                                                 </tr>
                                             ),
                                         )}
@@ -356,28 +428,37 @@ export function ConfirmOrder() {
                                     </table>
                                 )}
                             </div>
-                        </div>
-                        <div className="confirm-footer">
-                            <div className="confirm-note">Vui lòng kiểm tra thông tin trước khi đặt hàng</div>
-                            <div className="confirm-tax-checkbox">
+                            <div className="mt-4 flex items-center">
                                 <input
                                     type="checkbox"
                                     id="taxCheckbox"
                                     checked={isTaxIncluded}
                                     onChange={() => setIsTaxIncluded(!isTaxIncluded)}
-                                    className="confirm-checkbox"
+                                    className="w-5 h-5 cursor-pointer mr-2"
                                 />
-                                <label htmlFor="taxCheckbox" className="confirm-checkbox-label">
-                                    Thuế
+                                <label htmlFor="taxCheckbox" className="text-base cursor-pointer">
+                                    Thuế giá trị gia tăng
                                 </label>
                             </div>
-                            <div className="confirm-total-section">
-                                <div className="confirm-total-amount">
-                                    Tổng tiền:{" "}
-                                    <span>{calculatedOrder.totalAmount ? formatVND(calculatedOrder.totalAmount) : "Đang tính..."}</span>
+                            <div className="mt-4 text-right">
+                                <div className="text-xl font-bold text-gray-800">
+                                    Tổng
+                                    :{" "}
+                                    <span className="text-red-500">
+                                        {calculatedOrder.totalAmount ? formatVND(calculatedOrder.totalAmount) : "Đang tính..."}
+                                    </span>
                                 </div>
+                            </div>
+                        </div>
+                        <div className="border-t border-gray-200 pt-6 flex flex-col md:flex-row justify-between items-end">
+                            <div className="text-gray-500 mb-4 md:mb-0">Vui lòng kiểm tra thông tin trước khi đặt hàng</div>
+                            <div className="text-right">
                                 <button
-                                    className={`confirm-order-btn ${isSubmitting || !calculatedOrder.orderDetails ? "confirm-disabled" : ""}`}
+                                    className={`px-8 py-3 rounded-lg text-white font-medium text-lg ${
+                                        isSubmitting || !calculatedOrder.orderDetails
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-red-500 hover:bg-red-600 active:bg-red-500"
+                                    }`}
                                     onClick={handleOrder}
                                     disabled={isSubmitting || !calculatedOrder.orderDetails}
                                 >
@@ -388,7 +469,19 @@ export function ConfirmOrder() {
                     </div>
                 </div>
             </div>
+            {notification.show && (
+                <div className="fixed bottom-5 right-5 z-50 animate-fade-in-up">
+                    <div
+                        className={`px-4 py-3 rounded-md shadow-md text-red-600 text-sm flex items-center gap-2 transition ${
+                            notification.type === "error" ? "bg-red-300" : "bg-green-500"
+                        }`}
+                    >
+                        <span>{notification.type === "error" ? "❌" : "✅"}</span>
+                        <span>{notification.message}</span>
+                    </div>
+                </div>
+            )}
         </PageWrapper>
+
     )
 }
-

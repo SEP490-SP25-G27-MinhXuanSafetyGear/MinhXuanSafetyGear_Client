@@ -1,50 +1,53 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useContext } from "react"
-import {useNavigate, useParams} from "react-router-dom"
-import axios from "axios"
-import { FaImage, FaMarkdown, FaQuestionCircle } from "react-icons/fa"
-import "./create-blog.css"
-import { BlogPostContext } from "../../../contexts/BlogPostContext"
-import {TextEditor} from "../../../components/TextEditor";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { FaImage, FaMarkdown, FaQuestionCircle } from "react-icons/fa";
+import "./create-blog.css";
+import { BlogPostContext } from "../../../contexts/BlogPostContext";
+import { TextEditor } from "../../../components/TextEditor";
 import type React from "react";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export default function UpdateBlog() {
-	const navigate = useNavigate()
-	const [title, setTitle] = useState("")
-	const [content, setContent] = useState("")
-	const [status, setStatus] = useState("Draft")
-	const [summary, setSummary] = useState("")
-	const [tags, setTags] = useState("")
-	const [category, setCategory] = useState(0)
-	const [file, setFile] = useState(null)
-	const [previewUrl, setPreviewUrl] = useState("")
-	const [message, setMessage] = useState({ type: "", text: "" })
-	const [isSubmitting, setIsSubmitting] = useState(false)
-	const { categories } = useContext(BlogPostContext)
+	const navigate = useNavigate();
+	const [title, setTitle] = useState("");
+	const [content, setContent] = useState("");
+	const [status, setStatus] = useState("Draft");
+	const [summary, setSummary] = useState("");
+	const [tags, setTags] = useState("");
+	const [category, setCategory] = useState(0);
+	const [file, setFile] = useState(null);
+	const [previewUrl, setPreviewUrl] = useState("");
+	const [message, setMessage] = useState({ type: "", text: "" });
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [postUrl, setPostUrl] = useState(""); // Thêm state cho postUrl
+	const { categories } = useContext(BlogPostContext);
 	const { id } = useParams();
 	const [post, setPost] = useState({
 		id: 0,
 		title: "",
 		content: "",
-		tags:"",
+		tags: "",
 		summary: "",
 		status: "draft",
 		imageUrl: "",
 		categoryId: 0,
 	});
+
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog/${id}`);
-				setTitle(response.data.title)
-				setContent(response.data.content)
-				setStatus(response.data.status)
-				setSummary(response.data.summary)
-				setTags(response.data.tags)
+				setTitle(response.data.title);
+				setContent(response.data.content);
+				setStatus(response.data.status);
+				setSummary(response.data.summary);
+				setTags(response.data.tags);
 				setCategory(response.data.categoryId);
+				setPostUrl(response.data.postUrl || ""); // Lấy postUrl từ API
 			} catch (e) {
 				console.error("Error fetching post data", e);
 			}
@@ -53,35 +56,33 @@ export default function UpdateBlog() {
 			fetchData();
 		}
 	}, [id]);
-	useEffect(()=>{
-		if(post){
-			setTitle(post.title)
-			setContent(post.content)
-			setStatus(post.status)
-			setCategory(post.categoryId)
-			if(post.imageUrl !== null){
+
+	useEffect(() => {
+		if (post) {
+			setTitle(post.title);
+			setContent(post.content);
+			setStatus(post.status);
+			setCategory(post.categoryId);
+			if (post.imageUrl !== null) {
 				setPreviewUrl(post.imageUrl);
 			}
 		}
-	},[post])
+	}, [post]);
+
 	const handleFileChange = (e) => {
-		const selectedFile = e.target.files[0]
+		const selectedFile = e.target.files[0];
 		if (selectedFile) {
-			setFile(selectedFile)
-			setPreviewUrl(URL.createObjectURL(selectedFile))
+			setFile(selectedFile);
+			setPreviewUrl(URL.createObjectURL(selectedFile));
 		}
-	}
+	};
 
 	const handleContentChange = (newContent) => {
-		setContent(newContent)
-	}
+		setContent(newContent);
+	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		// if (!post.title || !post.content || !post.categoryId) {
-		// 	alert("Please fill in all required fields!");
-		// 	return;
-		// }
 
 		const formData = new FormData();
 		formData.append("id", parseInt(id));
@@ -92,10 +93,11 @@ export default function UpdateBlog() {
 		formData.append("status", status);
 		formData.append("category", category);
 		formData.append("file", file);
+		formData.append("postUrl", postUrl);
 
 		try {
 			setIsSubmitting(true);
-		    const response = await axios.put(`${BASE_URL}/api/BlogPost/update-blog`, formData, {
+			const response = await axios.put(`${BASE_URL}/api/BlogPost/update-blog`, formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
 			setPost(response.data);
@@ -108,14 +110,13 @@ export default function UpdateBlog() {
 		}
 	};
 
-	// Clean up object URLs when component unmounts
 	useEffect(() => {
 		return () => {
 			if (previewUrl) {
-				URL.revokeObjectURL(previewUrl)
+				URL.revokeObjectURL(previewUrl);
 			}
-		}
-	}, [previewUrl])
+		};
+	}, [previewUrl]);
 
 	return (
 		<div className="blog-editor-container">
@@ -125,7 +126,9 @@ export default function UpdateBlog() {
 				</div>
 
 				{message.text && (
-					<div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"}`}>{message.text}</div>
+					<div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"}`}>
+						{message.text}
+					</div>
 				)}
 
 				<form>
@@ -162,7 +165,13 @@ export default function UpdateBlog() {
 							<label htmlFor="content" className="form-label">
 								Nội dung
 							</label>
-							<TextEditor width={"100%"} height={"300px"} maxLength={50000} value={content} setValue={setContent} />
+							<TextEditor
+								width={"100%"}
+								height={"300px"}
+								maxLength={50000}
+								value={content}
+								setValue={setContent}
+							/>
 						</div>
 
 						<div className="form-group">
@@ -177,6 +186,20 @@ export default function UpdateBlog() {
 								value={tags}
 								onChange={(e) => setTags(e.target.value)}
 								maxLength={255}
+							/>
+						</div>
+
+						<div className="form-group">
+							<label htmlFor="postUrl" className="form-label">
+								URL bài viết
+							</label>
+							<input
+								type="url"
+								id="postUrl"
+								className="form-input"
+								placeholder="Nhập URL bài viết (ví dụ: https://example.com)"
+								value={postUrl}
+								onChange={(e) => setPostUrl(e.target.value)}
 							/>
 						</div>
 
@@ -251,7 +274,11 @@ export default function UpdateBlog() {
 									<div className="form-col">
 										<div className="file-preview-container">
 											<p className="form-label">Ảnh xem trước:</p>
-											<img src={previewUrl || "/placeholder.svg"} alt="Preview" className="file-preview-image" />
+											<img
+												src={previewUrl || "/placeholder.svg"}
+												alt="Preview"
+												className="file-preview-image"
+											/>
 										</div>
 									</div>
 								)}
@@ -268,13 +295,17 @@ export default function UpdateBlog() {
 						>
 							Hủy
 						</button>
-						<button onClick={(e)=>!isSubmitting? handleSubmit(e):()=>{return}} type="submit" className="btn btn-primary" disabled={isSubmitting}>
-							{isSubmitting ? "Đang xử lý..." : "Cập nhât bài viết"}
+						<button
+							onClick={(e) => (!isSubmitting ? handleSubmit(e) : () => {return})}
+							type="submit"
+							className="btn btn-primary"
+							disabled={isSubmitting}
+						>
+							{isSubmitting ? "Đang xử lý..." : "Cập nhật bài viết"}
 						</button>
 					</div>
 				</form>
 			</div>
 		</div>
-	)
+	);
 }
-

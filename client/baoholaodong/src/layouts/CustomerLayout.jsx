@@ -32,18 +32,23 @@ const CustomerLayout = () => {
     const shouldHideHeaderFooter = isCheckoutPage && isDone;
 
     return (
-        <div className="main-container">
-            {!shouldHideHeaderFooter && <Header cartCount={cartCount} cartItems={cartItems} showToast={showToast} />}
+        <div className="flex flex-col min-h-screen">
+            {!shouldHideHeaderFooter && (
+                <Header
+                    cartCount={cartCount}
+                    cartItems={cartItems}
+                    showToast={showToast}
+                />
+            )}
             {/*{!isCheckoutPage && location.pathname !== "/" && <Breadcrumb />}*/}
-            <main className="main-content">
+            <main className="flex-1">
                 <Outlet context={{ addToCart }} />
             </main>
             {!shouldHideHeaderFooter && <Footer />}
-            {toast && (
-                <Toast message={toast} onClose={handleToastClose} />
-            )}
+            {toast && <Toast message={toast} onClose={handleToastClose} />}
         </div>
     );
+
 };
 
 export default CustomerLayout;

@@ -118,7 +118,7 @@ export default function TopDealProducts({ products = [] }) {
                             const hasDiscount = minVariant?.discount || product.discount;
 
                             return (
-                                <div key={product.id} className="top-deal-product-card">
+                                <div key={product.id} className="top-deal-product-card flex flex-col">
                                     <div className="top-deal-image-container">
                                         <img
                                             src={product.image || noImage}
@@ -135,24 +135,44 @@ export default function TopDealProducts({ products = [] }) {
                                             </button>
                                         </div>
                                     </div>
-                                    <h3 className="top-deal-product-title">{product.name}</h3>
-                                    <div className="top-deal-price-container">
-                                        {hasDiscount ? (
-                                            <>
-                                                <span className="top-deal-price-discounted">{minPrice.toLocaleString()}đ</span>
-                                                <span className="top-deal-price-original">{minVariant?.price?.toLocaleString() || product.price?.toLocaleString()}đ</span>
-                                                <p className="top-deal-discount-text">Giảm {minVariant?.discount || product.discount}%</p>
-                                            </>
-                                        ) : (
-                                            <span className="top-deal-price-normal">{minPrice.toLocaleString()}đ</span>
-                                        )}
+                                    <div className="flex flex-col flex-grow p-3 gap-2">
+                                        <h3 className="top-deal-product-title line-clamp-2 min-h-[40px]">
+                                            {product.name}
+                                        </h3>
+                                        <div className="top-deal-price-container mt-auto">
+                                            {hasDiscount ? (
+                                                <>
+                                                    <span className="top-deal-price-discounted">
+                                                        {minPrice.toLocaleString()}đ
+                                                    </span>
+                                                    <span className="top-deal-price-original">
+                                                        {minVariant?.price?.toLocaleString() || product.price?.toLocaleString()}đ
+                                                    </span>
+                                                    <p className="top-deal-discount-text">
+                                                        Giảm {minVariant?.discount || product.discount}%
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <span className="top-deal-price-normal">
+                                                    {minPrice.toLocaleString()}đ
+                                                </span>
+                                            )}
+                                        </div>
+                                        <button
+                                            className="top-deal-add-to-cart-button flex items-center justify-center gap-1"
+                                            onClick={() => (product.productVariants?.length > 0 ? setSelectedProduct(product) : handleAddToCart(product))}
+                                        >
+                                            {product.productVariants?.length > 0 ? (
+                                                <>
+                                                    <FaCog /> Tùy chọn
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaCartPlus /> Thêm vào giỏ hàng
+                                                </>
+                                            )}
+                                        </button>
                                     </div>
-                                    <button
-                                        className="top-deal-add-to-cart-button"
-                                        onClick={() => (product.productVariants?.length > 0 ? setSelectedProduct(product) : handleAddToCart(product))}
-                                    >
-                                        {product.productVariants?.length > 0 ? <><FaCog /> Tùy chọn</> : <><FaCartPlus /> Thêm vào giỏ hàng</>}
-                                    </button>
                                 </div>
                             );
                         })}

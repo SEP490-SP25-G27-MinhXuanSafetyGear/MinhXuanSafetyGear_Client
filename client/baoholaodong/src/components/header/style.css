@@ -216,6 +216,7 @@
     .user-text{
         display: none;
     }
+
 }
 
 /* Tablet */
@@ -261,6 +262,8 @@
         gap: 0.25rem;
         font-size: 0.9rem;
     }
+
+
 }
 
 /* Desktop */

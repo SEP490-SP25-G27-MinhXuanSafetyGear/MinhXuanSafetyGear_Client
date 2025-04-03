@@ -1,83 +1,84 @@
-﻿"use client"
+﻿"use client";
 
-import { useState, useEffect, useContext } from "react"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
-import { FaImage } from "react-icons/fa"
-import "./create-blog.css"
-import { BlogPostContext } from "../../../contexts/BlogPostContext"
-import { TextEditor } from "../../../components/TextEditor"
-const BASE_URL = process.env.REACT_APP_BASE_URL_API
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { FaImage } from "react-icons/fa";
+import "./create-blog.css";
+import { BlogPostContext } from "../../../contexts/BlogPostContext";
+import { TextEditor } from "../../../components/TextEditor";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export default function CreateBlog() {
-  const navigate = useNavigate()
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [summary, setSummary] = useState("")
-  const [tags, setTags] = useState("")
-  const [status, setStatus] = useState("Draft")
-  const [category, setCategory] = useState(0)
-  const [file, setFile] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState("")
-  const [message, setMessage] = useState({ type: "", text: "" })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [activeTab, setActiveTab] = useState("edit")
-  const [showHelp, setShowHelp] = useState(false)
-  const { categories } = useContext(BlogPostContext)
+  const navigate = useNavigate();
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [summary, setSummary] = useState("");
+  const [tags, setTags] = useState("");
+  const [status, setStatus] = useState("Draft");
+  const [category, setCategory] = useState(0);
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [message, setMessage] = useState({ type: "", text: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("edit");
+  const [showHelp, setShowHelp] = useState(false);
+  const [postUrl, setPostUrl] = useState("");
+  const { categories } = useContext(BlogPostContext);
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]
+    const selectedFile = e.target.files[0];
     if (selectedFile) {
-      setFile(selectedFile)
-      setPreviewUrl(URL.createObjectURL(selectedFile))
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
     }
-  }
+  };
 
   const handleContentChange = (newContent) => {
-    setContent(newContent)
-  }
+    setContent(newContent);
+  };
 
   const handleCreate = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!title || !content || !category || !file) {
-      setMessage({ type: "error", text: "Vui lòng nhập đầy đủ thông tin!" })
-      return
+      setMessage({ type: "error", text: "Vui lòng nhập đầy đủ thông tin!" });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
-    const formData = new FormData()
-    formData.append("title", title)
-    formData.append("content", content)
-    formData.append("summary", summary)
-    formData.append("tags", tags)
-    formData.append("category", category)
-    formData.append("status", status)
-    formData.append("file", file)
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("summary", summary);
+    formData.append("tags", tags);
+    formData.append("category", category);
+    formData.append("status", status);
+    formData.append("file", file);
+    formData.append("postUrl", postUrl);
 
     try {
-      await axios.post(`${BASE_URL}/api/BlogPost/create-blog`, formData)
-      setMessage({ type: "success", text: "Bài viết đã được tạo thành công!" })
+      await axios.post(`${BASE_URL}/api/BlogPost/create-blog`, formData);
+      setMessage({ type: "success", text: "Bài viết đã được tạo thành công!" });
       setTimeout(() => {
-        navigate("/manager/blog-posts")
-      }, 1500)
+        navigate("/manager/blog-posts");
+      }, 1500);
     } catch (error) {
-      console.error("Lỗi khi tạo bài viết:", error)
-      setMessage({ type: "error", text: "Không thể tạo bài viết!" })
+      console.error("Lỗi khi tạo bài viết:", error);
+      setMessage({ type: "error", text: "Không thể tạo bài viết!" });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  // Clean up object URLs when component unmounts
   useEffect(() => {
     return () => {
       if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
+        URL.revokeObjectURL(previewUrl);
       }
-    }
-  }, [previewUrl])
+    };
+  }, [previewUrl]);
 
   return (
       <div className="blog-editor-container">
@@ -87,7 +88,9 @@ export default function CreateBlog() {
           </div>
 
           {message.text && (
-              <div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"}`}>{message.text}</div>
+              <div className={`alert ${message.type === "success" ? "alert-success" : "alert-error"}`}>
+                {message.text}
+              </div>
           )}
 
           <form onSubmit={handleCreate}>
@@ -126,7 +129,13 @@ export default function CreateBlog() {
                 <label htmlFor="content" className="form-label">
                   Nội dung
                 </label>
-                <TextEditor width={"100%"} height={"300px"} value={content} setValue={setContent} maxLength={2000} />
+                <TextEditor
+                    width={"100%"}
+                    height={"300px"}
+                    value={content}
+                    setValue={setContent}
+                    maxLength={2000}
+                />
               </div>
 
               <div className="form-group">
@@ -141,6 +150,20 @@ export default function CreateBlog() {
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     maxLength={255}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="postUrl" className="form-label">
+                  URL bài viết
+                </label>
+                <input
+                    type="url"
+                    id="postUrl"
+                    className="form-input"
+                    placeholder="Nhập URL bài viết (ví dụ: https://example.com)"
+                    value={postUrl}
+                    onChange={(e) => setPostUrl(e.target.value)}
                 />
               </div>
 
@@ -215,7 +238,11 @@ export default function CreateBlog() {
                       <div className="form-col">
                         <div className="file-preview-container">
                           <p className="form-label">Ảnh xem trước:</p>
-                          <img src={previewUrl || "/placeholder.svg"} alt="Preview" className="file-preview-image" />
+                          <img
+                              src={previewUrl || "/placeholder.svg"}
+                              alt="Preview"
+                              className="file-preview-image"
+                          />
                         </div>
                       </div>
                   )}
@@ -239,5 +266,5 @@ export default function CreateBlog() {
           </form>
         </div>
       </div>
-  )
+  );
 }
