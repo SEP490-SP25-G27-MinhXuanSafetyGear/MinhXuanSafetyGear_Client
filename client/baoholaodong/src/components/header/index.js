@@ -50,7 +50,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     };
 
     const location = useLocation();
-    const isCartPage = location.pathname === "/cart";
+    const isCartPage = location.pathname === "/cart" || location.pathname === "/confirm-order";
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
     useEffect(() => {

@@ -5,9 +5,9 @@ export default function CreateVariantForm({ setLoading, onSetProduct, onCreateVa
         productId: product.id,
         size: "",
         color: "",
-        quantity: 0,
+        quantity: product.quantity || 0,
         price: product.price,
-        discount: 0,
+        discount: product.discount || 0,
         status: true,
     });
 
