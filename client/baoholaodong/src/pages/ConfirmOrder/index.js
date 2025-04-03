@@ -379,6 +379,7 @@ export function ConfirmOrder() {
                                         <thead>
                                         <tr className="bg-gray-50">
                                             <th className="p-3 text-left font-medium text-gray-700">Sản phẩm</th>
+                                            <th className="p-3 text-center font-medium text-gray-700">Màu</th>
                                             <th className="p-3 text-center font-medium text-gray-700">Size</th>
                                             <th className="p-3 text-center font-medium text-gray-700">Đơn giá</th>
                                             <th className="p-3 text-center font-medium text-gray-700">SL</th>
@@ -416,6 +417,7 @@ export function ConfirmOrder() {
                                                             <span>{productName}</span>
                                                         </div>
                                                     </td>
+                                                    <td className="p-4 text-center">{color || "N/A"}</td>
                                                     <td className="p-4 text-center">{size || "N/A"}</td>
                                                     <td className="p-4 text-center">{formatVND(productPrice)}</td>
                                                     <td className="p-4 text-center">{quantity}</td>
