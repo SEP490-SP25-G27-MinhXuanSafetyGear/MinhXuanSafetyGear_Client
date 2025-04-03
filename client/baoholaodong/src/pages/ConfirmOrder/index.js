@@ -164,6 +164,7 @@ export function ConfirmOrder() {
                                         <thead className="bg-gray-100">
                                         <tr>
                                             <th className="border px-3 py-2">Sản phẩm</th>
+                                            <th className="border px-3 py-2 text-center">Màu</th>
                                             <th className="border px-3 py-2 text-center">Size</th>
                                             <th className="border px-3 py-2 text-center">Đơn giá</th>
                                             <th className="border px-3 py-2 text-center">SL</th>
@@ -177,6 +178,7 @@ export function ConfirmOrder() {
                                                 {
                                                     productId,
                                                     productName,
+                                                    color,
                                                     size,
                                                     quantity,
                                                     totalPrice,
@@ -187,6 +189,7 @@ export function ConfirmOrder() {
                                             ) => (
                                                 <tr key={`${productId}-${index}`} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                                                     <td className="border px-3 py-2">{productName}</td>
+                                                    <td className="border px-3 py-2 text-center">{color || "N/A"}</td>
                                                     <td className="border px-3 py-2 text-center">{size || "N/A"}</td>
                                                     <td className="border px-3 py-2 text-center">{formatVND(productPrice)}</td>
                                                     <td className="border px-3 py-2 text-center">{quantity}</td>
