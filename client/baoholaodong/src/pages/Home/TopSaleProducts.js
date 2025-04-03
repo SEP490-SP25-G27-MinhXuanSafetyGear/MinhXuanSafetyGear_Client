@@ -143,7 +143,7 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                     return (
                         <motion.div
                             key={product.id}
-                            className="w-[250px] flex-shrink-0 lg:w-auto group bg-white rounded-lg shadow-[0_0_10px_black] overflow-hidden cursor-pointer transition-transform duration-300"
+                            className="w-[250px] flex-shrink-0 lg:w-auto group bg-white rounded-lg shadow-[0_0_10px_black] overflow-hidden cursor-pointer transition-transform duration-300 flex flex-col"
                             initial={{ opacity: 0, y: 40 }}
                             animate={{ opacity: 1, y: 0 }}
                             whileHover={{ y: -8, transition: { duration: 0.05, ease: "easeOut" } }}
@@ -165,43 +165,53 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
                                 </div>
                             </div>
 
-                            <div className="p-3 flex flex-col gap-2">
+                            <div className="p-3 flex flex-col gap-2 flex-grow">
                                 <div className="flex text-yellow-400 text-sm justify-start">
-                                    {Array.from({ length: product.averageRating }, (_, i) => <FaStar key={i} />)}
+                                    {Array.from({ length: product.averageRating }, (_, i) => (
+                                        <FaStar key={i} />
+                                    ))}
                                 </div>
 
-                                <h3 className="text-sm font-semibold line-clamp-2 text-left">{product.name}</h3>
+                                <h3 className="text-sm font-semibold line-clamp-2 text-left min-h-[40px]">
+                                    {product.name}
+                                </h3>
 
-                                <div className="text-sm text-left min-h-[48px]">
-                                    {hasDiscount ? (
-                                        <>
-                                            <span className="text-red-600 font-bold">{minPrice.toLocaleString()}đ</span>
-                                            <span className="text-gray-400 line-through ml-2 text-sm">
-                        {minVariant?.price?.toLocaleString() || product.price.toLocaleString()}đ
-                      </span>
-                                            <p className="text-yellow-600 text-xs font-semibold mt-1">
-                                                Giảm {minVariant?.discount || product.discount}%
-                                            </p>
-                                        </>
-                                    ) : (
-                                        <span className="text-red-600 font-bold">{minPrice.toLocaleString()}đ</span>
-                                    )}
+                                <div className="mt-auto flex flex-col gap-2">
+                                    <div className="text-sm text-left min-h-[48px]">
+                                        {hasDiscount ? (
+                                            <>
+                                                <span className="text-red-600 font-bold">
+                                                    {minPrice.toLocaleString()}đ
+                                                </span>
+                                                <span className="text-gray-400 line-through ml-2 text-sm">
+                                                    {minVariant?.price?.toLocaleString() || product.price.toLocaleString()}đ
+                                                </span>
+                                                <p className="text-yellow-600 text-xs font-semibold mt-1">
+                                                    Giảm {minVariant?.discount || product.discount}%
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <span className="text-red-600 font-bold">
+                                                {minPrice.toLocaleString()}đ
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        className="text-sm bg-red-700 text-white w-full py-2 rounded hover:bg-red-800 transition flex items-center justify-center gap-1"
+                                        onClick={() => handleProductClick(product)}
+                                    >
+                                        {product.productVariants.length > 0 ? (
+                                            <>
+                                                <FaCog /> Tùy chọn
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FaCartPlus /> Thêm vào giỏ hàng
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
-
-                                <button
-                                    className="mt-auto text-sm bg-red-700 text-white w-full py-2 rounded hover:bg-red-800 transition"
-                                    onClick={() => handleProductClick(product)}
-                                >
-                                    {product.productVariants.length > 0 ? (
-                                        <span className="flex items-center justify-center gap-1">
-                      <FaCog /> Tùy chọn
-                    </span>
-                                    ) : (
-                                        <span className="flex items-center justify-center gap-1">
-                      <FaCartPlus /> Thêm vào giỏ hàng
-                    </span>
-                                    )}
-                                </button>
                             </div>
                         </motion.div>
                     );

@@ -123,7 +123,7 @@ const ProductListCategory = () => {
 
     return (
         <PageWrapper title={getCurrentCategoryName() || "Danh sách sản phẩm"}>
-            <div className="bg-gray-100 min-h-screen">
+            <div className="bg-gray-100 min-h-screen ">
                 <div className="relative w-full h-48 md:h-64 lg:h-80 overflow-hidden">
                     <img
                         src="https://img.freepik.com/premium-photo/personal-protective-equipment-safety-banner-with-place-text_106035-3441.jpg"
@@ -150,7 +150,7 @@ const ProductListCategory = () => {
                     </button>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 py-6">
+                <div className="max-w-[95rem] mx-auto px-4 py-6">
                     <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
                         <div className={`w-full lg:w-1/4 xl:w-1/5 ${mobileFiltersOpen ? "block" : "hidden"} lg:block`}>
                             <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-20">
@@ -255,15 +255,14 @@ const ProductListCategory = () => {
                                         {products.map((product) => (
                                             <motion.div
                                                 key={product.id}
-                                                className="bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl"
+                                                className="bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl flex flex-col"
                                                 variants={{
                                                     hidden: { opacity: 0, y: 20 },
                                                     visible: { opacity: 1, y: 0 },
                                                 }}
-
                                                 transition={{ duration: 0.3 }}
-                                                whileHover={{ y: -8, transition: { duration: 0.05, ease: "easeOut" } }}>
-
+                                                whileHover={{ y: -8, transition: { duration: 0.05, ease: "easeOut" } }}
+                                            >
                                                 <div className="relative overflow-hidden">
                                                     <img
                                                         src={product.image || "/placeholder.svg"}
@@ -279,58 +278,62 @@ const ProductListCategory = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div className="p-4">
-                                                    <h3 className="font-medium text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
-                                                    <div className="text-red-600 font-bold mb-3 min-h-[50px]">
-                                                        {(() => {
-                                                            const minVariant = getMinVariant(product);
-                                                            const minPrice = getMinVariantPrice(product);
-                                                            if (minVariant) {
-                                                                const hasDiscount = minVariant.discount > 0;
-                                                                return hasDiscount ? (
-                                                                    <>
-                                                                        <div>
-                                                                            <span className="text-red-600">{minPrice.toLocaleString()}đ</span>
-                                                                            <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
-                                                                        </div>
-                                                                        <p className="text-yellow-600">Giảm {minVariant.discount}%</p>
-                                                                    </>
-                                                                ) : (
-                                                                    <span>{minPrice.toLocaleString()}đ</span>
-                                                                );
-                                                            } else {
-                                                                const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
-                                                                return hasDiscount ? (
-                                                                    <>
-                                                                        <div>
-                                                                            <span className="text-red-600">{product.priceAfterDiscount.toLocaleString()}đ</span>
-                                                                            <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
-                                                                        </div>
-                                                                        <p className="text-yellow-600">Giảm {product.discount}%</p>
-                                                                    </>
-                                                                ) : (
-                                                                    <span>{product.price.toLocaleString()}đ</span>
-                                                                );
-                                                            }
-                                                        })()}
+                                                <div className="p-4 flex flex-col flex-grow gap-2">
+                                                    <h3 className="font-medium text-gray-800 mb-2 line-clamp-2 min-h-[40px]">
+                                                        {product.name}
+                                                    </h3>
+                                                    <div className="mt-auto">
+                                                        <div className="text-red-600 font-bold mb-3 min-h-[50px]">
+                                                            {(() => {
+                                                                const minVariant = getMinVariant(product);
+                                                                const minPrice = getMinVariantPrice(product);
+                                                                if (minVariant) {
+                                                                    const hasDiscount = minVariant.discount > 0;
+                                                                    return hasDiscount ? (
+                                                                        <>
+                                                                            <div>
+                                                                                <span className="text-red-600">{minPrice.toLocaleString()}đ</span>
+                                                                                <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
+                                                                            </div>
+                                                                            <p className="text-yellow-600">Giảm {minVariant.discount}%</p>
+                                                                        </>
+                                                                    ) : (
+                                                                        <span>{minPrice.toLocaleString()}đ</span>
+                                                                    );
+                                                                } else {
+                                                                    const hasDiscount = product.discount > 0 && product.priceAfterDiscount < product.price;
+                                                                    return hasDiscount ? (
+                                                                        <>
+                                                                            <div>
+                                                                                <span className="text-red-600">{product.priceAfterDiscount.toLocaleString()}đ</span>
+                                                                                <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                                                            </div>
+                                                                            <p className="text-yellow-600">Giảm {product.discount}%</p>
+                                                                        </>
+                                                                    ) : (
+                                                                        <span>{product.price.toLocaleString()}đ</span>
+                                                                    );
+                                                                }
+                                                            })()}
+                                                        </div>
+                                                        {product.productVariants && product.productVariants.length > 0 ? (
+                                                            <button
+                                                                className="w-full p-2 rounded-lg flex items-center justify-center gap-2 bg-red-700 text-white hover:bg-red-800 transition-colors"
+                                                                onClick={() => handleOpenPopup(product)}
+                                                            >
+                                                                <FaCog />
+                                                                Tùy chọn
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                className="w-full p-2 rounded-lg flex items-center justify-center gap-2 bg-red-700 text-white hover:bg-red-800 transition-colors"
+                                                                onClick={() => handleAddToCart(product)}
+                                                            >
+                                                                <FaCartPlus />
+                                                                Thêm vào giỏ
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                    {product.productVariants && product.productVariants.length > 0 ? (
-                                                        <button
-                                                            className="w-full p-2 rounded-lg flex items-center justify-center bg-red-700 text-white hover:bg-red-800 transition-colors"
-                                                            onClick={() => handleOpenPopup(product)}
-                                                        >
-                                                            <FaCog className="mr-2" />
-                                                            <span>Tùy chọn</span>
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            className="w-full p-2 rounded-lg flex items-center justify-center bg-red-700 text-white hover:bg-red-800 transition-colors"
-                                                            onClick={() => handleAddToCart(product)}
-                                                        >
-                                                            <FaCartPlus className="mr-2" />
-                                                            <span>Thêm vào giỏ</span>
-                                                        </button>
-                                                    )}
                                                 </div>
                                             </motion.div>
                                         ))}

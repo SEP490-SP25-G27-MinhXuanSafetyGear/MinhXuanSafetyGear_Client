@@ -127,7 +127,7 @@ const ProductList = () => {
                     </button>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 py-6">
+                <div className="max-w-[95rem] mx-auto px-4 py-6">
                     <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
                         <div className={`w-full lg:w-1/4 xl:w-1/5 ${mobileFiltersOpen ? "block" : "hidden"} lg:block`}>
                             <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-20">
@@ -232,7 +232,7 @@ const ProductList = () => {
                                         {products.map((product) => (
                                             <motion.div
                                                 key={product.id}
-                                                className="bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl"
+                                                className="bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl flex flex-col"
                                                 variants={{
                                                     hidden: { opacity: 0, y: 20 },
                                                     visible: { opacity: 1, y: 0 },
@@ -254,36 +254,62 @@ const ProductList = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div className="p-4">
-                                                    <h3 className="font-medium text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
-                                                    <div className="text-red-600 font-bold mb-3 min-h-[50px]">
-                                                        {product.discount > 0 ? (
-                                                            <>
-                                                                <span className="text-red-500">{(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ</span>
-                                                                <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
-                                                                <p className="text-yellow-600">Giảm {product.discount}%</p>
-                                                            </>
+                                                <div className="p-4 flex flex-col flex-grow gap-2">
+                                                    <h3 className="font-medium text-gray-800 mb-2 line-clamp-2 min-h-[40px]">
+                                                        {product.name}
+                                                    </h3>
+                                                    <div className="mt-auto">
+                                                        <div className="text-red-600 font-bold mb-3 min-h-[50px]">
+                                                            {(() => {
+                                                                const minVariant = getMinVariant(product);
+                                                                const minPrice = getMinVariantPrice(product);
+                                                                if (minVariant) {
+                                                                    const hasDiscount = minVariant.discount > 0;
+                                                                    return hasDiscount ? (
+                                                                        <>
+                                                                            <div>
+                                                                                <span className="text-red-500">{minPrice.toLocaleString()}đ</span>
+                                                                                <span className="text-gray-400 line-through ml-2">{minVariant.price.toLocaleString()}đ</span>
+                                                                            </div>
+                                                                            <p className="text-yellow-600">Giảm {minVariant.discount}%</p>
+                                                                        </>
+                                                                    ) : (
+                                                                        <span>{minPrice.toLocaleString()}đ</span>
+                                                                    );
+                                                                } else {
+                                                                    const hasDiscount = product.discount > 0 && (product.priceAfterDiscount || product.price) < product.price;
+                                                                    return hasDiscount ? (
+                                                                        <>
+                                                                            <div>
+                                                                                <span className="text-red-500">{(product.priceAfterDiscount || (product.price - product.discount)).toLocaleString()}đ</span>
+                                                                                <span className="text-gray-400 line-through ml-2">{product.price.toLocaleString()}đ</span>
+                                                                            </div>
+                                                                            <p className="text-yellow-600">Giảm {product.discount}%</p>
+                                                                        </>
+                                                                    ) : (
+                                                                        <span>{product.price.toLocaleString()}đ</span>
+                                                                    );
+                                                                }
+                                                            })()}
+                                                        </div>
+                                                        {product.productVariants && product.productVariants.length > 0 ? (
+                                                            <button
+                                                                className="w-full p-2 rounded-lg flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 transition-colors"
+                                                                onClick={() => handleOpenPopup(product)}
+                                                            >
+                                                                <FaCog />
+                                                                Tùy chọn
+                                                            </button>
                                                         ) : (
-                                                            <span>{product.price.toLocaleString()}đ</span>
+                                                            <button
+                                                                className="w-full p-2 rounded-lg flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 transition-colors"
+                                                                onClick={() => handleAddToCart(product)}
+                                                            >
+                                                                <FaCartPlus />
+                                                                Thêm vào giỏ
+                                                            </button>
                                                         )}
                                                     </div>
-                                                    {product.productVariants && product.productVariants.length > 0 ? (
-                                                        <button
-                                                            className="w-full p-2 rounded-lg flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-colors"
-                                                            onClick={() => handleOpenPopup(product)}
-                                                        >
-                                                            <FaCog className="mr-2" />
-                                                            <span>Tùy chọn</span>
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            className="w-full p-2 rounded-lg flex items-center justify-center bg-red-600 text-white hover:bg-red-700 transition-colors"
-                                                            onClick={() => handleAddToCart(product)}
-                                                        >
-                                                            <FaCartPlus className="mr-2" />
-                                                            <span>Thêm vào giỏ</span>
-                                                        </button>
-                                                    )}
                                                 </div>
                                             </motion.div>
                                         ))}

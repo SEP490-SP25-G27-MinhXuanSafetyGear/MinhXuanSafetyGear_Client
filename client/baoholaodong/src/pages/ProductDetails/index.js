@@ -308,7 +308,7 @@ export default function ProductDetail() {
                                     <div className="flex gap-2 flex-wrap">
                                         <button
                                             onClick={handleAddToCart}
-                                            className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-yellow-400 hover:text-black transition-colors"
+                                            className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-yellow-400 hover:text-red-600  transition-colors"
                                         >
                                             <ShoppingCart className="w-5 h-5" />
                                             Thêm vào giỏ

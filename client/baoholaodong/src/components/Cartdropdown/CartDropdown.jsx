@@ -31,7 +31,7 @@ const CartDropdown = () => {
                         {cartItems.map((item, index) => (
                             <div key={index} className="cart-item">
                                 <img
-                                    src={item.image || noImage} // Sử dụng noImage thay vì "/images/default.png"
+                                    src={item.image || noImage}
                                     alt={item.name}
                                     className="cart-item-image"
                                 />
