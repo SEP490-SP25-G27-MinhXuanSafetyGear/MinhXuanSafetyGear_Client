@@ -182,7 +182,6 @@ export default function ProductDetail() {
             priceAfterDiscount: product.priceAfterDiscount || product.price,
             discount: product.discount || 0,
         };
-        addToCart(cartItem);
         navigate("/confirm-order", {
             state: {
                 customerId: null,
