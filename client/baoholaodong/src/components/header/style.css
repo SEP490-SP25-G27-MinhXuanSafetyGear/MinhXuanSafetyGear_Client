@@ -8,13 +8,11 @@
     z-index: 900;
     padding: 0.5rem 1rem;
     transition: padding 0.3s ease;
-
 }
 
 .header.scrolled {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: fixed;
-
 }
 
 @keyframes slideDown {
@@ -32,12 +30,9 @@
     animation: slideDown 0.4s ease-out forwards;
 }
 
-
 .cart-wrapper {
     position: relative;
 }
-
-
 
 .header-content {
     display: flex;
@@ -91,7 +86,7 @@
 
 .company-info p {
     font-size: 0.75rem;
-    marginmans: 0;
+    margin: 0;
 }
 
 /* Search */
@@ -191,8 +186,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
-
 }
 
 /* Mobile */
@@ -213,13 +206,12 @@
         top: calc(100% + 0.5rem);
     }
 
-    .user-text{
+    .user-text {
         display: none;
     }
-
 }
 
-/* Tablet */
+/* Tablet (bao gồm iPad Mini) */
 @media (min-width: 768px) {
     .header {
         padding: 1rem;
@@ -227,32 +219,17 @@
 
     .header-content {
         flex-wrap: nowrap;
+        gap: 0.5rem; /* Giảm gap để tiết kiệm không gian */
     }
 
     .search-form {
         order: 0; /* Đưa lên giữa */
-        margin: 0 1rem;
-        min-width: 200px;
+        margin: 0 0.5rem; /* Giảm margin */
+        min-width: 150px; /* Giảm min-width để tránh chiếm quá nhiều chỗ */
     }
 
     .search-form input {
-        font-size: 1rem;
-    }
-
-    .contact {
-        display: flex;
-    }
-
-    .logo img {
-        height: 3rem;
-    }
-
-    .company-info {
-        display: block;
-    }
-
-    .user-text{
-        display: none;
+        font-size: 0.9rem; /* Giảm font-size */
     }
 
     .contact {
@@ -260,16 +237,28 @@
         flex-direction: column;
         align-items: center;
         gap: 0.25rem;
-        font-size: 0.9rem;
+        font-size: 0.8rem; /* Giảm font-size */
     }
 
+    .logo img {
+        height: 2.5rem; /* Giảm kích thước logo */
+    }
 
+    .company-info {
+        display: block;
+    }
+
+    .user-text {
+        display: none;
+    }
+
+    .cart svg {
+        font-size: 1.5rem; /* Đảm bảo icon cart không quá lớn */
+    }
 }
 
 /* Desktop */
 @media (min-width: 1024px) {
-
-
     .logo img {
         height: 3.5rem;
     }
@@ -292,27 +281,21 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-
-
     }
 
     .user svg {
-        font-size: 2rem; /* Increase the icon size */
+        font-size: 2rem;
     }
-
 
     .user-text {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        font-size: 2rem; /* Increase the icon size */
-
     }
 
     .user-text span:first-child {
-        font-size: 0.65rem; /* Smaller size for "Thông tin" */
-        margin-bottom: -0.25rem; /* Move "Thông tin" higher */
-
+        font-size: 0.65rem;
+        margin-bottom: -0.25rem;
     }
 
     .user-text span:last-child {
@@ -328,11 +311,45 @@
     }
 
     .cart svg {
-        font-size: 2rem; /* Increase the icon size */
+        font-size: 2rem;
+    }
+}
+
+/* Tối ưu cho iPad Mini (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .header-content {
+        gap: 0.5rem;
     }
 
+    .logo img {
+        height: 2rem;
+    }
 
+    .company-info h1 {
+        font-size: 0.9rem;
+    }
 
+    .company-info p {
+        font-size: 0.65rem;
+    }
 
+    .search-form {
+        min-width: 120px;
+    }
 
+    .contact {
+        font-size: 0.75rem;
+    }
+
+    .user svg {
+        font-size: 1.25rem;
+    }
+
+    .cart svg {
+        font-size: 1.25rem;
+    }
+
+    .actions {
+        gap: 0.5rem;
+    }
 }

@@ -1,28 +1,28 @@
 "use client"
 
-import { useState, useContext, useEffect } from "react"
-import { useLocation } from "react-router-dom"
-import { formatVND } from "../../utils/format"
-import axios from "axios"
-import { AuthContext } from "../../contexts/AuthContext"
-import { CreditCard, Truck, MapPin, Phone, Mail, User, DollarSign, CheckCircle } from "lucide-react"
-import PageWrapper from "../../components/pageWrapper/PageWrapper"
+import { useState, useContext, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { formatVND } from "../../utils/format";
+import axios from "axios";
+import { AuthContext } from "../../contexts/AuthContext";
+import { CreditCard, Truck, MapPin, Phone, Mail, User, DollarSign, CheckCircle } from "lucide-react";
+import PageWrapper from "../../components/pageWrapper/PageWrapper";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export function ConfirmOrder() {
-    const location = useLocation()
-    const orderData = location.state
-    const { user } = useContext(AuthContext)
+    const location = useLocation();
+    const orderData = location.state;
+    const { user } = useContext(AuthContext);
 
-    const [orderSuccess, setOrderSuccess] = useState(false)
-    const [orderMessage, setOrderMessage] = useState("")
-    const [notification, setNotification] = useState({ show: false, message: "", type: "" })
-    const [invoiceNumber, setInvoiceNumber] = useState(null)
+    const [orderSuccess, setOrderSuccess] = useState(false);
+    const [orderMessage, setOrderMessage] = useState("");
+    const [notification, setNotification] = useState({ show: false, message: "", type: "" });
+    const [invoiceNumber, setInvoiceNumber] = useState(null);
     const [calculatedOrder, setCalculatedOrder] = useState({
         orderDetails: null,
         totalAmount: 0,
-    })
+    });
     const [customerInfo, setCustomerInfo] = useState({
         customerId: null,
         customerName: user ? user.customerName : "",
@@ -30,11 +30,11 @@ export function ConfirmOrder() {
         customerPhone: "",
         customerAddress: orderData.customerAddress,
         paymentMethod: orderData.paymentMethod,
-    })
-    const [isTaxIncluded, setIsTaxIncluded] = useState(true)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [truckAnimation, setTruckAnimation] = useState(false)
-    const [rotatePage, setRotatePage] = useState(false)
+    });
+    const [isTaxIncluded, setIsTaxIncluded] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [truckAnimation, setTruckAnimation] = useState(false);
+    const [rotatePage, setRotatePage] = useState(false);
 
     const calculateOrder = async () => {
         try {
@@ -50,38 +50,38 @@ export function ConfirmOrder() {
                     quantity,
                     variantId: variant.variantId,
                 })),
-            }
-            const response = await axios.post(`${BASE_URL}/api/Order/calculate-order`, newOrder)
-            setCalculatedOrder(response.data)
+            };
+            const response = await axios.post(`${BASE_URL}/api/Order/calculate-order`, newOrder);
+            setCalculatedOrder(response.data);
         } catch (error) {
-            console.error("Lỗi tính toán đơn hàng:", error)
+            console.error("Lỗi tính toán đơn hàng:", error);
         }
-    }
+    };
 
     useEffect(() => {
-        calculateOrder()
-    }, [orderData, isTaxIncluded])
+        calculateOrder();
+    }, [orderData, isTaxIncluded]);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setCustomerInfo((prev) => ({ ...prev, [name]: value }))
-    }
+        const { name, value } = e.target;
+        setCustomerInfo((prev) => ({ ...prev, [name]: value }));
+    };
 
     const showNotification = (message, type = "error") => {
-        setNotification({ show: true, message, type })
+        setNotification({ show: true, message, type });
         setTimeout(() => {
-            setNotification({ show: false, message: "", type: "" })
-        }, 5000)
-    }
+            setNotification({ show: false, message: "", type: "" });
+        }, 5000);
+    };
 
     const handleOrder = async () => {
         if (!customerInfo.customerName || !customerInfo.customerPhone || !customerInfo.customerAddress) {
-            showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error")
-            return
+            showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error");
+            return;
         }
 
-        setIsSubmitting(true)
-        setTruckAnimation(true)
+        setIsSubmitting(true);
+        setTruckAnimation(true);
 
         const newOrder = {
             customerName: customerInfo.customerName,
@@ -95,41 +95,40 @@ export function ConfirmOrder() {
                 quantity,
                 variantId: variant.variantId,
             })),
-        }
+        };
 
         try {
-            const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder)
-            const orderResponse = response.data
+            const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder);
+            const orderResponse = response.data;
 
             setTimeout(() => {
-                setTruckAnimation(false)
-                setRotatePage(true)
+                setTruckAnimation(false);
+                setRotatePage(true);
                 setTimeout(() => {
-                    setOrderSuccess(true)
-                    setOrderMessage("Đơn hàng của bạn đã được ghi nhận.")
+                    setOrderSuccess(true);
+                    setOrderMessage("Đơn hàng của bạn đã được ghi nhận.");
                     if (customerInfo.paymentMethod === "Online") {
-                        setInvoiceNumber(orderResponse.invoice?.invoiceNumber)
+                        setInvoiceNumber(orderResponse.invoice?.invoiceNumber);
                     }
-                    setRotatePage(false)
-                    window.scrollTo({ top: 0, behavior: "smooth" })
-                }, 1000)
-            }, 3500)
+                    setRotatePage(false);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                }, 1000);
+            }, 3500);
         } catch (error) {
-            console.error("Order failed:", error)
-            setTruckAnimation(false)
-            showNotification("Đặt hàng thất bại. Vui lòng thử lại sau!", "error")
-            setIsSubmitting(false)
+            console.error("Order failed:", error);
+            setTruckAnimation(false);
+            showNotification("Đặt hàng thất bại. Vui lòng thử lại sau!", "error");
+            setIsSubmitting(false);
         }
-    }
+    };
 
-    const totalAmount = orderData.orderDetails.reduce((total, item) => total + item.price * item.quantity, 0)
+    const totalAmount = orderData.orderDetails.reduce((total, item) => total + item.price * item.quantity, 0);
 
     if (orderSuccess) {
         return (
             <PageWrapper title="Đặt hàng thành công">
                 <div className="max-w-5xl mx-auto px-4 py-8">
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-
                         {/* HEADER: nền xanh lá và icon thành công */}
                         <div className="bg-gradient-to-r from-green-500 to-green-700 p-6">
                             <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center">
@@ -243,14 +242,12 @@ export function ConfirmOrder() {
                     </div>
                 </div>
             </PageWrapper>
-
-        )
+        );
     }
-
 
     return (
         <PageWrapper title="Xác nhận đơn hàng">
-            <div className={`max-w-5xl mx-auto px-4 py-8 ${rotatePage ? "animate-[confirm-page-rotate_1s_ease-in-out_forwards]" : ""}`}>
+            <div className={`max-w-6xl mx-auto px-4 py-8 ${rotatePage ? "animate-[confirm-page-rotate_1s_ease-in-out_forwards]" : ""}`}>
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="bg-gradient-to-t from-red-900 to-red-600 p-6">
                         <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center">
@@ -378,16 +375,16 @@ export function ConfirmOrder() {
                                 {!calculatedOrder.orderDetails ? (
                                     <div className="text-center py-5 text-gray-600">Đang tính toán đơn hàng...</div>
                                 ) : (
-                                    <table className="w-full border-collapse">
+                                    <table className="w-full border-collapse min-w-[800px]">
                                         <thead>
                                         <tr className="bg-gray-50">
-                                            <th className="p-3 text-left font-medium text-gray-700">Sản phẩm</th>
-                                            <th className="p-3 text-center font-medium text-gray-700">Màu</th>
-                                            <th className="p-3 text-center font-medium text-gray-700">Size</th>
-                                            <th className="p-3 text-center font-medium text-gray-700">Đơn giá</th>
-                                            <th className="p-3 text-center font-medium text-gray-700">SL</th>
-                                            <th className="p-3 text-center font-medium text-gray-700">Thuế (%)</th>
-                                            <th className="p-3 text-right font-medium text-gray-700">Thành tiền</th>
+                                            <th className="p-3 text-left font-medium text-gray-700 min-w-[200px]">Sản phẩm</th>
+                                            <th className="p-3 text-center font-medium text-gray-700 min-w-[80px]">Màu</th>
+                                            <th className="p-3 text-center font-medium text-gray-700 min-w-[80px]">Size</th>
+                                            <th className="p-3 text-center font-medium text-gray-700 min-w-[100px]">Đơn giá</th>
+                                            <th className="p-3 text-center font-medium text-gray-700 min-w-[50px]">SL</th>
+                                            <th className="p-3 text-center font-medium text-gray-700 min-w-[80px]">Thuế (%)</th>
+                                            <th className="p-3 text-right font-medium text-gray-700 min-w-[120px]">Thành tiền</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -415,9 +412,9 @@ export function ConfirmOrder() {
                                                             <img
                                                                 src={productImage || "/placeholder.svg"}
                                                                 alt={productName}
-                                                                className="w-16 h-16 object-cover rounded-md border border-gray-200 mr-3"
+                                                                className="w-16 h-16 object-cover rounded-md border border-gray-200 mr-3 flex-shrink-0"
                                                             />
-                                                            <span>{productName}</span>
+                                                            <span className="truncate">{productName}</span>
                                                         </div>
                                                     </td>
                                                     <td className="p-4 text-center">{color || "N/A"}</td>
@@ -487,6 +484,5 @@ export function ConfirmOrder() {
                 </div>
             )}
         </PageWrapper>
-
-    )
+    );
 }

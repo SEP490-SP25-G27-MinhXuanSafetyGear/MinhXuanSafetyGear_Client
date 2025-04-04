@@ -6,12 +6,47 @@ import {
 import { CustomerProductContext } from "../../contexts/CustomerProductContext";
 import { useNavigate } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
+import axios from "axios"; // Thêm axios để gọi API
+
+const BASE_URL = process.env.REACT_APP_BASE_URL_API; // Đảm bảo BASE_URL đã được cấu hình
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
     const [openIndex, setOpenIndex] = useState(null);
     const { groupCategories } = useContext(CustomerProductContext);
     const [menuItems, setMenuItems] = useState([]);
+    const [phoneNumber, setPhoneNumber] = useState(""); // State để lưu số điện thoại từ API
     const navigate = useNavigate();
+
+    // Hàm loại bỏ thẻ HTML
+    const stripHtml = (html) => {
+        const div = document.createElement("div");
+        div.innerHTML = html;
+        return div.textContent || div.innerText || "";
+    };
+
+    // Gọi API để lấy số điện thoại
+    useEffect(() => {
+        const fetchPhoneNumber = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-category/lien-he`);
+                const contactData = response.data;
+                // Tìm bài post có title là "Điện thoại"
+                const phonePost = contactData.find((post) => post.title.toLowerCase() === "điện thoại");
+                if (phonePost) {
+                    // Loại bỏ thẻ HTML trước khi lưu số điện thoại
+                    const cleanPhoneNumber = stripHtml(phonePost.content);
+                    setPhoneNumber(cleanPhoneNumber);
+                } else {
+                    setPhoneNumber("0912.201.309"); // Số mặc định nếu không tìm thấy
+                }
+            } catch (error) {
+                console.error("Error fetching phone number:", error);
+                setPhoneNumber("0912.201.309"); // Số mặc định nếu có lỗi
+            }
+        };
+
+        fetchPhoneNumber();
+    }, []);
 
     const handleItemClick = (index, groupId, cateId, event) => {
         toggleSidebar();
@@ -126,7 +161,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 </div>
 
                 <div className="absolute bottom-0 w-full p-4 bg-gray-100 flex items-center justify-center">
-                    <span className="text-red-600 font-bold text-lg">Hotline: 0912.201.309</span>
+                    <span className="text-red-600 font-bold text-lg">
+                        Hotline: {phoneNumber || "Đang tải..."}
+                    </span>
                 </div>
             </div>
         </>

@@ -5,6 +5,9 @@ import Sidebar from "./Sidebar";
 import CartDropdown from "../Cartdropdown/CartDropdown";
 import "./style.css";
 import { AuthContext } from "../../contexts/AuthContext";
+import axios from "axios";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -12,9 +15,41 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
     const [isScrolled, setIsScrolled] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [search, setSearch] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const dropdownTimeout = React.useRef(null);
+
+    // Hàm loại bỏ thẻ HTML
+    const stripHtml = (html) => {
+        const div = document.createElement("div");
+        div.innerHTML = html;
+        return div.textContent || div.innerText || "";
+    };
+
+    // Gọi API để lấy số điện thoại
+    useEffect(() => {
+        const fetchPhoneNumber = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-category/lien-he`);
+                const contactData = response.data;
+                // Tìm bài post có title là "Điện thoại"
+                const phonePost = contactData.find((post) => post.title.toLowerCase() === "điện thoại");
+                if (phonePost) {
+                    // Loại bỏ thẻ HTML trước khi lưu số điện thoại
+                    const cleanPhoneNumber = stripHtml(phonePost.content);
+                    setPhoneNumber(cleanPhoneNumber);
+                } else {
+                    setPhoneNumber("0912.201.309");
+                }
+            } catch (error) {
+                console.error("Error fetching phone number:", error);
+                setPhoneNumber("0912.201.309");
+            }
+        };
+
+        fetchPhoneNumber();
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -93,11 +128,11 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                 <div className="actions">
                     <div className="contact">
                         <FaPhoneAlt />
-                        <span>0912.201.309</span>
+                        <span>{phoneNumber || "Đang tải..."}</span>
                     </div>
                     <div className="user" onClick={() => !user && navigate("/login")}>
                         {user && user.imageUrl ? (
-                            <img src={user.imageUrl} alt="User Avatar"  className="h-8 w-8 rounded-full object-cover" />
+                            <img src={user.imageUrl} alt="User Avatar" className="h-8 w-8 rounded-full object-cover" />
                         ) : (
                             <FaUser />
                         )}
