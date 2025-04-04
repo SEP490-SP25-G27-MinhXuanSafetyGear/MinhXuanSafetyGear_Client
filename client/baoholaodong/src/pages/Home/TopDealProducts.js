@@ -35,6 +35,11 @@ export default function TopDealProducts({ products = [] }) {
     const { addToCart } = useContext(CartContext);
     const navigate = useNavigate();
 
+    const handleViewAll = () => {
+        navigate("/products/0/0/trang-thiet-bi-bao-ho?page=1");
+    };
+
+
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -105,7 +110,8 @@ export default function TopDealProducts({ products = [] }) {
                                 <FaArrowRight />
                             </button>
                         </div>
-                        <button className="top-deal-view-all-button">
+                        <button className="top-deal-view-all-button"
+                                onClick={handleViewAll}>
                             <span>Xem tất cả <FaArrowRight className="inline ml-1" /></span>
                             <span></span>
                         </button>

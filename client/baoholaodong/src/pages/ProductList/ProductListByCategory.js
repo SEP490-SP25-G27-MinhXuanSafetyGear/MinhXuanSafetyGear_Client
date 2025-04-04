@@ -121,6 +121,7 @@ const ProductListCategory = () => {
         const currentCategory = currentGroup.categories.find((c) => c.categoryId === Number.parseInt(cate))
         return currentCategory ? currentCategory.categoryName : currentGroup.groupName
     }
+
     return (
         <PageWrapper title={getCurrentCategoryName() || "Danh sách sản phẩm"}>
             <div className="bg-gray-100 min-h-screen ">
@@ -330,7 +331,7 @@ const ProductListCategory = () => {
                                         ))}
                                     </motion.div>
 
-                                    {totalPages > 0 && (
+                                    {products.length > 20 && totalPages > 0 && (
                                         <div className="mt-8 flex justify-center">
                                             <div className="flex items-center gap-1">
                                                 <button

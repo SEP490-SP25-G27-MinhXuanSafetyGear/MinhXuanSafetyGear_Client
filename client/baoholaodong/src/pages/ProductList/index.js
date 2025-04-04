@@ -307,7 +307,8 @@ const ProductList = () => {
                                         ))}
                                     </motion.div>
 
-                                    {totalPages > 1 && (
+                                    {/* Chỉ hiển thị phân trang khi số sản phẩm > 20 */}
+                                    {products.length > 20 && totalPages > 1 && (
                                         <div className="mt-8 flex justify-center">
                                             <div className="flex items-center gap-1">
                                                 <button

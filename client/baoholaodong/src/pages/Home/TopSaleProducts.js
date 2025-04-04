@@ -38,6 +38,11 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
 
+
+    const handleViewAll = () => {
+        navigate("/products/0/0/trang-thiet-bi-bao-ho?page=1");
+    };
+
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -219,7 +224,8 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
             </div>
 
             <div className="flex justify-center mt-8">
-                <button className="px-6 py-2 bg-red-700 text-white rounded-full font-bold uppercase tracking-wide hover:bg-yellow-400 hover:text-red-700 transition">
+                <button className="px-6 py-2 bg-red-700 text-white rounded-full font-bold uppercase tracking-wide hover:bg-yellow-400 hover:text-red-700 transition"
+                        onClick={handleViewAll}>
                     Xem tất cả <FaArrowRight className="inline ml-1" />
                 </button>
             </div>
