@@ -273,54 +273,9 @@ export default function OrderDetail() {
                           <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
                         </div>
                         <img
-                          src={
-                            getInvoiceImageUrl(order.invoice.invoiceNumber) ||
-                            "/placeholder.svg"
-                          }
+                          src={order.invoice.imageScreenTransfer}
                           alt="Hình ảnh hóa đơn"
                           className="w-full h-auto object-contain max-h-[400px] relative z-10"
-                          onLoad={(e) => {
-                            const target = e.target;
-                            const parent = target.parentElement;
-                            if (parent && parent.firstChild) {
-                              parent.firstChild.classList.add("hidden");
-                            }
-                          }}
-                          onError={(e) => {
-                            const target = e.target;
-                            target.classList.add("hidden");
-                            const parent = target.parentElement;
-                            if (parent) {
-                              if (parent.firstChild) {
-                                parent.firstChild.classList.add("hidden");
-                              }
-                              const errorDiv = document.createElement("div");
-                              errorDiv.className =
-                                "absolute inset-0 flex flex-col items-center justify-center bg-red-50 text-red-500 p-4 text-center";
-                              errorDiv.innerHTML = `
-                                                                <p>Không thể tải hình ảnh hóa đơn</p>
-                                                                <button class="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 transition-colors">
-                                                                    Thử lại
-                                                                </button>
-                                                            `;
-                              errorDiv
-                                .querySelector("button")
-                                .addEventListener("click", () => {
-                                  const timestamp = new Date().getTime();
-                                  target.src = `${getInvoiceImageUrl(
-                                    order.invoice.invoiceNumber
-                                  )}&t=${timestamp}`;
-                                  target.classList.remove("hidden");
-                                  errorDiv.remove();
-                                  if (parent.firstChild) {
-                                    parent.firstChild.classList.remove(
-                                      "hidden"
-                                    );
-                                  }
-                                });
-                              parent.appendChild(errorDiv);
-                            }
-                          }}
                         />
                       </div>
                     </div>

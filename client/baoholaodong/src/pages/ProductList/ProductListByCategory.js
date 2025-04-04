@@ -19,6 +19,7 @@ import { CartContext } from "../../contexts/CartContext"
 import { toSlug } from "../../utils/SlugUtils"
 import ProductPopup from "../../components/productpopup"
 import PageWrapper from "../../components/pageWrapper/PageWrapper"
+import Banner from "../../components/banner/Banner";
 
 const useQuery = () => new URLSearchParams(useLocation().search)
 
@@ -120,21 +121,11 @@ const ProductListCategory = () => {
         const currentCategory = currentGroup.categories.find((c) => c.categoryId === Number.parseInt(cate))
         return currentCategory ? currentCategory.categoryName : currentGroup.groupName
     }
-
     return (
         <PageWrapper title={getCurrentCategoryName() || "Danh sách sản phẩm"}>
             <div className="bg-gray-100 min-h-screen ">
                 <div className="relative w-full h-48 md:h-64 lg:h-80 overflow-hidden">
-                    <img
-                        src="https://img.freepik.com/premium-photo/personal-protective-equipment-safety-banner-with-place-text_106035-3441.jpg"
-                        alt="Banner"
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <h1 className="text-white text-2xl md:text-4xl font-bold text-center px-4">
-                            {getCurrentCategoryName() || "Sản phẩm"}
-                        </h1>
-                    </div>
+                    <Banner/>
                 </div>
 
                 <div className="sticky top-0 z-10 bg-white shadow-md p-4 lg:hidden">
