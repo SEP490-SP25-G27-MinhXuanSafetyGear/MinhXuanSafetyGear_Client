@@ -1,4 +1,4 @@
-﻿import React, { useState, useContext } from "react";
+﻿import React, { useState, useContext, useEffect } from "react";
 import { Minus, Plus } from "lucide-react";
 import { FaTimes } from "react-icons/fa";
 import './style.css';
@@ -10,6 +10,20 @@ const ProductPopup = ({ product, onClose }) => {
     const [quantity, setQuantity] = useState(1);
     const { addToCart } = useContext(CartContext);
     const [selectedVariant, setSelectedVariant] = useState(null);
+
+    const hasVariants = product?.productVariants && product.productVariants.length > 0;
+
+    useEffect(() => {
+        if (product) {
+            if (hasVariants && !selectedVariant) {
+                // Chọn variant đầu tiên nếu có variants
+                setSelectedVariant(product.productVariants[0]);
+            } else if (!hasVariants) {
+                // Nếu không có variants, dùng chính product làm selectedVariant
+                setSelectedVariant(product);
+            }
+        }
+    }, [product, selectedVariant, hasVariants]);
 
     if (!product) return null;
 
@@ -46,17 +60,35 @@ const ProductPopup = ({ product, onClose }) => {
                                 <span>{(selectedVariant?.price || product.price).toLocaleString()}đ</span>
                             )}
                         </p>
-                        <ProductVariantSelector product={product} setSelectedVariant={setSelectedVariant} />
+                        {hasVariants ? (
+                            // Hiển thị ProductVariantSelector nếu có variants
+                            <ProductVariantSelector
+                                product={product}
+                                setSelectedVariant={setSelectedVariant}
+                                initialVariant={product.productVariants[0]}
+                            />
+                        ) : null}
                         <div className="flex items-center mt-4">
-                            <button onClick={() => setQuantity((prev) => Math.max(1, prev - 1))} className="quantity-button">
+                            <button
+                                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                                className="quantity-button"
+                            >
                                 <Minus size={16} />
                             </button>
                             <span className="mx-3 text-lg font-semibold">{quantity}</span>
-                            <button onClick={() => setQuantity((prev) => prev + 1)} className="quantity-button">
+                            <button
+                                onClick={() => setQuantity((prev) => prev + 1)}
+                                className="quantity-button"
+                            >
                                 <Plus size={16} />
                             </button>
                         </div>
-                        <button className="add-to-cart-popup" onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
+                        <button
+                            className="add-to-cart-popup"
+                            onClick={handleAddToCart}
+                        >
+                            Thêm vào giỏ hàng
+                        </button>
                     </div>
                 </div>
             </div>

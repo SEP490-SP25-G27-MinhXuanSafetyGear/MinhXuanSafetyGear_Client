@@ -2,141 +2,129 @@
 
 import { useEffect, useState } from "react"
 
-export default function ProductVariantSelector({ product, setSelectedVariant }) {
-    const [selectedColor, setSelectedColor] = useState(null)
-    const [selectedSize, setSelectedSize] = useState(null)
+export default function ProductVariantSelector({ product, setSelectedVariant, initialVariant }) {
+    const [selectedColor, setSelectedColor] = useState(null);
+    const [selectedSize, setSelectedSize] = useState(null);
 
-    // Chuẩn hóa màu sắc và kích thước để tránh trùng lặp do khác biệt nhỏ
-    const normalizeString = (str) => {
-        return str.trim().toLowerCase()
-    }
+    // Chuẩn hóa chuỗi
+    const normalizeString = (str) => str.trim().toLowerCase();
 
     // Tạo mảng màu sắc và kích thước không trùng lặp
     const getUniqueColors = () => {
-        const colorMap = new Map()
-
+        const colorMap = new Map();
         product.productVariants.forEach((variant) => {
-            const normalizedColor = normalizeString(variant.color)
+            const normalizedColor = normalizeString(variant.color);
             if (!colorMap.has(normalizedColor)) {
-                colorMap.set(normalizedColor, variant.color) // Lưu phiên bản gốc của màu
+                colorMap.set(normalizedColor, variant.color);
             }
-        })
-
-        return Array.from(colorMap.values())
-    }
+        });
+        return Array.from(colorMap.values());
+    };
 
     const getUniqueSizes = () => {
-        const sizeMap = new Map()
-
+        const sizeMap = new Map();
         product.productVariants.forEach((variant) => {
-            const normalizedSize = normalizeString(variant.size)
+            const normalizedSize = normalizeString(variant.size);
             if (!sizeMap.has(normalizedSize)) {
-                sizeMap.set(normalizedSize, variant.size) // Lưu phiên bản gốc của kích thước
+                sizeMap.set(normalizedSize, variant.size);
             }
-        })
+        });
+        return Array.from(sizeMap.values());
+    };
 
-        return Array.from(sizeMap.values())
-    }
+    const allColors = getUniqueColors();
+    const allSizes = getUniqueSizes();
 
-    // Lấy tất cả các màu và kích thước có sẵn (đã chuẩn hóa)
-    const allColors = getUniqueColors()
-    const allSizes = getUniqueSizes()
-
-    // Lọc các kích thước có sẵn dựa trên màu đã chọn
-    const availableSizes = selectedColor
-        ? [
-            ...new Set(
-                product.productVariants
-                    .filter((v) => normalizeString(v.color) === normalizeString(selectedColor))
-                    .map((v) => v.size),
-            ),
-        ]
-        : allSizes
-
-    // Lọc các màu có sẵn dựa trên kích thước đã chọn
-    const availableColors = selectedSize
-        ? [
-            ...new Set(
-                product.productVariants
-                    .filter((v) => normalizeString(v.size) === normalizeString(selectedSize))
-                    .map((v) => v.color),
-            ),
-        ]
-        : allColors
-
-    const handleColorSelect = (color) => {
-        // Nếu người dùng nhấp vào màu đã chọn, hủy chọn nó
-        if (selectedColor && normalizeString(selectedColor) === normalizeString(color)) {
-            setSelectedColor(null)
-        } else {
-            setSelectedColor(color)
-
-            // Nếu kích thước hiện tại không khả dụng với màu mới, reset kích thước
-            if (
-                selectedSize &&
-                !product.productVariants.some(
-                    (v) =>
-                        normalizeString(v.color) === normalizeString(color) &&
-                        normalizeString(v.size) === normalizeString(selectedSize),
-                )
-            ) {
-                setSelectedSize(null)
-            }
+    // Đồng bộ với initialVariant khi component mount
+    useEffect(() => {
+        if (initialVariant && !selectedColor && !selectedSize) {
+            setSelectedColor(initialVariant.color);
+            setSelectedSize(initialVariant.size);
+            setSelectedVariant(initialVariant);
         }
-    }
+    }, [initialVariant, selectedColor, selectedSize, setSelectedVariant]);
 
-    const handleSizeSelect = (size) => {
-        // Nếu người dùng nhấp vào kích thước đã chọn, hủy chọn nó
-        if (selectedSize && normalizeString(selectedSize) === normalizeString(size)) {
-            setSelectedSize(null)
-        } else {
-            setSelectedSize(size)
-
-            // Nếu màu hiện tại không khả dụng với kích thước mới, reset màu
-            if (
-                selectedColor &&
-                !product.productVariants.some(
-                    (v) =>
-                        normalizeString(v.size) === normalizeString(size) &&
-                        normalizeString(v.color) === normalizeString(selectedColor),
-                )
-            ) {
-                setSelectedColor(null)
-            }
-        }
-    }
-
+    // Cập nhật selectedVariant khi color/size thay đổi
     useEffect(() => {
         if (selectedColor && selectedSize) {
             const variant = product.productVariants.find(
                 (v) =>
                     normalizeString(v.color) === normalizeString(selectedColor) &&
-                    normalizeString(v.size) === normalizeString(selectedSize),
-            )
-            setSelectedVariant(variant || null)
-            console.log(variant)
-        } else {
-            setSelectedVariant(null)
+                    normalizeString(v.size) === normalizeString(selectedSize)
+            );
+            setSelectedVariant(variant || null);
+        } else if (!selectedColor || !selectedSize) {
+            setSelectedVariant(null);
         }
-    }, [selectedColor, selectedSize, product.productVariants, setSelectedVariant])
+    }, [selectedColor, selectedSize, product.productVariants, setSelectedVariant]);
 
-    // Kiểm tra xem biến thể có tồn tại không
+    const availableSizes = selectedColor
+        ? [...new Set(
+            product.productVariants
+                .filter((v) => normalizeString(v.color) === normalizeString(selectedColor))
+                .map((v) => v.size)
+        )]
+        : allSizes;
+
+    const availableColors = selectedSize
+        ? [...new Set(
+            product.productVariants
+                .filter((v) => normalizeString(v.size) === normalizeString(selectedSize))
+                .map((v) => v.color)
+        )]
+        : allColors;
+
+    const handleColorSelect = (color) => {
+        if (selectedColor && normalizeString(selectedColor) === normalizeString(color)) {
+            setSelectedColor(null);
+        } else {
+            setSelectedColor(color);
+            if (
+                selectedSize &&
+                !product.productVariants.some(
+                    (v) =>
+                        normalizeString(v.color) === normalizeString(color) &&
+                        normalizeString(v.size) === normalizeString(selectedSize)
+                )
+            ) {
+                setSelectedSize(null);
+            }
+        }
+    };
+
+    const handleSizeSelect = (size) => {
+        if (selectedSize && normalizeString(selectedSize) === normalizeString(size)) {
+            setSelectedSize(null);
+        } else {
+            setSelectedSize(size);
+            if (
+                selectedColor &&
+                !product.productVariants.some(
+                    (v) =>
+                        normalizeString(v.size) === normalizeString(size) &&
+                        normalizeString(v.color) === normalizeString(selectedColor)
+                )
+            ) {
+                setSelectedColor(null);
+            }
+        }
+    };
+
     const isVariantAvailable = (color, size) => {
         return product.productVariants.some(
-            (v) => normalizeString(v.color) === normalizeString(color) && normalizeString(v.size) === normalizeString(size),
-        )
-    }
+            (v) => normalizeString(v.color) === normalizeString(color) && normalizeString(v.size) === normalizeString(size)
+        );
+    };
 
     return (
-        <div className="pt-3  rounded-lg mb-4">
+        <div className="pt-3 rounded-lg mb-4">
             <div className="mb-4">
                 <p className="font-semibold mb-2">Màu sắc:</p>
                 <div className="flex flex-wrap gap-2">
                     {allColors.map((color) => {
                         const isAvailable = selectedSize
                             ? availableColors.some((c) => normalizeString(c) === normalizeString(color))
-                            : true
-
+                            : true;
                         return (
                             <button
                                 key={color}
@@ -150,12 +138,14 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
                                 onClick={() => isAvailable && handleColorSelect(color)}
                                 disabled={!isAvailable}
                                 title={
-                                    selectedColor && normalizeString(selectedColor) === normalizeString(color) ? "Nhấp để bỏ chọn" : ""
+                                    selectedColor && normalizeString(selectedColor) === normalizeString(color)
+                                        ? "Nhấp để bỏ chọn"
+                                        : ""
                                 }
                             >
                                 {color}
                             </button>
-                        )
+                        );
                     })}
                 </div>
             </div>
@@ -166,8 +156,7 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
                     {allSizes.map((size) => {
                         const isAvailable = selectedColor
                             ? availableSizes.some((s) => normalizeString(s) === normalizeString(size))
-                            : true
-
+                            : true;
                         return (
                             <button
                                 key={size}
@@ -180,11 +169,15 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
                                 }`}
                                 onClick={() => isAvailable && handleSizeSelect(size)}
                                 disabled={!isAvailable}
-                                title={selectedSize && normalizeString(selectedSize) === normalizeString(size) ? "Nhấp để bỏ chọn" : ""}
+                                title={
+                                    selectedSize && normalizeString(selectedSize) === normalizeString(size)
+                                        ? "Nhấp để bỏ chọn"
+                                        : ""
+                                }
                             >
                                 {size}
                             </button>
-                        )
+                        );
                     })}
                 </div>
             </div>
@@ -193,6 +186,5 @@ export default function ProductVariantSelector({ product, setSelectedVariant }) 
                 <div className="mt-3 text-red-500 text-sm">Biến thể sản phẩm này không có sẵn.</div>
             )}
         </div>
-    )
+    );
 }
-

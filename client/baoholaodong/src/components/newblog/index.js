@@ -87,7 +87,7 @@ const NewBlog = () => {
         <section className="py-10 bg-[#f9f9f9]">
             {/* Tiêu đề ra ngoài container để sát trái màn hình */}
             <div className="px-4 mb-4">
-                <h2 className="text-xl md:text-2xl font-bold text-[#b50a00] text-left relative inline-block after:block after:w-1/3 after:h-1 after:bg-yellow-400 after:mt-1 after:clip-path-[polygon(0%_0%,100%_0%,calc(100%-4px)_100%,0%_100%)]">
+                <h2 className="text-xl md:text-2xl font-bold text-[#b50a00] text-left relative inline-block after:block after:w-1/3 after:h-1 after:bg-yellow-400 after:mt-1 after:[clip-path:polygon(0%_0%,100%_0%,calc(100%-4px)_100%,0%_100%)]">
                     KIẾN THỨC AN TOÀN LAO ĐỘNG
                 </h2>
             </div>

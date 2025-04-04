@@ -1,8 +1,8 @@
 ﻿/* TopDealProducts.css */
 .top-deal-container {
-    background-image: url('../../images/saletrees.jpg');
+    background-image: url('https://img.pikbest.com/background/20220119/red-chinese-style-texture-hd-background_6230540.jpg!sw800');
     background-position: 50% 50%;
-    background-size: 40%;
+    background-size: 60%;
     background-repeat: repeat;
     padding-top: 2.5rem;
     padding-bottom: 2.5rem;
@@ -124,7 +124,7 @@
     z-index: 0;
 }
 
-.top-deal-view-all-button:hover Meow:hover span:last-child {
+.top-deal-view-all-button:hover span:last-child {
     left: 0;
 }
 
@@ -145,6 +145,9 @@
     padding: 0.75rem;
     flex-shrink: 0;
     transition: transform 0.2s;
+    display: flex; /* Thêm flex để điều chỉnh layout */
+    flex-direction: column; /* Sắp xếp theo cột */
+    min-height: 400px; /* Đặt chiều cao tối thiểu để các thẻ đồng nhất */
 }
 
 @media (min-width: 768px) {
@@ -214,6 +217,13 @@
     font-size: 1rem;
     font-weight: 600;
     text-align: left;
+    height: 2.5rem; /* Chiều cao cố định cho 2 dòng */
+    line-height: 1.25rem; /* Đảm bảo 2 dòng vừa khít */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @media (min-width: 768px) {
@@ -226,6 +236,7 @@
 .top-deal-price-container {
     text-align: left;
     margin-top: 0.5rem;
+    flex-grow: 1; /* Cho phép phần giá mở rộng để đẩy button xuống dưới */
 }
 
 .top-deal-price-discounted {
