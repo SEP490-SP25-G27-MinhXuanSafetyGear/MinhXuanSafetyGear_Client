@@ -1,53 +1,19 @@
 ﻿"use client"
 
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react"
+import React, {  useContext,  useMemo} from "react"
 import { BlogPostContext } from "../../../contexts/BlogPostContext"
 import { Edit, Plus } from "lucide-react"
-import Loading from "../../../components/Loading/Loading"
 import { motion } from "framer-motion"
 import { FaRegFrown } from "react-icons/fa"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
 const BlogPosts = () => {
-    const { loading, categories, fetchCategories, search, setSearch } =
+    const {blogPosts, loading, categories,setCategorySelected,categorySelected, fetchCategories, search, setSearch,page,setPage } =
         useContext(BlogPostContext)
-    const [BlogPosts, setBlogPosts] = useState([]);
-    const memoizedBlogPosts = useMemo(() => BlogPosts, [BlogPosts])
-    const [page, setPage] = useState(1)
-    const [size, setSize] = useState(20)
-    const [categorySelected, setCategorySelected] = useState(3)
+    const memoizedBlogPosts = useMemo(() => blogPosts, [blogPosts])
     const navigate = useNavigate()
 
-    // Fetch categories only once when component mounts
-    useEffect(() => {
-        if (categories.length === 0) {
-            fetchCategories()
-        }
-    }, [categories.length, fetchCategories])
-
-    // Fetch blog posts when relevant filters change
-    useEffect(() => {
-        fetchBlogPosts()
-    }, [categorySelected, page, size, search])
-
-    const fetchBlogPosts = useCallback(async () => {
-        try {
-            const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-page`, {
-                params: {
-                    categoryId: categorySelected,
-                    page: page,
-                    size: size,
-                    search: search,
-                },
-            })
-            setBlogPosts(response.data.items)
-        } catch (error) {
-            console.error("Lỗi khi tải bài viết:", error.response?.data || error.message)
-        }
-    }, [categorySelected, page, size, search, setBlogPosts])
 
     const handleUpdate = (id) => {
         navigate("/manager/update-blog/" + id)
@@ -56,7 +22,6 @@ const BlogPosts = () => {
     return (
         <div className="space-y-6">
             <div className="bg-white min-h-[800px] rounded-lg shadow">
-                <Loading isLoading={loading} />
                 <div className="p-6 border-b flex justify-between items-center">
                     <h3 className="text-lg font-semibold text-gray-800">Danh sách blog</h3>
                     <div className="flex space-x-4">

@@ -1,7 +1,7 @@
-import React, {createContext, useState, useEffect, useCallback} from "react";
-import axios from "axios";
-import {useNavigate} from "react-router-dom";
-
+import React, {createContext, useState, useEffect, useCallback, useContext} from "react";
+import {setAuthToken} from '../axiosInstance';
+import axiosInstance from '../axiosInstance';
+import {AuthContext} from "./AuthContext";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const ProductContext = createContext();
 
@@ -19,12 +19,19 @@ export const AdminProductProvider = ({ children }) => {
 	const [categories, setCategories] = useState([]);
 	const [reports, setReports] = useState(null);
 	const [productState,setProductState] = useState(null);
-	/** Lấy danh sách sản phẩm */
+	const {user} = useContext(AuthContext);
+	useEffect(() => {
+		if (user && user.token) {
+			setAuthToken(user.token);
+		}
+	}, [user]);
 
+	/** Lấy danh sách sản phẩm */
 	const fetchProducts = useCallback(async () => {
 		//setLoading(true);
 		try {
-			const response = await axios.get(`${BASE_URL}/api/Product/get-product-page`, {
+
+			const response = await axiosInstance.get(`/Product/get-product-page`, {
 				params: {group:selectedGroup, category: selectedCategory, page: currentPage, pagesize: size },
 			});
 			setProducts(response.data.items || []);
@@ -40,7 +47,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** Lấy thông tin chi tiết sản phẩm */
 	const getProductById = async (id) => {
 		try {
-			const response = await axios.get(`${BASE_URL}/api/product/get-product-by-id/${id}`);
+			const response = await axiosInstance.get(`/product/get-product-by-id/${id}`);
 			return response.data;
 		} catch (error) {
 			console.error("Lỗi khi lấy thông tin sản phẩm:", error.response?.data || error.message);
@@ -50,7 +57,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** Lấy danh sách danh mục */
 	const fetchGroupCategories = async () => {
 		try {
-			const response = await axios.get(`${BASE_URL}/api/Product/getall-category`);
+			const response = await axiosInstance.get(`/Product/getall-category`);
 			setGroupCategories(response.data || []);
 		} catch (error) {
 			console.error("Lỗi khi lấy danh mục sản phẩm:", error.response?.data || error.message);
@@ -63,7 +70,7 @@ export const AdminProductProvider = ({ children }) => {
 
 	const fetchTaxes = async () => {
 		try{
-			const response = await axios.get(`${BASE_URL}/api/tax/getall`);
+			const response = await axiosInstance.get(`/tax/getall`);
 			setTaxes(response.data || []);
 		}catch(error){
 
@@ -72,7 +79,7 @@ export const AdminProductProvider = ({ children }) => {
 
 	const createTax = async (newTax)=>{
 		try{
-			const response = await axios.post(`${BASE_URL}/api/tax/create`, newTax);
+			const response = await axiosInstance.post(`/tax/create`, newTax);
 			const data = response.data;
 			setTaxes((prev)=>[...prev, data]);
 		}catch(error){
@@ -81,7 +88,7 @@ export const AdminProductProvider = ({ children }) => {
 	}
 	const updateTax = async (tax) =>{
 		try{
-			const response = await axios.put(`${BASE_URL}/api/tax/update`, tax);
+			const response = await axiosInstance.put(`/tax/update`, tax);
 			const updatedTax = response.data;
 
 			setTaxes((prev) =>
@@ -94,7 +101,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** Thêm danh mục sản phẩm */
 	const createCategory = async (category) => {
 		try{
-			const response = await axios.post(`${BASE_URL}/api/Product/create-category`, category);
+			const response = await axiosInstance.post(`/Product/create-category`, category);
 			setGroupCategories(response.data);
 			return response.data;
 		}catch (error){
@@ -105,7 +112,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** Thêm danh mục sản phẩm */
 	const updateCategory = async (category) => {
 		try{
-			const response = await axios.put(`${BASE_URL}/api/Product/update-category`, category);
+			const response = await axiosInstance.put(`/Product/update-category`, category);
 			setGroupCategories(response.data);
 			return response.data;
 		}catch (error){
@@ -116,7 +123,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** Tạo sản phẩm */
 	const createProduct = async (product) => {
 		try {
-			const response = await axios.post(`${BASE_URL}/api/product/create-product`, product);
+			const response = await axiosInstance.post(`/product/create-product`, product);
 			const newProduct = {...await response.data,isNew: true};
 			setProducts((prevProducts)=>[newProduct,...prevProducts]);
 			return response.data;
@@ -132,7 +139,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** Xóa sản phẩm */
 	const deleteProduct = async (id) => {
 		try {
-			const response = await axios.delete(`${BASE_URL}/api/product/delete-product/${id}`);
+			const response = await axiosInstance.delete(`/product/delete-product/${id}`);
 			if (response.status >= 200 && response.status < 300) {
 				return true; // SignalR sẽ tự động cập nhật danh sách sản phẩm
 			}
@@ -144,7 +151,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** cập nhật sản phẩm */
 	const updateProduct = async (product) => {
 		try{
-			const response = await axios.put(`${BASE_URL}/api/product/update-product`, product);
+			const response = await axiosInstance.put(`/product/update-product`, product);
 			const updatedProduct = response.data;
 			// Cập nhật danh sách sản phẩm
 			setProducts((prevProducts) =>
@@ -167,7 +174,7 @@ export const AdminProductProvider = ({ children }) => {
 			return;
 		}
 		try {
-			const response = await axios.get(`${BASE_URL}/api/Product/search-product`, {
+			const response = await axiosInstance.get(`/Product/search-product`, {
 				params: { title: value },
 			});
 			setProducts(response.data || []);
@@ -179,7 +186,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** upload image */
 	const uploadImage = async (image) => {
 		try{
-			const response = await axios.post(`${BASE_URL}/api/Product/create-image`, image);
+			const response = await axiosInstance.post(`/Product/create-image`, image);
 			return response.data;
 		}catch(error){
 			throw error;
@@ -189,7 +196,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** upload image */
 	const updateImage = async (image) => {
 		try{
-			const response = await axios.put(`${BASE_URL}/api/Product/update-image`, image);
+			const response = await axiosInstance.put(`/Product/update-image`, image);
 			const updatedProduct = response.data;
 			// Cập nhật danh sách sản phẩm
 			setProducts((prevProducts) =>
@@ -204,7 +211,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** delete image */
 	const deleteImage = async (id) => {
 		try{
-			const response = await axios.delete(`${BASE_URL}/api/Product/delete-image/${id}`);
+			const response = await axiosInstance.delete(`/Product/delete-image/${id}`);
 			return response.data;
 		}catch(error){
 			throw error;
@@ -214,7 +221,7 @@ export const AdminProductProvider = ({ children }) => {
 	/** create variant */
 	const createVariant= async (variant)=>{
 		try{
-			const response = await axios.post(`${BASE_URL}/api/Product/create-product-variant`, variant);
+			const response = await axiosInstance.post(`/Product/create-product-variant`, variant);
 			return response.data;
 		}catch(error){
 			throw error;
@@ -224,7 +231,7 @@ export const AdminProductProvider = ({ children }) => {
 	// update variant
 	const updateVariant = async (variant) => {
 		try{
-			const response = await axios.put(`${BASE_URL}/api/Product/update-product-variant`, variant);
+			const response = await axiosInstance.put(`/Product/update-product-variant`, variant);
 			return response.data;
 		}catch(error){
 			throw error;
@@ -242,7 +249,7 @@ export const AdminProductProvider = ({ children }) => {
 				productId: productId,
 				taxId: taxId
 			}
-			const response = await axios.post(`${BASE_URL}/api/product/add-tax`, productTax);
+			const response = await axiosInstance.post(`/product/add-tax`, productTax);
 			return response.data;
 		}catch(error){
 			throw error;
@@ -255,7 +262,7 @@ export const AdminProductProvider = ({ children }) => {
 	 * */
 	const deleteProductTax= async (id) => {
 		try{
-			const response = await axios.delete(`${BASE_URL}/api/product/remove-tax/?productTaxid=${id}`);
+			const response = await axiosInstance.delete(`/product/remove-tax/?productTaxid=${id}`);
 			return response.data;
 		}catch(error){
 			throw error;
@@ -264,7 +271,7 @@ export const AdminProductProvider = ({ children }) => {
 
 	const createGroup = async (group)=>{
 		try{
-			const response = await axios.post(`${BASE_URL}/api/Product/create-group-category`, group);
+			const response = await axiosInstance.post(`/Product/create-group-category`, group);
 			setGroupCategories((prevGroups) =>[...prevGroups,response.data])
 			return response.data;
 		}catch (error){
@@ -273,7 +280,7 @@ export const AdminProductProvider = ({ children }) => {
 	}
 	const updateGroupCategory = async (group)=>{
 		try{
-			const response = await axios.put(`${BASE_URL}/api/Product/update-group-category`, group);
+			const response = await axiosInstance.put(`/Product/update-group-category`, group);
 			const updatedGroup = await response.data;
 			setGroupCategories((prevGroups) => {
 				return prevGroups.map((g) =>
@@ -287,7 +294,7 @@ export const AdminProductProvider = ({ children }) => {
 	}
 	const fetchReport = async () => {
 		try{
-			const response = await axios.get(`${BASE_URL}/api/Report`);
+			const response = await axiosInstance.get(`/Report`);
 			setReports(response.data);
 		}catch (error){
 
