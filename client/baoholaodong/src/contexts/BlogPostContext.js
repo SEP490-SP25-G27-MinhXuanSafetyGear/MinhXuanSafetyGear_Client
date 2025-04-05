@@ -1,8 +1,9 @@
-﻿import React, { createContext, useState, useEffect } from "react";
+﻿import React, {createContext, useState, useEffect, useContext} from "react";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
-
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+import {setAuthToken} from '../axiosInstance';
+import axiosInstance from '../axiosInstance';
+import {AuthContext} from "./AuthContext";
 export const BlogPostContext = createContext();
 
 export const BlogPostProvider = ({ children }) => {
@@ -16,11 +17,18 @@ export const BlogPostProvider = ({ children }) => {
     const [search, setSearch] = useState("");
     const [groupCategories, setGroupCategories] = useState([]);
 
+    const {user} = useContext(AuthContext);
+    useEffect(() => {
+        if (user && user.token) {
+            setAuthToken(user.token);
+        }
+    }, [user]);
+
     /** Lấy danh sách bài viết */
     const fetchBlogPosts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-page`, {
+            const response = await axiosInstance.get(`/BlogPost/get-blog-page`, {
                 params: { categoryId: categorySelected, page, size }
             });
             setBlogPosts(response.data.items);
@@ -37,7 +45,7 @@ export const BlogPostProvider = ({ children }) => {
             return;
         }
         try {
-            const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-id/${id}`);
+            const response = await axiosInstance.get(`/BlogPost/get-blog-by-id/${id}`);
             return response.data;
         } catch (error) {
             console.error("Lỗi khi lấy thông tin bài viết:", error.response?.data || error.message);
@@ -47,7 +55,7 @@ export const BlogPostProvider = ({ children }) => {
     /** Lấy danh sách danh mục bài viết */
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-categories`);
+            const response = await axiosInstance.get(`/BlogPost/get-blog-categories`);
             setCategories(response.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục bài viết:", error.response?.data || error.message);
@@ -57,7 +65,7 @@ export const BlogPostProvider = ({ children }) => {
     /** Tạo bài viết mới */
     const createBlogPost = async (blogPost) => {
         try {
-            const response = await axios.post(`${BASE_URL}/api/BlogPost/create-blog`, blogPost);
+            const response = await axiosInstance.post(`/BlogPost/create-blog`, blogPost);
             return response.data;
         } catch (error) {
             console.error("Lỗi khi tạo bài viết:", error.response?.data || error.message);
@@ -68,7 +76,7 @@ export const BlogPostProvider = ({ children }) => {
     /** Cập nhật bài viết */
     const updateBlogPost = async (blogPost) => {
         try {
-            const response = await axios.put(`${BASE_URL}/api/BlogPost/update-blog`, blogPost);
+            const response = await axiosInstance.put(`/BlogPost/update-blog`, blogPost);
             return response.data;
         } catch (error) {
             console.error("Lỗi khi cập nhật bài viết:", error.response?.data || error.message);
@@ -79,7 +87,7 @@ export const BlogPostProvider = ({ children }) => {
     /** Xóa bài viết */
     const deleteBlogPost = async (id) => {
         try {
-            const response = await axios.delete(`${BASE_URL}/api/BlogPost/delete-blog/${id}`);
+            const response = await axiosInstance.delete(`/BlogPost/delete-blog/${id}`);
             return response.data;
         } catch (error) {
             console.error("Lỗi khi xóa bài viết:", error.response?.data || error.message);
@@ -94,7 +102,7 @@ export const BlogPostProvider = ({ children }) => {
             return;
         }
         try {
-            const response = await axios.get(`${BASE_URL}/api/BlogPost/search-blog`, {
+            const response = await axiosInstance.get(`/BlogPost/search-blog`, {
                 params: { title: value },
             });
             setBlogPosts(response.data);
@@ -107,7 +115,7 @@ export const BlogPostProvider = ({ children }) => {
     const createBlogCategory = async (categoryData) => {
         try {
             setLoading(true);
-            const response = await axios.post(`${BASE_URL}/api/BlogPost/create-blog-category`, categoryData);
+            const response = await axiosInstance.post(`/BlogPost/create-blog-category`, categoryData);
             const newCategory = response.data; // { id, name, description, createdAt, updatedAt }
             setCategories((prevCategories) => [...prevCategories, newCategory]);
             return newCategory;
@@ -123,7 +131,7 @@ export const BlogPostProvider = ({ children }) => {
     const updateBlogCategory = async (categoryData) => {
         try {
             setLoading(true);
-            const response = await axios.put(`${BASE_URL}/api/BlogPost/update-blog-category`, categoryData);
+            const response = await axiosInstance.put(`/BlogPost/update-blog-category`, categoryData);
             const updatedCategory = response.data; // { id, name, description, createdAt, updatedAt }
             setCategories((prevCategories) =>
                 prevCategories.map((cat) =>
@@ -142,7 +150,7 @@ export const BlogPostProvider = ({ children }) => {
     // SignalR
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`${BASE_URL}/blogHub`)
+            .withUrl(`/blogHub`)
             .withAutomaticReconnect()
             .build();
 
@@ -210,11 +218,12 @@ export const BlogPostProvider = ({ children }) => {
             if (search.trim() !== "") {
                 searchBlogPost(search);
             } else {
-                fetchBlogPosts();
+                fetchBlogPosts(); // ✅ Chỉ gọi lại khi clear tìm kiếm
             }
         }, 500);
         return () => clearTimeout(delaySearch);
     }, [search]);
+
 
     return (
         <BlogPostContext.Provider

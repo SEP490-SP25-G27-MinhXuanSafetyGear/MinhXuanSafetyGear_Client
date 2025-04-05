@@ -1,10 +1,17 @@
-﻿import React, { createContext, useState, useEffect, useCallback } from "react";
+﻿import React, {createContext, useState, useEffect, useCallback, useContext} from "react";
 import axios from "axios";
-
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+import {setAuthToken} from '../axiosInstance';
+import axiosInstance from '../axiosInstance';
+import {AuthContext} from "./AuthContext";
 export const UserContext = createContext();
 
 export const AdminUserContextProvider = ({ children }) => {
+    const {user} = useContext(AuthContext);
+    useEffect(() => {
+        if (user && user.token) {
+            setAuthToken(user.token);
+        }
+    }, [user]);
     const [pageUser, setPageUsers] = useState({
         currentPage: 1,
         pageSize: 10,
@@ -37,7 +44,7 @@ export const AdminUserContextProvider = ({ children }) => {
 
     const fetchUser = useCallback(async (role, setState) => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/User/get-users`, {
+            const response = await axiosInstance.get(`/User/get-users`, {
                 params: {
                     page: 1, // Reset về trang 1 khi fetch lại
                     size: 10,
