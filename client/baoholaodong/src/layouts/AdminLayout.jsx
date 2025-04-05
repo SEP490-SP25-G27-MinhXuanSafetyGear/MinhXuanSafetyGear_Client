@@ -21,6 +21,8 @@ import { AuthContext } from "../contexts/AuthContext";
 import NotificationBell from "../components/notifications/Notification";
 import axios from 'axios';
 import { HubConnectionBuilder } from '@microsoft/signalr';
+import {setAuthToken} from "../axiosInstance";
+import axiosInstance from "../axiosInstance";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const AdminLayout = () => {
@@ -28,7 +30,11 @@ const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
-
+    useEffect(() => {
+        if (user && user.token) {
+            setAuthToken(user.token);
+        }
+    }, [user]);
     const navItems = useMemo(() => {
         if (user.role === 'Admin') {
             return [
@@ -68,7 +74,7 @@ const AdminLayout = () => {
 
     const fetchNotifications = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/Notification/getall-admin-noti`);
+            const response = await axiosInstance.get(`/Notification/getall-admin-noti`);
             const formattedNotifications = response.data.map(notification => ({
                 id: notification.id,
                 title: notification.title,
@@ -122,7 +128,7 @@ const AdminLayout = () => {
             )
         );
         try {
-            await axios.put(`${BASE_URL}/api/Notification/mask-as-read`, null, {
+            await axiosInstance.put(`/Notification/mask-as-read`, null, {
                 params: {
                     notificationId: id,
                     readAll: false,
