@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useState, useEffect, useCallback, useContext} from "react";
 import { SquarePen, Eye, Plus, CheckCircle, XCircle } from "lucide-react";
 import Modal from "../../../components/Modal/Modal";
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import { useNavigate } from "react-router-dom";
 import { formatVND } from "../../../utils/format";
+import {AuthContext} from "../../../contexts/AuthContext";
+import {setAuthToken} from "../../../axiosInstance";
+import axiosInstance from "../../../axiosInstance";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
 const Orders = () => {
   const [isOpenImage, setIsOpenImage] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
@@ -21,19 +23,24 @@ const Orders = () => {
   const [status, setStatus] = useState("all");
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const navigate = useNavigate();
-
+  const {user} = useContext(AuthContext);
+  useEffect(() => {
+    if (user && user.token) {
+      setAuthToken(user.token);
+    }
+  }, [user]);
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(
-          `${BASE_URL}/api/Order/get-page-orders?page=${currentPage}&pageSize=10&customerName=${searchName}&startDate=${startDateString}&endDate=${endDateString}&status=${
+        const response = await axiosInstance.get(
+          `/Order/get-page-orders?page=${currentPage}&pageSize=10&customerName=${searchName}&startDate=${startDateString}&endDate=${endDateString}&status=${
             status === "all" ? "" : status
           }`
         );
         const detailedOrders = await Promise.all(
           response.data.items.map(async (order) => {
-            const detailResponse = await axios.get(
-              `${BASE_URL}/api/Order/get-order/${order.orderId}`
+            const detailResponse = await axiosInstance.get(
+              `Order/get-order/${order.orderId}`
             );
             return detailResponse.data;
           })
@@ -59,8 +66,8 @@ const Orders = () => {
       .then(() => {})
       .catch((err) => console.error("SignalR Connection Error:", err));
     connection.on("NewOrderCreated", async (newOrder) => {
-      const detailResponse = await axios.get(
-        `${BASE_URL}/api/Order/get-order/${newOrder.orderId}`
+      const detailResponse = await axiosInstance.get(
+        `/Order/get-order/${newOrder.orderId}`
       );
       setOrders((prevOrders) => [detailResponse.data, ...prevOrders]);
     });
@@ -83,10 +90,10 @@ const Orders = () => {
     setUpdatingOrderId(orderId);
     try {
       await axios.put(
-        `${BASE_URL}/api/invoice/confirm-invoice-by-employee/${invoiceNumber}/${newStatus}`
+        `/invoice/confirm-invoice-by-employee/${invoiceNumber}/${newStatus}`
       );
-      const detailResponse = await axios.get(
-        `${BASE_URL}/api/Order/get-order/${orderId}`
+      const detailResponse = await axiosInstance.get(
+        `/Order/get-order/${orderId}`
       );
       setOrders((prevOrders) =>
         prevOrders.map((order) =>

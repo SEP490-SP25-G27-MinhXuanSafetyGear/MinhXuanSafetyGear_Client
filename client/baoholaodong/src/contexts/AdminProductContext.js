@@ -2,7 +2,6 @@ import React, {createContext, useState, useEffect, useCallback, useContext} from
 import {setAuthToken} from '../axiosInstance';
 import axiosInstance from '../axiosInstance';
 import {AuthContext} from "./AuthContext";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const ProductContext = createContext();
 
 export const AdminProductProvider = ({ children }) => {

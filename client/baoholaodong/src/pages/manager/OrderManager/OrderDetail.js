@@ -1,10 +1,12 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import {useContext, useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, CheckCircle, Clock, XCircle, Image } from "lucide-react";
-
+import {setAuthToken} from "../../../axiosInstance";
+import axiosInstance from "../../../axiosInstance";
+import {AuthContext} from "../../../contexts/AuthContext";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export default function OrderDetail() {
@@ -14,7 +16,12 @@ export default function OrderDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
-
+  const { user } = useContext(AuthContext);
+  useEffect(() => {
+    if (user && user.token) {
+      setAuthToken(user.token);
+    }
+  }, [user]);
   useEffect(() => {
     if (id) {
       fetchOrder();
@@ -23,7 +30,7 @@ export default function OrderDetail() {
 
   const fetchOrder = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/Order/get-order/${id}`);
+      const response = await axiosInstance.get(`/Order/get-order/${id}`);
       setOrder(response.data);
       console.log("API Response:", response.data);
     } catch (err) {
@@ -41,8 +48,8 @@ export default function OrderDetail() {
     }
     setUpdating(true);
     try {
-      await axios.put(
-        `${BASE_URL}/api/invoice/confirm-invoice-by-employee/${order.invoice.invoiceNumber}/${newStatus}`
+      await axiosInstance().put(
+        `/invoice/confirm-invoice-by-employee/${order.invoice.invoiceNumber}/${newStatus}`
       );
       await fetchOrder();
     } catch (err) {
