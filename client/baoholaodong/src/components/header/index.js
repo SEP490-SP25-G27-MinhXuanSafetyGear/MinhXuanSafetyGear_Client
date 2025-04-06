@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom"; // Thêm Link
 import Sidebar from "./Sidebar";
 import CartDropdown from "../Cartdropdown/CartDropdown";
 import "./style.css";
 import { AuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
+import logo from "../../images/logo.gif";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
@@ -33,10 +34,8 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
             try {
                 const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-category/lien-he`);
                 const contactData = response.data;
-                // Tìm bài post có title là "Điện thoại"
                 const phonePost = contactData.find((post) => post.title.toLowerCase() === "điện thoại");
                 if (phonePost) {
-                    // Loại bỏ thẻ HTML trước khi lưu số điện thoại
                     const cleanPhoneNumber = stripHtml(phonePost.content);
                     setPhoneNumber(cleanPhoneNumber);
                 } else {
@@ -97,6 +96,11 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    // Ngăn sự kiện click lan tỏa từ dropdown
+    const handleUserClick = (e) => {
+        e.stopPropagation(); // Ngăn sự kiện click lan tỏa lên div.user
+    };
+
     return (
         <header className={`header ${isScrolled ? "scrolled" : ""}`}>
             <div className="header-content">
@@ -106,10 +110,7 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                 </button>
 
                 <a href="/" className="logo">
-                    <img
-                        src="http://baoholaodongminhxuan.com/images/common/logo1.gif"
-                        alt="Company Logo"
-                    />
+                    <img src={logo} alt="Company Logo" />
                     <div className="company-info">
                         <h1>BẢO HỘ LAO ĐỘNG MINH XUÂN</h1>
                         <p>Luôn đem lại an toàn và hoàn hảo nhất cho bạn!</p>
@@ -140,16 +141,24 @@ function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }
                             <span>Thông tin</span>
                             <span>Tài khoản</span>
                         </div>
-                        <div className="user-dropdown">
+                        <div className="user-dropdown" onClick={handleUserClick}>
                             {user ? (
                                 <>
-                                    <a href={`/order-history/${user.userId}`}>Đơn hàng</a>
-                                    <a href="/logout">Đăng xuất</a>
+                                    <Link to={`/order-history/${user.userId}`} className="block">
+                                        Đơn hàng
+                                    </Link>
+                                    <Link to="/logout" className="block">
+                                        Đăng xuất
+                                    </Link>
                                 </>
                             ) : (
                                 <>
-                                    <a href="/register">Đăng ký</a>
-                                    <a href="/login">Đăng nhập</a>
+                                    <Link to="/register" className="block">
+                                        Đăng ký
+                                    </Link>
+                                    <Link to="/login" className="block">
+                                        Đăng nhập
+                                    </Link>
                                 </>
                             )}
                         </div>

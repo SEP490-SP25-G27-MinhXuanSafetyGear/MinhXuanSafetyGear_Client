@@ -28,17 +28,15 @@ const CustomerLayout = () => {
 
     const params = new URLSearchParams(location.search);
     const isCheckoutPage = location.pathname === "/checkout";
+    const isRegisterPage = location.pathname === "/register";
+    const isSigninPage = location.pathname === "/login";
     const isDone = params.get("done") === "true";
-    const shouldHideHeaderFooter = isCheckoutPage && isDone;
+    const shouldHideHeaderFooter = (isCheckoutPage && isDone) || isRegisterPage || isSigninPage;
 
     return (
         <div className="flex flex-col min-h-screen">
             {!shouldHideHeaderFooter && (
-                <Header
-                    cartCount={cartCount}
-                    cartItems={cartItems}
-                    showToast={showToast}
-                />
+                <Header cartCount={cartCount} cartItems={cartItems} showToast={showToast} />
             )}
             {/*{!isCheckoutPage && location.pathname !== "/" && <Breadcrumb />}*/}
             <main className="flex-1">
@@ -48,7 +46,6 @@ const CustomerLayout = () => {
             {toast && <Toast message={toast} onClose={handleToastClose} />}
         </div>
     );
-
 };
 
 export default CustomerLayout;
