@@ -12,7 +12,7 @@ const BlogPosts = () => {
         useContext(BlogPostContext)
     const navigate = useNavigate()
 
-    const POSTS_PER_PAGE = 10
+    const POSTS_PER_PAGE = 5
     const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE)
 
     const paginatedPosts = useMemo(() => {
