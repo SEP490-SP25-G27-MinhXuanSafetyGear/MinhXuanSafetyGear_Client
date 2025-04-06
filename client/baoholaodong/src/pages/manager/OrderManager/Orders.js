@@ -89,7 +89,7 @@ const Orders = () => {
     }
     setUpdatingOrderId(orderId);
     try {
-      await axios.put(
+      await axiosInstance.put(
         `/invoice/confirm-invoice-by-employee/${invoiceNumber}/${newStatus}`
       );
       const detailResponse = await axiosInstance.get(

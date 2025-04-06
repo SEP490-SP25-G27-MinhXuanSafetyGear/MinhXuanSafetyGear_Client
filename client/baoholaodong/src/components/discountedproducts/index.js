@@ -1,4 +1,4 @@
-// src/components/discountedproducts/index.js
+// src/components/discountedproducts/PoductSearch.js
 import React, { useRef, useState } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import './style.css';
