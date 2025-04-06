@@ -18,7 +18,7 @@ import React from "react";
 import BlogCategories from "../pages/manager/BlogCategory/BlogCategories";
 import CustomerLayout from "../layouts/CustomerLayout";
 import Cart from "../pages/Cart";
-import ProductList from "../pages/ProductList";
+import ProductList from "../pages/ProductList/PoductSearch";
 import ProductDetail from "../pages/ProductDetails";
 import { CustomerProductProvider } from "../contexts/CustomerProductContext";
 import { BlogPostProvider } from "../contexts/BlogPostContext";

@@ -2,7 +2,6 @@
 
 import {useContext, useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { ArrowLeft, CheckCircle, Clock, XCircle, Image } from "lucide-react";
 import {setAuthToken} from "../../../axiosInstance";
 import axiosInstance from "../../../axiosInstance";
@@ -48,7 +47,7 @@ export default function OrderDetail() {
     }
     setUpdating(true);
     try {
-      await axiosInstance().put(
+      await axiosInstance.put(
         `/invoice/confirm-invoice-by-employee/${order.invoice.invoiceNumber}/${newStatus}`
       );
       await fetchOrder();
