@@ -1,22 +1,35 @@
 ﻿"use client"
 
-import React, {  useContext,  useMemo} from "react"
+import React, { useContext, useMemo } from "react"
 import { BlogPostContext } from "../../../contexts/BlogPostContext"
 import { Edit, Plus } from "lucide-react"
 import { motion } from "framer-motion"
 import { FaRegFrown } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
 
-
 const BlogPosts = () => {
     const {blogPosts, loading, categories,setCategorySelected,categorySelected, fetchCategories, search, setSearch,page,setPage } =
         useContext(BlogPostContext)
-    const memoizedBlogPosts = useMemo(() => blogPosts, [blogPosts])
     const navigate = useNavigate()
 
+    const POSTS_PER_PAGE = 10
+    const totalPages = Math.ceil(blogPosts.length / POSTS_PER_PAGE)
+
+    const paginatedPosts = useMemo(() => {
+        const startIndex = (page - 1) * POSTS_PER_PAGE
+        const endIndex = startIndex + POSTS_PER_PAGE
+        return blogPosts.slice(startIndex, endIndex)
+    }, [blogPosts, page])
 
     const handleUpdate = (id) => {
         navigate("/manager/update-blog/" + id)
+    }
+
+    // Hàm xử lý thay đổi trang
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPage(newPage)
+        }
     }
 
     return (
@@ -49,7 +62,7 @@ const BlogPosts = () => {
                             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
                         >
                             <Plus className="w-5 h-5 mr-2" />
-                            Thêm bai viet
+                            Thêm bài viết
                         </button>
                     </div>
                 </div>
@@ -61,15 +74,47 @@ const BlogPosts = () => {
                                 <div key={index} className="animate-pulse bg-gray-200 h-48 rounded-lg"></div>
                             ))}
                         </div>
-                    ) : memoizedBlogPosts.length === 0 ? (
+                    ) : blogPosts.length === 0 ? (
                         <div className="flex justify-center items-center">
                             <FaRegFrown className="text-gray-500 w-12 h-12" />
                             <span className="text-gray-500 ml-4">Không có bài viết nào</span>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <BlogPostTable blogPosts={memoizedBlogPosts} handleUpdate={handleUpdate} />
-                        </div>
+                        <>
+                            <div className="overflow-x-auto">
+                                <BlogPostTable blogPosts={paginatedPosts} handleUpdate={handleUpdate} />
+                            </div>
+                            {/* Phần phân trang */}
+                            {totalPages > 1 && (
+                                <div className="mt-6 flex justify-center items-center space-x-2">
+                                    <button
+                                        onClick={() => handlePageChange(page - 1)}
+                                        disabled={page === 1}
+                                        className="px-3 py-1 border rounded disabled:opacity-50"
+                                    >
+                                        Trước
+                                    </button>
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => handlePageChange(pageNum)}
+                                            className={`px-3 py-1 border rounded ${
+                                                page === pageNum ? 'bg-blue-500 text-white' : ''
+                                            }`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => handlePageChange(page + 1)}
+                                        disabled={page === totalPages}
+                                        className="px-3 py-1 border rounded disabled:opacity-50"
+                                    >
+                                        Sau
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
@@ -130,4 +175,3 @@ const BlogPostTable = React.memo(({ blogPosts = [], handleUpdate }) => {
 })
 
 export default BlogPosts
-
