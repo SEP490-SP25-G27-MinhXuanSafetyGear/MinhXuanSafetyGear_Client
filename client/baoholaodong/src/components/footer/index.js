@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
+import logo from '../../images/logo.gif';
 
 const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
@@ -60,7 +61,7 @@ const Footer = () => {
                 {/* Logo */}
                 <div className="col-span-1 lg:col-span-2 space-y-3">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <img src="http://baoholaodongminhxuan.com/images/common/logo1.gif" alt="Logo" className="w-24 h-32 object-contain" />
+                        <img src={logo} alt="Logo" className="w-24 h-32 object-contain" />
                         <div>
                             <p className="text-red-700 text-base font-bold uppercase">Bảo Hộ Lao Động Minh Xuân</p>
                             <p className="text-red-700 text-sm">Luôn đem lại an toàn và hoàn hảo nhất cho bạn!</p>
