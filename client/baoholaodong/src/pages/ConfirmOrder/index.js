@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useContext, useEffect } from "react"
@@ -6,10 +5,9 @@ import { useLocation } from "react-router-dom"
 import { formatVND } from "../../utils/format"
 import axios from "axios"
 import { AuthContext } from "../../contexts/AuthContext"
-import { CreditCard, Truck, MapPin, Phone, Mail, User, DollarSign, CheckCircle, X } from "lucide-react"
+import { CreditCard, Truck, MapPin, Phone, Mail, User, DollarSign, CheckCircle } from "lucide-react"
 import "./style.css"
-import PageWrapper from "../../components/pageWrapper/PageWrapper";
-
+import PageWrapper from "../../components/pageWrapper/PageWrapper"
 
 const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
@@ -22,7 +20,10 @@ export function ConfirmOrder() {
     const [orderMessage, setOrderMessage] = useState("")
     const [notification, setNotification] = useState({ show: false, message: "", type: "" })
     const [invoiceNumber, setInvoiceNumber] = useState(null)
-    const [calculatedTotal, setCalculatedTotal] = useState(null)
+    const [calculatedOrder, setCalculatedOrder] = useState({
+        orderDetails: null,
+        totalAmount: 0,
+    })
     const [customerInfo, setCustomerInfo] = useState({
         customerId: null,
         customerName: user ? user.customerName : "",
@@ -31,31 +32,37 @@ export function ConfirmOrder() {
         customerAddress: orderData.customerAddress,
         paymentMethod: orderData.paymentMethod,
     })
+    const [isTaxIncluded, setIsTaxIncluded] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [truckAnimation, setTruckAnimation] = useState(false)
     const [rotatePage, setRotatePage] = useState(false)
 
+    const calculateOrder = async () => {
+        try {
+            const newOrder = {
+                customerName: "dinhlinh",
+                customerEmail: "user@gmail.com",
+                customerPhone: "1234567890",
+                customerAddress: "123",
+                paymentMethod: "Cash",
+                isTaxIncluded: isTaxIncluded,
+                orderDetails: orderData.orderDetails.map(({ productId, quantity, variant }) => ({
+                    productId,
+                    quantity,
+                    variantId: variant.variantId,
+                })),
+            }
+            const response = await axios.post(`${BASE_URL}/api/Order/calculate-order`, newOrder)
+            console.log(response.data)
+            setCalculatedOrder(response.data)
+        } catch (error) {
+            console.error("Lỗi tính toán đơn hàng:", error)
+        }
+    }
 
     useEffect(() => {
-        const fetchCalculatedTotal = async () => {
-            try {
-                const body = {
-                    orderDetails: orderData.orderDetails.map(({ productId, quantity, variant }) => ({
-                        productId,
-                        quantity,
-                        variantId: variant.variantId,
-                    })),
-                };
-                const response = await axios.post(`${BASE_URL}/api/Order/calculate-order`, body);
-                setCalculatedTotal(response.data.totalAmount);
-            } catch (error) {
-                console.error("Lỗi tính toán đơn hàng:", error);
-            }
-        };
-
-        fetchCalculatedTotal();
-    }, [orderData]);
-
+        calculateOrder()
+    }, [orderData, isTaxIncluded])
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
@@ -71,12 +78,12 @@ export function ConfirmOrder() {
 
     const handleOrder = async () => {
         if (!customerInfo.customerName || !customerInfo.customerPhone || !customerInfo.customerAddress) {
-            showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error");
-            return;
+            showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error")
+            return
         }
 
-        setIsSubmitting(true);
-        setTruckAnimation(true);
+        setIsSubmitting(true)
+        setTruckAnimation(true)
 
         const newOrder = {
             customerName: customerInfo.customerName,
@@ -84,38 +91,39 @@ export function ConfirmOrder() {
             customerPhone: customerInfo.customerPhone,
             customerAddress: customerInfo.customerAddress,
             paymentMethod: customerInfo.paymentMethod,
+            isTaxIncluded: isTaxIncluded,
             orderDetails: orderData.orderDetails.map(({ productId, quantity, variant }) => ({
                 productId,
                 quantity,
                 variantId: variant.variantId,
             })),
-        };
+        }
 
         try {
-            const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder);
-            const orderResponse = response.data;
+            const response = await axios.post(`${BASE_URL}/api/Order/create-order-v2`, newOrder)
+            const orderResponse = response.data
 
             setTimeout(() => {
-                setTruckAnimation(false);
+                setTruckAnimation(false)
 
-                setRotatePage(true);
+                setRotatePage(true)
                 setTimeout(() => {
-                    setOrderSuccess(true);
-                    setOrderMessage("Đơn hàng của bạn đã được ghi nhận.");
+                    setOrderSuccess(true)
+                    setOrderMessage("Đơn hàng của bạn đã được ghi nhận.")
                     if (customerInfo.paymentMethod === "Online") {
-                        setInvoiceNumber(orderResponse.invoice?.invoiceNumber);
+                        setInvoiceNumber(orderResponse.invoice?.invoiceNumber)
                     }
-                    setRotatePage(false);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                }, 1000);
-            }, 3500);
+                    setRotatePage(false)
+                    window.scrollTo({ top: 0, behavior: "smooth" })
+                }, 1000)
+            }, 3500)
         } catch (error) {
-            console.error("Order failed:", error);
-            setTruckAnimation(false);
-            showNotification("Đặt hàng thất bại. Vui lòng thử lại sau!", "error");
-            setIsSubmitting(false);
+            console.error("Order failed:", error)
+            setTruckAnimation(false)
+            showNotification("Đặt hàng thất bại. Vui lòng thử lại sau!", "error")
+            setIsSubmitting(false)
         }
-    };
+    }
 
     const totalAmount = orderData.orderDetails.reduce((total, item) => total + item.price * item.quantity, 0)
 
@@ -144,7 +152,8 @@ export function ConfirmOrder() {
                                 <p>
                                     Phương thức thanh toán: {customerInfo.paymentMethod === "Cash" ? "Tiền mặt" : "Thanh toán online"}
                                 </p>
-                                <p className="confirm-total">Tổng tiền: {formatVND(calculatedTotal ?? totalAmount)}</p>
+                                <p>Đã bao gồm thuế: {isTaxIncluded ? "Có" : "Không"}</p>
+                                <p className="confirm-total">Tổng tiền: {formatVND(calculatedOrder.totalAmount ?? totalAmount)}</p>
                             </div>
                             <div className="confirm-button-group">
                                 <button onClick={() => (window.location.href = "/")} className="confirm-btn-continue">
@@ -155,7 +164,7 @@ export function ConfirmOrder() {
                                 </button>
                                 {customerInfo.paymentMethod === "Online" && invoiceNumber && (
                                     <button
-                                        onClick={() => window.location.href = `/checkout?invoiceNumber=${invoiceNumber}`}
+                                        onClick={() => (window.location.href = `/checkout?invoiceNumber=${invoiceNumber}`)}
                                         className="confirm-btn-pay-now"
                                     >
                                         Thanh toán ngay
@@ -172,7 +181,6 @@ export function ConfirmOrder() {
     return (
         <PageWrapper title="Xác nhận đơn hàng">
             <div className={`confirm-container ${rotatePage ? "confirm-rotate" : ""}`}>
-
                 <div className="confirm-order-card">
                     <div className="confirm-order-header">
                         <h1 className="confirm-order-title">
@@ -290,61 +298,97 @@ export function ConfirmOrder() {
                         <div className="confirm-section">
                             <h2 className="confirm-section-title">Chi tiết sản phẩm</h2>
                             <div className="confirm-table-wrapper">
-                                <table className="confirm-order-table">
-                                    <thead>
-                                    <tr>
-                                        <th>Sản phẩm</th>
-                                        <th>Size</th>
-                                        <th>Màu</th>
-                                        <th>SL</th>
-                                        <th>Đơn giá</th>
-                                        <th>Thành tiền</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {orderData.orderDetails.map((item, index) => (
-                                        <tr key={`${item.productId}-${index}`} className={index % 2 === 0 ? "confirm-even" : "confirm-odd"}>
-                                            <td>
-                                                <div className="confirm-product-info">
-                                                    <img
-                                                        src={item.image || "/placeholder.svg"}
-                                                        alt={item.productName}
-                                                        className="confirm-product-img"
-                                                    />
-                                                    <span>{item.productName}</span>
-                                                </div>
-                                            </td>
-                                            <td>{item.variant.size || "N/A"}</td>
-                                            <td>{item.variant ? item.variant.color : "N/A"}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>{formatVND(item.price)}</td>
-                                            <td>{formatVND(item.price * item.quantity)}</td>
+                                {!calculatedOrder.orderDetails ? (
+                                    <div className="confirm-loading">Đang tính toán đơn hàng...</div>
+                                ) : (
+                                    <table className="confirm-order-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th>Size</th>
+                                            <th>Màu</th>
+                                            <th>SL</th>
+                                            <th>Đơn giá</th>
+                                            <th>Thuế</th>
+                                            <th>Thành tiền</th>
                                         </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                        {calculatedOrder.orderDetails.map(
+                                            (
+                                                {
+                                                    productId,
+                                                    productName,
+                                                    productImage,
+                                                    color,
+                                                    size,
+                                                    quantity,
+                                                    totalPrice,
+                                                    productTax,
+                                                    productPrice,
+                                                },
+                                                index,
+                                            ) => (
+                                                <tr
+                                                    key={`${productId}-${index}`}
+                                                    className={index % 2 === 0 ? "confirm-even" : "confirm-odd"}
+                                                >
+                                                    <td>
+                                                        <div className="confirm-product-info">
+                                                            <img
+                                                                src={productImage || "/placeholder.svg"}
+                                                                alt={productName}
+                                                                className="confirm-product-img"
+                                                            />
+                                                            <span>{productName}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>{size || "N/A"}</td>
+                                                    <td>{color || "N/A"}</td>
+                                                    <td>{quantity}</td>
+                                                    <td>{formatVND(productPrice)}</td>
+                                                    <td>{`${productTax}%`}</td>
+                                                    <td>{formatVND(totalPrice)}</td>
+                                                </tr>
+                                            ),
+                                        )}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
                         </div>
                         <div className="confirm-footer">
                             <div className="confirm-note">Vui lòng kiểm tra thông tin trước khi đặt hàng</div>
+                            <div className="confirm-tax-checkbox">
+                                <input
+                                    type="checkbox"
+                                    id="taxCheckbox"
+                                    checked={isTaxIncluded}
+                                    onChange={() => setIsTaxIncluded(!isTaxIncluded)}
+                                    className="confirm-checkbox"
+                                />
+                                <label htmlFor="taxCheckbox" className="confirm-checkbox-label">
+                                    Thuế
+                                </label>
+                            </div>
                             <div className="confirm-total-section">
                                 <div className="confirm-total-amount">
-                                    Tổng tiền: <span>{formatVND(calculatedTotal ?? totalAmount)}</span>
+                                    Tổng tiền:{" "}
+                                    <span>{calculatedOrder.totalAmount ? formatVND(calculatedOrder.totalAmount) : "Đang tính..."}</span>
                                 </div>
                                 <button
-                                    className={`confirm-order-btn ${isSubmitting ? "confirm-disabled" : ""}`}
+                                    className={`confirm-order-btn ${isSubmitting || !calculatedOrder.orderDetails ? "confirm-disabled" : ""}`}
                                     onClick={handleOrder}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || !calculatedOrder.orderDetails}
                                 >
-                                    {isSubmitting ? "Đang xử lý..." : "Đặt hàng"}
+                                    {isSubmitting ? "Đang xử lý..." : !calculatedOrder.orderDetails ? "Đang tính toán..." : "Đặt hàng"}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-        </ PageWrapper>
-
+        </PageWrapper>
     )
 }
+
