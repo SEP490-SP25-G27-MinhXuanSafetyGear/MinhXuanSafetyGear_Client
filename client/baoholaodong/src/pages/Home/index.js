@@ -16,7 +16,6 @@ function Index() {
     const [topSaleProducts, setTopSaleProducts] = useState([]);
     const [topDealProducts, setTopDealProducts] = useState([]);
     const [customerSayAboutUs ,setCustomerSayAboutUs] = useState([]);
-    const [banners, setBanners] = useState([]);
     useEffect(() => {
         if (localStorage.getItem("welcomeBack") === "true") {
             setShowWelcome(true);
@@ -48,14 +47,7 @@ function Index() {
 
         }
     }
-    const fetchBanners = async () => {
-        try{
-            const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-category/banner`)
-            setBanners(response.data);
-            console.log(response.data);
-        }catch (e){
-        }
-    }
+
     useEffect(() => {
         fetchProductsByTopic("top_sale").then((data) => setTopSaleProducts(data));
         fetchProductsByTopic("top_deal").then((data) => setTopDealProducts(data));
@@ -65,17 +57,12 @@ function Index() {
             fetchCustomerSayAboutUs();
         }
     },[customerSayAboutUs])
-    useEffect(()=>{
-        if(banners.length === 0){
-            fetchBanners();
 
-        }
-    },[banners]);
     return (
         <PageWrapper title="Bảo hộ lao động Minh Xuân">
             <div className="home-container">
                 {showWelcome && <div className="welcome-message">🎉 Welcome back!</div>}
-                <Banner banners={banners} />
+                <Banner />
                 <TopDealProducts products={topDealProducts} />
                 <TopSaleProducts products={topSaleProducts} title="TOP SẢN PHẨM BÁN CHẠY" />
                 <Feedbacks blogpost={customerSayAboutUs} />

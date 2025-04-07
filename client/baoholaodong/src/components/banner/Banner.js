@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-const Banner = ({ banners = [] }) => {
+const Banner = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
-
+    const [banners, setBanners] = useState([]);
     const nextSlide = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
     };
-
+    const fetchBanners = async () => {
+        try{
+            const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-category/banner`)
+            setBanners(response.data);
+            console.log(response.data);
+        }catch (e){
+        }
+    }
     useEffect(() => {
         if (banners.length === 0) return; // Đảm bảo có ảnh
 
         const interval = setInterval(nextSlide, 5000);
         return () => clearInterval(interval);
     }, [currentIndex, banners.length]); // Thêm dependency để cập nhật
+    useEffect(()=>{
+        if(banners.length === 0){
+            fetchBanners();
 
+        }
+    },[banners]);
     return (
         <div className="relative w-full h-[300px] md:h-[500px] overflow-hidden">
             {banners.length > 0 ? (
