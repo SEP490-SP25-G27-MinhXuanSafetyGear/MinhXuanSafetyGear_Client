@@ -108,53 +108,6 @@ export const CustomerProductProvider =({ children }) => {
         }
     }
 
-    /** Kết nối với SignalR */
-    useEffect(() => {
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`${BASE_URL}/productHub`)
-            .withAutomaticReconnect()
-            .build();
-
-        connection.start()
-            .then(() => setHubConnection(connection))
-            .catch(err => console.error("Lỗi khi kết nối SignalR:", err));
-
-        return () => {
-            if (connection.state === signalR.HubConnectionState.Connected) {
-                connection.stop();
-            }
-        };
-    }, []);
-
-    /** Lắng nghe sự kiện từ SignalR */
-    useEffect(() => {
-        if (!hubConnection) return;
-        const handleProductChange = (productUpdated) => {
-            setTopSaleProducts((prevProducts) =>
-                prevProducts.map((product) =>
-                    product.id === productUpdated.id ? productUpdated : product
-                )
-            );
-            setTopDealProducts((prevProducts) =>
-            prevProducts.map((product) =>
-                 product.id === productUpdated.id ? productUpdated : product)
-            );
-
-        };
-        hubConnection.on("ProductUpdated", handleProductChange);
-        hubConnection.on("ProductAdded", handleProductChange);
-        hubConnection.on("ProductDeleted", handleProductChange);
-        hubConnection.on("ProductCategoryAdded");
-        hubConnection.on("ProductCategoryUpdated");
-        return () => {
-            hubConnection.off("ProductUpdated", handleProductChange);
-            hubConnection.off("ProductAdded", handleProductChange);
-            hubConnection.off("ProductDeleted", handleProductChange);
-            hubConnection.off("ProductCategoryAdded");
-            hubConnection.off("ProductCategoryUpdated");
-        };
-    }, [hubConnection]);
-
     useEffect(() => {
         const loadData = async () => {
             if (topSaleProducts.length === 0) {

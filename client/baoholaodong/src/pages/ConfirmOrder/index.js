@@ -112,8 +112,8 @@ export function ConfirmOrder() {
                     }
                     setRotatePage(false);
                     window.scrollTo({ top: 0, behavior: "smooth" });
-                }, 1000);
-            }, 3500);
+                }, 0);
+            }, 0);
         } catch (error) {
             console.error("Order failed:", error);
             setTruckAnimation(false);

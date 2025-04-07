@@ -29,7 +29,7 @@ const VerificationPage = () => {
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${BASE_URL}/api/user/confirm-email`, {
+            const response = await axios.post(`${BASE_URL}/api/Authentication/confirm-email`, {
                 email: verification.email,
                 code: verification.verificationCode
             });

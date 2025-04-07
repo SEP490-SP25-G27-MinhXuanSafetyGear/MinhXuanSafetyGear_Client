@@ -210,7 +210,7 @@ export default function ProductDetail() {
                 <div className="flex items-center text-sm text-gray-500 mb-4">
                     <a href="/" className="hover:text-red-600">Trang chủ</a>
                     <ChevronRight className="w-4 h-4 mx-1" />
-                    <a href="/products" className="hover:text-red-600">Sản phẩm</a>
+                    <a href="/products/0/0/all" className="hover:text-red-600">Sản phẩm</a>
                     <ChevronRight className="w-4 h-4 mx-1" />
                     <span className="text-gray-700 font-medium">{product.name}</span>
                 </div>
