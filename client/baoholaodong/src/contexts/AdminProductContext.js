@@ -122,7 +122,11 @@ export const AdminProductProvider = ({ children }) => {
 	/** Tạo sản phẩm */
 	const createProduct = async (product) => {
 		try {
-			const response = await axiosInstance.post(`/product/create-product`, product);
+			const response = await axiosInstance.post(`/product/create-product`, product,{
+				headers:{
+					'Content-Type': 'multipart/form-data'
+				}
+			});
 			const newProduct = {...await response.data,isNew: true};
 			setProducts((prevProducts)=>[newProduct,...prevProducts]);
 			return response.data;

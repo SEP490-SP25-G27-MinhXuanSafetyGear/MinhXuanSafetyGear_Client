@@ -23,6 +23,7 @@ import axios from 'axios';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import {setAuthToken} from "../axiosInstance";
 import axiosInstance from "../axiosInstance";
+import RoleWrapper from "../components/RoleWrapper";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 const AdminLayout = () => {
@@ -46,20 +47,16 @@ const AdminLayout = () => {
                 { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
                 { path: '/manager/blog-categories', icon: BookOpen, label: 'Blog Categories' },
                 { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
-                { path: '/manager/invoices', icon: Receipt, label: 'Invoices' },
-                { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
                 { path: '/manager/taxes', icon: Percent, label: 'Taxes' },
                 { path: '/manager/settings', icon: Settings, label: 'Settings' },
             ];
         } else if (user.role === 'Manager') {
             return [
-                { path: '/manager/employees', icon: Briefcase, label: 'Employee' },
                 { path: '/manager/orders', icon: ShoppingBag, label: 'Orders' },
                 { path: '/manager/products', icon: Package, label: 'Products' },
                 { path: '/manager/product_categories', icon: Boxes, label: 'Product Categories' },
                 { path: '/manager/blog-categories', icon: BookOpen, label: 'Blog Categories' },
                 { path: '/manager/blog-posts', icon: FileText, label: 'Blog Posts' },
-                { path: '/manager/notifications', icon: Bell, label: 'Notifications' },
                 { path: '/manager/settings', icon: Settings, label: 'Settings' },
             ];
         }
@@ -74,7 +71,11 @@ const AdminLayout = () => {
 
     const fetchNotifications = async () => {
         try {
-            const response = await axiosInstance.get(`/Notification/getall-admin-noti`);
+            const response = await axiosInstance.get(`/Notification/getall-noti`,{
+                params:{
+                    recipientId : user.userId,
+                }
+            });
             const formattedNotifications = response.data.map(notification => ({
                 id: notification.id,
                 title: notification.title,
@@ -108,7 +109,9 @@ const AdminLayout = () => {
                     connection.invoke('JoinEmployeeGroup')
                         .catch(err => console.error('Error joining group:', err));
                     connection.on('ReceiveNotification', (notification) => {
-                        setNotifications(prev => [notification, ...prev]);
+                        if(notification.recipientId === user.userId) {
+                            setNotifications(prev => [notification, ...prev]);
+                        }
                     });
                 })
                 .catch(err => console.log('Connection failed:', err));

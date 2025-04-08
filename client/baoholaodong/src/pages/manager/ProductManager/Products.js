@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import Modal from "../../../components/Modal/Modal";
 import { formatVND } from "../../../utils/format";
 import ManagerToast from "../../../components/managerToast/ManagerToast";
+import RoleWrapper from "../../../components/RoleWrapper";
 
 const useQuery = () => new URLSearchParams(useLocation().search);
 
@@ -154,12 +155,15 @@ const Products = () => {
 								</option>
 							))}
 						</select>
-						<button
-							className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
-							onClick={handleCreate}>
-							<Plus className="w-5 h-5 mr-2" />
-							Thêm sản phẩm
-						</button>
+						<RoleWrapper allowedRoles={"Admin"}>
+							<button
+								className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
+								onClick={handleCreate}>
+								<Plus className="w-5 h-5 mr-2" />
+								Thêm sản phẩm
+							</button>
+						</RoleWrapper>
+
 					</div>
 				</div>
 

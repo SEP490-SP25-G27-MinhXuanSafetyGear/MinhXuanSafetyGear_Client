@@ -160,51 +160,6 @@ const CreateProduct = () => {
 		}, 0)
 	}
 
-	// Insert Markdown syntax for certificate
-	const insertCertificateMarkdown = (syntax, placeholder = "") => {
-		const textarea = document.querySelector("textarea#qualityCertificate")
-		if (!textarea) return
-
-		const start = textarea.selectionStart
-		const end = textarea.selectionEnd
-		const text = textarea.value
-		const before = text.substring(0, start)
-		const selection = text.substring(start, end) || placeholder
-		const after = text.substring(end)
-
-		let insertText
-		switch (syntax) {
-			case "bold":
-				insertText = `**${selection}**`
-				break
-			case "italic":
-				insertText = `*${selection}*`
-				break
-			case "heading":
-				insertText = `## ${selection}`
-				break
-			case "list":
-				insertText = `- ${selection}\n- Item 2\n- Item 3`
-				break
-			case "link":
-				insertText = `[${selection || "Link text"}](https://example.com)`
-				break
-			default:
-				insertText = selection
-		}
-
-		setProduct((prev) => ({
-			...prev,
-			qualityCertificate: before + insertText + after,
-		}))
-
-		// Set cursor position after update
-		setTimeout(() => {
-			textarea.focus()
-			const newCursorPos = start + insertText.length
-			textarea.setSelectionRange(newCursorPos, newCursorPos)
-		}, 0)
-	}
 
 	// Gửi dữ liệu lên server
 	const handleSubmit = async (e) => {
@@ -233,8 +188,15 @@ const CreateProduct = () => {
 				formData.append(`productVariants[${index}].status`, variant.status);
 			});
 			images.forEach((image) => {
-				formData.append("files", image);
+				let file = image;
+				// Trường hợp image là Blob mà không có tên, thêm tên và MIME type
+				if (!(image instanceof File)) {
+					file = new File([image], "image.jpg", { type: "image/jpeg" });
+				}
+				formData.append("files", file);
 			});
+
+			console.log([...formData.entries()])
 			await createProduct(formData);
 			navigate("/manager/products", { state: { toastMessage: "Thêm sản phẩm thành công!", toastType: "success" } });
 		} catch (err) {

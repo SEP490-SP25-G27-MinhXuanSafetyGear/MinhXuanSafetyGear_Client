@@ -101,29 +101,27 @@ const UserRouter = () => {
                         </AdminProductProvider>
                     }
                 >
-                    <Route
-                        path="dashboard"
-                        element={<PrivateRoute element={<Dashboard />} roleRequired={['Admin']} />}
-                    />
-                    <Route path="users" element={<Users />} />
-                    <Route path="employees" element={<Employees />} />
-                    <Route path="create-employee" element={<CreateEmployee />} />
-                    <Route path="update-employee" element={<UpdateEmployee />} />
+                    <Route path="dashboard" element={<PrivateRoute element={<Dashboard />} roleRequired={['Admin']} />} />
+                    <Route path="users" element={<PrivateRoute element={<Users />} roleRequired={['Admin']} />} />
+                    <Route path="employees" element={<PrivateRoute element={<Employees />} roleRequired={['Admin']} />} />
+                    <Route path="create-employee" element={<PrivateRoute element={<CreateEmployee />} roleRequired={['Admin']} />} />
+                    <Route path="update-employee" element={<PrivateRoute element={<UpdateEmployee />} roleRequired={['Admin']} />} />
                     <Route path="orders" element={<Orders />} />
-                    <Route path="create-order" element={<CreateOrder />} />
-                    <Route path="order-detail/:id" element={<OrderDetail />} />
-                    <Route path="products" element={<Products />} />
-                    <Route path="blog-posts" element={<BlogPosts />} />
-                    <Route path="create-blog" element={<CreateBlogs />} />
-                    <Route path="update-blog/:id" element={<UpdateBlogs />} />
-                    <Route path="invoices" element={<Invoices />} />
-                    <Route path="notifications" element={<Notifications />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="createproduct" element={<CreateProduct />} />
-                    <Route path="update-product/:id/:slug" element={<UpdateProduct />} />
-                    <Route path="product_categories" element={<ProductCategories />} />
-                    <Route path="blog-categories" element={<BlogCategories />} />
-                    <Route path="taxes" element={<Taxes />} />
+                    <Route path="create-order" element={<PrivateRoute element={<CreateOrder />} roleRequired={['Admin']} />} />
+                    <Route path="order-detail/:id" element={<PrivateRoute element={<OrderDetail />} roleRequired={['Admin']} />} />
+                    <Route path="products" element={<Products/>} />
+                    <Route path="blog-posts" element={<PrivateRoute element={<BlogPosts />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="create-blog" element={<PrivateRoute element={<CreateBlogs />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="update-blog/:id" element={<PrivateRoute element={<UpdateBlogs />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="invoices" element={<PrivateRoute element={<Invoices />} roleRequired={['Admin']} />} />
+                    <Route path="notifications" element={<PrivateRoute element={<Notifications />} roleRequired={['Admin']} />} />
+                    <Route path="settings" element={<PrivateRoute element={<Settings />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="createproduct" element={<PrivateRoute element={<CreateProduct />} roleRequired={['Admin']} />} />
+                    <Route path="update-product/:id/:slug" element={<PrivateRoute element={<UpdateProduct />} roleRequired={['Admin']} />} />
+                    <Route path="product_categories" element={<PrivateRoute element={<ProductCategories />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="blog-categories" element={<PrivateRoute element={<BlogCategories />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="taxes" element={<PrivateRoute element={<Taxes />} roleRequired={['Admin']} />} />
+
                 </Route>
             </Routes>
         </Router>

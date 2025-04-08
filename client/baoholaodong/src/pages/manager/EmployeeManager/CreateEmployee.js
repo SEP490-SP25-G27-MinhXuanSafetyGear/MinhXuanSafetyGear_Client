@@ -1,11 +1,19 @@
-﻿import React, {useContext, useState} from "react";
+﻿import React, {useContext, useEffect, useState} from "react";
 import ErrorList from "../../../components/ErrorList/ErrorList";
 import Loading from "../../../components/Loading/Loading";
 import axios from "axios";
 import {UserContext} from "../../../contexts/AdminUserContext";
 import {useNavigate} from "react-router-dom";
+import {AuthContext} from "../../../contexts/AuthContext";
+import axiosInstance, {setAuthToken} from "../../../axiosInstance";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export default function CreateEmployee() {
+    const {user} = useContext(AuthContext);
+    useEffect(() => {
+        if (user && user.token) {
+            setAuthToken(user.token);
+        }
+    }, [user]);
     const {pushEmployee} = useContext(UserContext);
     const navigate = useNavigate();
     const [employee, setEmployee] = useState({
@@ -37,7 +45,7 @@ export default function CreateEmployee() {
         setLoading(true);
 
         try {
-            const response = await axios.post(`${BASE_URL}/api/User/create-employee`, employee);
+            const response = await axiosInstance.post(`/User/create-employee`, employee);
             pushEmployee(response.data);
             navigate('/manager/employees');
         } catch (error) {

@@ -1,11 +1,19 @@
 ﻿import Loading from "../../../components/Loading/Loading";
 import ErrorList from "../../../components/ErrorList/ErrorList";
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import axios from "axios";
+import {AuthContext} from "../../../contexts/AuthContext";
+import axiosInstance, {setAuthToken} from "../../../axiosInstance";
 const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
 export default function UpdateEmployee() {
+    const {user} = useContext(AuthContext);
+    useEffect(() => {
+        if (user && user.token) {
+            setAuthToken(user.token);
+        }
+    }, [user]);
     const [searchParams] = useSearchParams();
     const id = searchParams.get("id");
     const [employee, setEmployee] = useState({
@@ -42,7 +50,7 @@ export default function UpdateEmployee() {
         setLoading(true);
         try {
             // Call API update employee here
-            const response = await axios.put(`${BASE_URL}/api/User/update-employee`,employee )
+            const response = await axiosInstance.put(`/User/update-employee`,employee )
             setEmployee(response.data);
         } catch (error) {
             console.error("Lỗi khi cập nhật nhân viên:", error);
@@ -64,7 +72,7 @@ export default function UpdateEmployee() {
                 return;
             }
             try {
-                const response = await axios.get(`${BASE_URL}/api/User/get-employee-by-id/${id}`);
+                const response = await axiosInstance.get(`/User/get-employee-by-id/${id}`);
                 setEmployee(response.data);
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu nhân viên:", error);
