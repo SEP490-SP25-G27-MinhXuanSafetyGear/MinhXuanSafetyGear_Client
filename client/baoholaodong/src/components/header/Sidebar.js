@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import {
     FaHardHat, FaBolt, FaTint, FaShieldAlt, FaBiohazard,
-    FaFireExtinguisher, FaTimes, FaChevronDown, FaChevronUp
+    FaFireExtinguisher, FaTimes, FaChevronDown, FaChevronUp, FaBroom, FaRoad, FaUserShield
 } from "react-icons/fa";
 import { CustomerProductContext } from "../../contexts/CustomerProductContext";
 import { useNavigate } from "react-router-dom";
@@ -81,7 +81,10 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
             case "Thiết bị chống ồn": return <FaShieldAlt />;
             case "Thiết bị phòng độc": return <FaBiohazard />;
             case "Phòng cháy chữa cháy": return <FaFireExtinguisher />;
-            default: return null;
+            case "Thiết bị phòng sạch": return <FaBroom />;
+            case "An toàn giao thông": return <FaRoad />;
+            case "An ninh, bảo vệ": return <FaUserShield />;
+            default: return <FaHardHat />;
         }
     };
 
