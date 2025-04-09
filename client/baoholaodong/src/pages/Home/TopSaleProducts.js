@@ -120,9 +120,8 @@ const TopSaleProducts = ({ products = [], title = "" }) => {
     return (
         <main className="w-full max-w-screen-2xl mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl md:text-2xl font-bold text-red-700 relative inline-block uppercase">
+                <h2 className="text-xl md:text-2xl font-bold text-[#b50a00] text-left relative inline-block after:block after:w-1/3 after:h-1 after:bg-yellow-400 after:mt-1 after:[clip-path:polygon(0%_0%,100%_0%,calc(100%-4px)_100%,0%_100%)]">
                     {title}
-                    <span className="absolute bottom-0 left-0 w-1/4 h-[3px] bg-yellow-400 -mb-1"></span>
                 </h2>
 
                 <div className="flex flex-wrap gap-2">

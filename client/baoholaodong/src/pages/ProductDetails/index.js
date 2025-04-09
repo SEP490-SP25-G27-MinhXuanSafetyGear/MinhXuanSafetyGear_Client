@@ -49,6 +49,7 @@ export default function ProductDetail() {
         productReviews: [],
     });
     const [BlogTransport, setBlogTransport] = useState(null);
+    const [purchasePolicyContent, setPurchasePolicyContent] = useState(null); // Thêm state cho nội dung chính sách mua hàng
 
     const [product, setProduct] = useState({
         id: 0,
@@ -96,7 +97,6 @@ export default function ProductDetail() {
         navigate(`/products/${product.slug}`, { replace: true });
     };
 
-    // SignalR and API fetch logic remains the same
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -136,6 +136,19 @@ export default function ProductDetail() {
         };
         fetchData();
     }, [slug]);
+
+    useEffect(() => {
+        const fetchPurchasePolicy = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-page?categoryId=2&page=1&size=20`);
+                const policyPost = response.data.items.find(post => post.title === "Chính sách mua hàng");
+                setPurchasePolicyContent(policyPost ? policyPost.content : null);
+            } catch (error) {
+                console.error("Error fetching purchase policy:", error);
+            }
+        };
+        fetchPurchasePolicy();
+    }, []);
 
     const handleAddToCart = () => {
         const availableQuantity = selectedVariant ? selectedVariant.quantity : product.quantity;
@@ -206,7 +219,6 @@ export default function ProductDetail() {
     return (
         <PageWrapper title={product.name || "Chi tiết sản phẩm"}>
             <div className="min-h-screen bg-gray-50 py-5 w-[90%] mx-auto flex flex-col gap-5">
-                {/* Breadcrumb */}
                 <div className="flex items-center text-sm text-gray-500 mb-4">
                     <a href="/" className="hover:text-red-600">Trang chủ</a>
                     <ChevronRight className="w-4 h-4 mx-1" />
@@ -215,41 +227,38 @@ export default function ProductDetail() {
                     <span className="text-gray-700 font-medium">{product.name}</span>
                 </div>
 
-                {/* Main Product Card */}
                 <div className="bg-white rounded-lg shadow-md p-5 mb-5">
                     {isLoading ? (
                         <LoadingSkeleton />
                     ) : (
                         <div className="flex flex-col lg:flex-row gap-5 animate-fade-in">
-                            {/* Product Images */}
                             <div className="w-full lg:w-1/2 min-w-[300px]">
                                 <div className="w-full h-[560px] overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center mb-3">
                                     <img
                                         src={product.productImages[imageIndex]?.image || noImage}
                                         alt={product.name}
                                         className="w-full h-full object-cover"
-                                        onError={(e) => e.target.src = noImage}
+                                        onError={(e) => (e.target.src = noImage)}
                                     />
                                 </div>
                                 <div className="flex gap-2 overflow-x-auto">
                                     {product.productImages.map((img, index) => (
                                         <div
                                             key={index}
-                                            className={`w-32 h-32 flex-shrink-0 rounded-md overflow-hidden cursor-pointer ${imageIndex === index ? "border-2 border-blue-600" : "border border-gray-200"}`}
+                                            className={`w-32 h-32 flex-shrink-0 rounded-md monocytogenes-hidden cursor-pointer ${imageIndex === index ? "border-2 border-blue-600" : "border border-gray-200"}`}
                                             onClick={() => setImageIndex(index)}
                                         >
                                             <img
                                                 src={img.image || noImage}
                                                 alt={`Thumbnail ${index + 1}`}
                                                 className="w-full h-full object-cover"
-                                                onError={(e) => e.target.src = noImage}
+                                                onError={(e) => (e.target.src = noImage)}
                                             />
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Product Info */}
                             <div className="w-full lg:w-1/2">
                                 <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
                                 <div className="flex items-center gap-2 mb-4">
@@ -287,7 +296,9 @@ export default function ProductDetail() {
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                             className="w-8 h-8 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 disabled:opacity-50"
                                             disabled={quantity <= 1}
-                                        >-</button>
+                                        >
+                                            -
+                                        </button>
                                         <input
                                             type="number"
                                             value={quantity}
@@ -298,7 +309,9 @@ export default function ProductDetail() {
                                             onClick={() => setQuantity(Math.min(selectedVariant?.quantity || product.quantity, quantity + 1))}
                                             className="w-8 h-8 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 disabled:opacity-50"
                                             disabled={quantity >= (selectedVariant?.quantity || product.quantity)}
-                                        >+</button>
+                                        >
+                                            +
+                                        </button>
                                         <span className="text-sm text-gray-600">
                                             Còn {selectedVariant?.quantity || product.quantity} sản phẩm
                                         </span>
@@ -307,7 +320,7 @@ export default function ProductDetail() {
                                     <div className="flex gap-2 flex-wrap">
                                         <button
                                             onClick={handleAddToCart}
-                                            className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-yellow-400 hover:text-red-600  transition-colors"
+                                            className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-yellow-400 hover:text-red-600 transition-colors"
                                         >
                                             <ShoppingCart className="w-5 h-5" />
                                             Thêm vào giỏ
@@ -349,11 +362,8 @@ export default function ProductDetail() {
                     )}
                 </div>
 
-                {/* Main Content Area */}
                 <div className="flex flex-col lg:flex-row gap-5">
-                    {/* Left Column */}
                     <div className="flex-1 lg:flex-[3] space-y-5">
-                        {/* Product Details Tabs */}
                         <div className="bg-white rounded-lg shadow-md p-5">
                             <div className="flex border-b mb-6">
                                 {["description", "reviews", "shipping"].map((tab) => (
@@ -426,7 +436,7 @@ export default function ProductDetail() {
                                                                 src={customerImage || noImage}
                                                                 alt={customerName}
                                                                 className="w-12 h-12 rounded-full object-cover"
-                                                                onError={(e) => e.target.src = noImage}
+                                                                onError={(e) => (e.target.src = noImage)}
                                                             />
                                                             <div>
                                                                 <div className="font-bold">{customerName}</div>
@@ -472,7 +482,6 @@ export default function ProductDetail() {
                             )}
                         </div>
 
-                        {/* Related Products */}
                         <div>
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold">Sản phẩm liên quan</h2>
@@ -505,7 +514,7 @@ export default function ProductDetail() {
                                                     src={product.image || noImage}
                                                     alt={product.name}
                                                     className="w-full h-full object-cover hover:scale-105 transition-transform"
-                                                    onError={(e) => e.target.src = noImage}
+                                                    onError={(e) => (e.target.src = noImage)}
                                                 />
                                             </div>
                                             <div className="p-4">
@@ -523,7 +532,6 @@ export default function ProductDetail() {
                         </div>
                     </div>
 
-                    {/* Right Column */}
                     <div className="hidden lg:flex flex-col gap-5 flex-1">
                         <div className="bg-white rounded-lg shadow-md p-5">
                             <h3 className="text-xl font-bold mb-4">Top sản phẩm bán chạy</h3>
@@ -551,7 +559,7 @@ export default function ProductDetail() {
                                                 src={product.image || noImage}
                                                 alt={product.name}
                                                 className="w-20 h-20 object-cover rounded-lg"
-                                                onError={(e) => e.target.src = noImage}
+                                                onError={(e) => (e.target.src = noImage)}
                                             />
                                             <div>
                                                 <h4 className="font-medium">{product.name}</h4>
@@ -567,31 +575,49 @@ export default function ProductDetail() {
                             )}
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-md p-5">
-                            <h3 className="text-lg font-semibold mb-4">Chính sách mua hàng</h3>
-                            <ul className="space-y-3">
-                                <li className="flex items-start gap-2">
-                                    <Truck className="w-5 h-5 text-blue-600 mt-0.5" />
-                                    <div>
-                                        <p className="font-medium">Giao hàng miễn phí</p>
-                                        <p className="text-sm text-gray-600">Cho đơn hàng từ 500.000₫</p>
-                                    </div>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <Package className="w-5 h-5 text-blue-600 mt-0.5" />
-                                    <div>
-                                        <p className="font-medium">Đổi trả dễ dàng</p>
-                                        <p className="text-sm text-gray-600">Trong vòng 30 ngày</p>
-                                    </div>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
-                                    <div>
-                                        <p className="font-medium">Bảo hành chính hãng</p>
-                                        <p className="text-sm text-gray-600">Theo chính sách nhà sản xuất</p>
-                                    </div>
-                                </li>
-                            </ul>
+                        <div className="bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+                            <h3 className="text-xl font-bold mb-4 border-b-2 border-blue-200 pb-2">Chính sách mua hàng</h3>
+                            {purchasePolicyContent ? (
+                                <div className="space-y-4 text-gray-700">
+                                    <DisplayContent content={purchasePolicyContent} />
+                                    <style jsx>{`
+                                        .space-y-4 p {
+                                            font-style: italic;
+                                            line-height: 1.6;
+                                        }
+                                        .space-y-4 ul {
+                                            list-style-type: none;
+                                            padding-left: 0;
+                                        }
+                                        .space-y-4 ul li {
+                                            position: relative;
+                                            padding-left: 1.5rem;
+                                            margin-bottom: 0.75rem;
+                                            font-weight: 500;
+                                            transition: background-color 0.2s ease;
+                                        }
+                                        .space-y-4 ul li:hover {
+                                            background-color: #f1f5f9;
+                                            border-radius: 0.375rem;
+                                        }
+                                        .space-y-4 ul li:before {
+                                            content: "✔";
+                                            position: absolute;
+                                            left: 0;
+                                            color: #3b82f6;
+                                            font-size: 1rem;
+                                        }
+                                    `}</style>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center py-4">
+                                    <svg className="animate-spin h-5 w-5 text-blue-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                                    </svg>
+                                    <p className="text-sm text-gray-500">Đang tải chính sách...</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

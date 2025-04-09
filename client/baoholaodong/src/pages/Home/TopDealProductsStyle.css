@@ -1,6 +1,5 @@
-﻿/* TopDealProducts.css */
-.top-deal-container {
-    background-image: url('https://img.pikbest.com/background/20220119/red-chinese-style-texture-hd-background_6230540.jpg!sw800');
+﻿.top-deal-container {
+    background-image: url(../../images/deal-bg.jpg);
     background-position: 50% 50%;
     background-size: 60%;
     background-repeat: repeat;
@@ -47,7 +46,7 @@
     font-weight: 700;
     text-transform: uppercase;
     font-family: 'Oswald', sans-serif;
-    white-space: nowrap; /* Ngăn chữ xuống dòng */
+    white-space: nowrap;
 }
 
 @media (min-width: 768px) {
@@ -68,6 +67,7 @@
     height: 3px;
     width: 100%;
     background-color: #facc15;
+    clip-path: polygon(0% 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
 }
 
 .top-deal-button-group {
@@ -93,17 +93,20 @@
 
 .top-deal-view-all-button {
     margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
     background-color: #dc2626;
     color: white;
-    padding: 0.5rem 1.5rem;
     font-size: 0.875rem;
     font-weight: 700;
     text-transform: uppercase;
+    border: 2px solid #b50a00;
+    border-left: none;
+    border-right: none;
     position: relative;
     overflow: hidden;
-    transition: color 0.3s;
-    border-top: 2px solid #b50a00;
-    border-bottom: 2px solid #b50a00;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
 }
 
 .top-deal-view-all-button:hover {
@@ -112,19 +115,25 @@
 
 .top-deal-view-all-button span:first-child {
     position: relative;
-    z-index: 10;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.top-deal-view-all-button span:last-child {
+.top-deal-view-all-button::after {
+    content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
     left: -100%;
+    width: 100%;
+    height: 100%;
     background-color: #facc15;
-    transition: all 0.3s;
+    transition: left 0.3s ease;
     z-index: 0;
 }
 
-.top-deal-view-all-button:hover span:last-child {
+.top-deal-view-all-button:hover::after {
     left: 0;
 }
 

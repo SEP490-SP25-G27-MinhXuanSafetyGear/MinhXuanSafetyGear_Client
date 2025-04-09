@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import {DisplayContent} from "../TextEditor";
+import feedbackBackground from "../../images/feedback-bg.jpg";
 
 const FeedbacksStepSlide = ({blogpost =[]}) => {
     const [perPage, setPerPage] = useState(4);
@@ -40,7 +41,8 @@ const FeedbacksStepSlide = ({blogpost =[]}) => {
     return (
         <section
             className="relative py-16 px-4 text-white bg-no-repeat bg-center bg-auto"
-            style={{ backgroundImage: "url('https://static.vecteezy.com/system/resources/previews/049/033/798/non_2x/3d-black-geometric-abstract-background-overlap-layer-on-dark-space-with-waves-lines-decoration-minimalist-modern-graphic-design-element-cutout-style-concept-for-banner-flyer-card-or-brochure-cover-vector.jpg')" }}
+            style={{ backgroundImage:  `url(${feedbackBackground})` }}
+
         >
             <div className="absolute inset-0 bg-black bg-opacity-70"></div>
             <div className="relative max mx-auto z-10">
