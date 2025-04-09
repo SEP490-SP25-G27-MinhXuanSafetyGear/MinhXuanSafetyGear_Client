@@ -49,7 +49,7 @@ export default function ProductDetail() {
         productReviews: [],
     });
     const [BlogTransport, setBlogTransport] = useState(null);
-    const [purchasePolicyContent, setPurchasePolicyContent] = useState(null); // Thêm state cho nội dung chính sách mua hàng
+    const [purchasePolicyContent, setPurchasePolicyContent] = useState(null);
 
     const [product, setProduct] = useState({
         id: 0,
@@ -140,8 +140,8 @@ export default function ProductDetail() {
     useEffect(() => {
         const fetchPurchasePolicy = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-page?categoryId=2&page=1&size=20`);
-                const policyPost = response.data.items.find(post => post.title === "Chính sách mua hàng");
+                const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-category/chinh-sach`);
+                const policyPost = response.data.find(post => post.title === "Chính sách mua hàng");
                 setPurchasePolicyContent(policyPost ? policyPost.content : null);
             } catch (error) {
                 console.error("Error fetching purchase policy:", error);
@@ -245,7 +245,7 @@ export default function ProductDetail() {
                                     {product.productImages.map((img, index) => (
                                         <div
                                             key={index}
-                                            className={`w-32 h-32 flex-shrink-0 rounded-md monocytogenes-hidden cursor-pointer ${imageIndex === index ? "border-2 border-blue-600" : "border border-gray-200"}`}
+                                            className={`w-32 h-32 flex-shrink-0 rounded-md overflow-hidden cursor-pointer ${imageIndex === index ? "border-2 border-blue-600" : "border border-gray-200"}`}
                                             onClick={() => setImageIndex(index)}
                                         >
                                             <img
