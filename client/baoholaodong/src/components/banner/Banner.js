@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-const Banner = () => {
+const Banner = ({config}) => {
+    const BASE_URL = config.baseUrl;
     const [currentIndex, setCurrentIndex] = useState(0);
     const [banners, setBanners] = useState([]);
     const nextSlide = () => {

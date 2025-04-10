@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 import { FaRegFrown } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
 
-const BlogPosts = () => {
+const BlogPosts = ({config}) => {
     const {blogPosts, loading, categories,setCategorySelected,categorySelected, fetchCategories, search, setSearch,page,setPage } =
         useContext(BlogPostContext)
     const navigate = useNavigate()

@@ -1,15 +1,14 @@
 import React, {useState, useEffect, useCallback, useContext} from "react";
 import { SquarePen, Eye, Plus, CheckCircle, XCircle } from "lucide-react";
 import Modal from "../../../components/Modal/Modal";
-import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import { useNavigate } from "react-router-dom";
 import { formatVND } from "../../../utils/format";
 import {AuthContext} from "../../../contexts/AuthContext";
-import {setAuthToken} from "../../../axiosInstance";
+import {setAxiosInstance} from "../../../axiosInstance";
 import axiosInstance from "../../../axiosInstance";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-const Orders = () => {
+const Orders = ({config}) => {
+  const BASE_URL = config.baseUrl;
   const [isOpenImage, setIsOpenImage] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
   const [orders, setOrders] = useState([]);
@@ -26,7 +25,7 @@ const Orders = () => {
   const {user} = useContext(AuthContext);
   useEffect(() => {
     if (user && user.token) {
-      setAuthToken(user.token);
+      setAxiosInstance(user.token,BASE_URL);
     }
   }, [user]);
   useEffect(() => {

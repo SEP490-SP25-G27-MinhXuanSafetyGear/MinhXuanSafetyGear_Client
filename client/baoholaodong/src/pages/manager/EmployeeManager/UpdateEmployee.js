@@ -4,14 +4,14 @@ import React, {useContext, useEffect, useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import axios from "axios";
 import {AuthContext} from "../../../contexts/AuthContext";
-import axiosInstance, {setAuthToken} from "../../../axiosInstance";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+import axiosInstance, {setAxiosInstance} from "../../../axiosInstance";
 
-export default function UpdateEmployee() {
+
+export default function UpdateEmployee({config}) {
     const {user} = useContext(AuthContext);
     useEffect(() => {
         if (user && user.token) {
-            setAuthToken(user.token);
+            setAxiosInstance(user.token);
         }
     }, [user]);
     const [searchParams] = useSearchParams();

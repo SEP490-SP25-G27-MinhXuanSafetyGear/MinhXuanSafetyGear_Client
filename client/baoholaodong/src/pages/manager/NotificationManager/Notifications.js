@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { Bell, Check, X } from 'lucide-react';
 
-const Notifications = () => {
+const Notifications = ({config}) => {
 	return (
 		<div className="space-y-6">
 			<div className="bg-white rounded-lg shadow">

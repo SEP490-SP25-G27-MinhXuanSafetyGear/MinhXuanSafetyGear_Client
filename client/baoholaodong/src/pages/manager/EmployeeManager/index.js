@@ -3,7 +3,7 @@ import {UserContext} from "../../../contexts/AdminUserContext";
 import {Edit, Trash2, User} from "lucide-react";
 import {useNavigate} from "react-router-dom";
 
-const Employees = () => {
+const Employees = ({config}) => {
     const {pageEmployee} = useContext(UserContext);
     const navigate = useNavigate();
     return (

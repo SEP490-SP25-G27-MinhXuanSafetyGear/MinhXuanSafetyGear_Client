@@ -35,7 +35,7 @@ const sections = [
     },
 ];
 
-const About = () => {
+const About = ({config}) => {
     return (
         <PageWrapper title="Về chúng tôi">
         <div className="about-container">

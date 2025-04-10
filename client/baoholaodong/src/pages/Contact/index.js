@@ -4,7 +4,7 @@ import './style.css';
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
 
 
-const Contact = () => {
+const Contact = ({config}) => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",

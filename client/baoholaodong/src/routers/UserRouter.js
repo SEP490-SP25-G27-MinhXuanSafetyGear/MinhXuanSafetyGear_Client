@@ -47,7 +47,7 @@ import BlogDetail from "../pages/BlogDetail";
 import OrderHistory from "../pages/OrderHistory";
 import FeedBack from "../pages/FeedBack";
 
-const UserRouter = () => {
+const UserRouter = ({ config }) => {
     return (
         <Router>
             <ScrollToTop />
@@ -56,71 +56,70 @@ const UserRouter = () => {
                 <Route path="/503" element={<Error503 />} />
                 <Route path="/404" element={<Error404 />} />
                 <Route path="*" element={<Error404 />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/forgot-password" element={<ForgotPassword config={config}/>} />
+                <Route path="/reset-password" element={<ResetPassword config={config}/>} />
                 <Route
                     path="/"
                     element={
-                        <CustomerProductProvider>
-                            <CustomerLayout />
+                        <CustomerProductProvider config={config}>
+                            <CustomerLayout  config={config}/>
                         </CustomerProductProvider>
                     }
                 >
-                    <Route path="/feedback/:slug" element={<FeedBack />} />
-                    <Route index element={<Home />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/login" element={<Signin />} />
+                    <Route path="/feedback/:slug" element={<FeedBack config={config} />} />
+                    <Route index element={<Home config={config} />} />
+                    <Route path="/register" element={<Register config={config}  />} />
+                    <Route path="/login" element={<Signin  config={config}/>} />
                     <Route path="/cart" element={<Cart />} />
-                    <Route path="/products" element={<ProductList />} />
-                    <Route path="/products/:slug" element={<ProductDetail />} />
-                    <Route path="/blogs" element={<BlogList />} />
-                    <Route path="/blogs/:slug" element={<BlogDetail />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="confirm-order" element={<ConfirmOrder />} />
-                    <Route path="/checkout" element={<Checkout />} />
-                    <Route path="/verification" element={<VerificationPage />} />
-                    <Route path="/logout" element={<Logout />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/customerInfo" element={<CustomerInfo />} />
-                    <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory />} />
-                    <Route path="/category/:categoryId" element={<ProductListByCategory />} />
-                    <Route path="confirm-order" element={<ConfirmOrder />} />
-                    <Route path="/order-history/:userId" element={<OrderHistory />} />
+                    <Route path="/products" element={<ProductList config={config} />} />
+                    <Route path="/products/:slug" element={<ProductDetail config={config} />} />
+                    <Route path="/blogs" element={<BlogList config={config} />} />
+                    <Route path="/blogs/:slug" element={<BlogDetail config={config} />} />
+                    <Route path="/about" element={<About config={config} />} />
+                    <Route path="confirm-order" element={<ConfirmOrder config={config} />} />
+                    <Route path="/checkout" element={<Checkout config={config} />} />
+                    <Route path="/verification" element={<VerificationPage config={config} />} />
+                    <Route path="/logout" element={<Logout config={config} />} />
+                    <Route path="/contact" element={<Contact config={config} />} />
+                    <Route path="/customerInfo" element={<CustomerInfo config={config} />} />
+                    <Route path="/products/:group/:cate/:slug" element={<ProductListByCategory config={config} />} />
+                    <Route path="/category/:categoryId" element={<ProductListByCategory config={config} />} />
+                    <Route path="confirm-order" element={<ConfirmOrder config={config} />} />
+                    <Route path="/order-history/:userId" element={<OrderHistory  config={config}/>} />
                 </Route>
-                <Route path="/demo" element={<ProductVariantSelector />} />
                 {/* Admin Routes */}
                 <Route
                     path="/manager"
                     element={
-                        <AdminProductProvider>
-                            <BlogPostProvider>
-                                <AdminUserContextProvider>
-                                    <PrivateRoute element={<AdminLayout />} roleRequired={['Admin', 'Manager']} />
+                        <AdminProductProvider config={config}>
+                            <BlogPostProvider config={config} >
+                                <AdminUserContextProvider config={config} >
+                                    <PrivateRoute element={<AdminLayout config={config} />} roleRequired={['Admin', 'Manager']} />
                                 </AdminUserContextProvider>
                             </BlogPostProvider>
                         </AdminProductProvider>
                     }
                 >
-                    <Route path="dashboard" element={<PrivateRoute element={<Dashboard />} roleRequired={['Admin']} />} />
-                    <Route path="users" element={<PrivateRoute element={<Users />} roleRequired={['Admin']} />} />
-                    <Route path="employees" element={<PrivateRoute element={<Employees />} roleRequired={['Admin']} />} />
-                    <Route path="create-employee" element={<PrivateRoute element={<CreateEmployee />} roleRequired={['Admin']} />} />
-                    <Route path="update-employee" element={<PrivateRoute element={<UpdateEmployee />} roleRequired={['Admin']} />} />
-                    <Route path="orders" element={<Orders />} />
-                    <Route path="create-order" element={<PrivateRoute element={<CreateOrder />} roleRequired={['Admin']} />} />
-                    <Route path="order-detail/:id" element={<PrivateRoute element={<OrderDetail />} roleRequired={['Admin']} />} />
-                    <Route path="products" element={<Products/>} />
-                    <Route path="blog-posts" element={<PrivateRoute element={<BlogPosts />} roleRequired={['Admin','Manager']} />} />
-                    <Route path="create-blog" element={<PrivateRoute element={<CreateBlogs />} roleRequired={['Admin','Manager']} />} />
-                    <Route path="update-blog/:id" element={<PrivateRoute element={<UpdateBlogs />} roleRequired={['Admin','Manager']} />} />
-                    <Route path="invoices" element={<PrivateRoute element={<Invoices />} roleRequired={['Admin']} />} />
-                    <Route path="notifications" element={<PrivateRoute element={<Notifications />} roleRequired={['Admin']} />} />
-                    <Route path="settings" element={<PrivateRoute element={<Settings />} roleRequired={['Admin','Manager']} />} />
-                    <Route path="createproduct" element={<PrivateRoute element={<CreateProduct />} roleRequired={['Admin']} />} />
-                    <Route path="update-product/:id/:slug" element={<PrivateRoute element={<UpdateProduct />} roleRequired={['Admin']} />} />
-                    <Route path="product_categories" element={<PrivateRoute element={<ProductCategories />} roleRequired={['Admin','Manager']} />} />
-                    <Route path="blog-categories" element={<PrivateRoute element={<BlogCategories />} roleRequired={['Admin','Manager']} />} />
-                    <Route path="taxes" element={<PrivateRoute element={<Taxes />} roleRequired={['Admin']} />} />
+                    <Route path="dashboard" element={<PrivateRoute element={<Dashboard config={config} />} roleRequired={['Admin']} />} />
+                    <Route path="users" element={<PrivateRoute element={<Users  config={config}/>} roleRequired={['Admin']} />} />
+                    <Route path="employees" element={<PrivateRoute element={<Employees config={config} />} roleRequired={['Admin']} />} />
+                    <Route path="create-employee" element={<PrivateRoute element={<CreateEmployee config={config} />} roleRequired={['Admin']} />} />
+                    <Route path="update-employee" element={<PrivateRoute element={<UpdateEmployee config={config} />} roleRequired={['Admin']} />} />
+                    <Route path="orders" element={<Orders config={config} />} />
+                    <Route path="create-order" element={<PrivateRoute element={<CreateOrder config={config} />} roleRequired={['Admin']} />} />
+                    <Route path="order-detail/:id" element={<PrivateRoute element={<OrderDetail config={config} />} roleRequired={['Admin']} />} />
+                    <Route path="products" element={<Products config={config}/>} />
+                    <Route path="blog-posts" element={<PrivateRoute element={<BlogPosts config={config} />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="create-blog" element={<PrivateRoute element={<CreateBlogs config={config} />} roleRequired={['Admin','Manager']} />} />
+                    <Route path="update-blog/:id" element={<PrivateRoute element={<UpdateBlogs   config={config}/>} roleRequired={['Admin','Manager']} />} />
+                    <Route path="invoices" element={<PrivateRoute element={<Invoices config={config}/>} roleRequired={['Admin']} />} />
+                    <Route path="notifications" element={<PrivateRoute element={<Notifications config={config}/>} roleRequired={['Admin']} />} />
+                    <Route path="settings" element={<PrivateRoute element={<Settings config={config}/>} roleRequired={['Admin','Manager']} />} />
+                    <Route path="createproduct" element={<PrivateRoute element={<CreateProduct config={config}/>} roleRequired={['Admin']} />} />
+                    <Route path="update-product/:id/:slug" element={<PrivateRoute element={<UpdateProduct config={config} />} roleRequired={['Admin']} />} />
+                    <Route path="product_categories" element={<PrivateRoute element={<ProductCategories config={config}/>} roleRequired={['Admin','Manager']} />} />
+                    <Route path="blog-categories" element={<PrivateRoute element={<BlogCategories config={config}/>} roleRequired={['Admin','Manager']} />} />
+                    <Route path="taxes" element={<PrivateRoute element={<Taxes config={config}/>} roleRequired={['Admin']} />} />
 
                 </Route>
             </Routes>

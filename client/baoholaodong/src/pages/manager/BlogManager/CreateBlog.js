@@ -7,9 +7,9 @@ import { FaImage } from "react-icons/fa";
 import "./create-blog.css";
 import { BlogPostContext } from "../../../contexts/BlogPostContext";
 import { TextEditor } from "../../../components/TextEditor";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-export default function CreateBlog() {
+export default function CreateBlog({config}) {
+  const BASE_URL = config.baseUrl;
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");

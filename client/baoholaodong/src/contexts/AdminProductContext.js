@@ -1,10 +1,11 @@
 import React, {createContext, useState, useEffect, useCallback, useContext} from "react";
-import {setAuthToken} from '../axiosInstance';
+import {setAxiosInstance} from '../axiosInstance';
 import axiosInstance from '../axiosInstance';
 import {AuthContext} from "./AuthContext";
 export const ProductContext = createContext();
 
-export const AdminProductProvider = ({ children }) => {
+export const AdminProductProvider = ({ children ,config}) => {
+	const BASE_URL = config.baseUrl;
 	const [products, setProducts] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState(0);
 	const [newProduct, setNewProduct] = useState(null);
@@ -20,10 +21,9 @@ export const AdminProductProvider = ({ children }) => {
 	const [productState,setProductState] = useState(null);
 	const {user} = useContext(AuthContext);
 	useEffect(() => {
-		if (user && user.token) {
-			setAuthToken(user.token);
-		}
-	}, [user]);
+		setAxiosInstance(user.token, BASE_URL);
+	}, [user, config]);
+
 
 	/** Lấy danh sách sản phẩm */
 	const fetchProducts = useCallback(async () => {
@@ -60,7 +60,7 @@ export const AdminProductProvider = ({ children }) => {
 			setGroupCategories(response.data || []);
 		} catch (error) {
 			console.error("Lỗi khi lấy danh mục sản phẩm:", error.response?.data || error.message);
-			setGroupCategories([]);
+			// setGroupCategories([]);
 		}
 	};
 	/**

@@ -1,12 +1,10 @@
 ﻿import React, {createContext, useState, useEffect, useContext} from "react";
-import axios from "axios";
 import * as signalR from "@microsoft/signalr";
-import {setAuthToken} from '../axiosInstance';
-import axiosInstance from '../axiosInstance';
+import axiosInstance, {setAxiosInstance} from '../axiosInstance';
 import {AuthContext} from "./AuthContext";
 export const BlogPostContext = createContext();
 
-export const BlogPostProvider = ({ children }) => {
+export const BlogPostProvider = ({ children,config }) => {
     const [blogPosts, setBlogPosts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [categorySelected, setCategorySelected] = useState(0);
@@ -20,7 +18,7 @@ export const BlogPostProvider = ({ children }) => {
     const {user} = useContext(AuthContext);
     useEffect(() => {
         if (user && user.token) {
-            setAuthToken(user.token);
+            setAxiosInstance(user.token,config.baseUrl);
         }
     }, [user]);
 

@@ -59,7 +59,7 @@ const LoadingSkeleton = () => {
 	);
 };
 
-const UpdateProduct = () => {
+const UpdateProduct = ({config}) => {
 	const { id, slug } = useParams();
 	const { getProductById, categories, updateProduct, uploadImage, updateImage, deleteImage, updateVariant, createVariant, addProductTax, taxes, deleteProductTax } = useContext(ProductContext);
 

@@ -25,9 +25,9 @@ import { DisplayContent } from "../../components/TextEditor";
 import { formatVND } from "../../utils/format";
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+export default function ProductDetail({config}) {
+    const BASE_URL = config.baseUrl;
 
-export default function ProductDetail() {
     const { slug } = useParams();
     const { addToCart, showToast } = useContext(CartContext);
     const [selectedVariant, setSelectedVariant] = useState(null);

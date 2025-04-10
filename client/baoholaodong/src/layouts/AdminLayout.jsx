@@ -19,21 +19,19 @@ import {
 } from 'lucide-react';
 import { AuthContext } from "../contexts/AuthContext";
 import NotificationBell from "../components/notifications/Notification";
-import axios from 'axios';
 import { HubConnectionBuilder } from '@microsoft/signalr';
-import {setAuthToken} from "../axiosInstance";
+import {setAxiosInstance} from "../axiosInstance";
 import axiosInstance from "../axiosInstance";
-import RoleWrapper from "../components/RoleWrapper";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-const AdminLayout = () => {
+const AdminLayout = ({config}) => {
+    const BASE_URL = config.baseUrl;
     const { user, logout } = useContext(AuthContext);
     const location = useLocation();
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
     useEffect(() => {
         if (user && user.token) {
-            setAuthToken(user.token);
+            setAxiosInstance(user.token,config.baseUrl);
         }
     }, [user]);
     const navItems = useMemo(() => {

@@ -4,7 +4,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 import Loading from "../../components/Loading/Loading";
 import logo from '../../images/logo.gif';
 
-const Signin = () => {
+const Signin = ({config}) => {
     const [formSignin, setFormSignin] = useState({
         email: '',
         password: ''

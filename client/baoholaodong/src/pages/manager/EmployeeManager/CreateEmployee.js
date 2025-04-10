@@ -5,13 +5,12 @@ import axios from "axios";
 import {UserContext} from "../../../contexts/AdminUserContext";
 import {useNavigate} from "react-router-dom";
 import {AuthContext} from "../../../contexts/AuthContext";
-import axiosInstance, {setAuthToken} from "../../../axiosInstance";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-export default function CreateEmployee() {
+import axiosInstance, {setAxiosInstance} from "../../../axiosInstance";
+export default function CreateEmployee({config}) {
     const {user} = useContext(AuthContext);
     useEffect(() => {
         if (user && user.token) {
-            setAuthToken(user.token);
+            setAxiosInstance(user.token);
         }
     }, [user]);
     const {pushEmployee} = useContext(UserContext);

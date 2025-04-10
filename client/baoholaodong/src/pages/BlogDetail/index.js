@@ -5,15 +5,13 @@ import { FaClock } from "react-icons/fa";
 import { DisplayContent } from "../../components/TextEditor";
 import "./style.css";
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
-
-
-const BlogDetail = () => {
+const BlogDetail = ({config}) => {
+    const BASE_URL = config.baseUrl;
     const { slug } = useParams(); // Lấy slug từ URL
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
     // Gọi API để lấy chi tiết bài viết
     useEffect(() => {
@@ -21,7 +19,7 @@ const BlogDetail = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get(`${API_BASE}/api/BlogPost/get-blog-by-slug/${slug}`);
+                const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-by-slug/${slug}`);
                 setBlog(response.data);
             } catch (err) {
                 setError("Không tìm thấy bài viết hoặc lỗi server");

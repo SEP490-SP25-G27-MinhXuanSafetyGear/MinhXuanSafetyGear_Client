@@ -7,9 +7,9 @@ import Modal from "../../../components/Modal/Modal";
 import Loading from "../../../components/Loading/Loading";
 import ProductVariantSelector from "../../ProductDetails/ProductVariantSelector";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-export default function CreateOrder() {
+export default function CreateOrder({config}) {
+    const BASE_URL = config.baseUrl;
     const [products, setProducts] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [productSelected, setProductSelected] = useState(null);

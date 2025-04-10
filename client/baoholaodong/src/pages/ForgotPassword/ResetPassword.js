@@ -4,9 +4,10 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 
 const queryParams = new URLSearchParams(window.location.search);
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-function ResetPassword() {
+
+function ResetPassword({config}) {
+    const BASE_URL = config.baseUrl;
     const [timeLeft, setTimeLeft] = useState(3000); // 5 minutes in seconds
     const [formData, setFormData] = useState({
         token: queryParams.get('token') || "",

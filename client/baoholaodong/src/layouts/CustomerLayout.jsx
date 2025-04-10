@@ -5,7 +5,7 @@ import Footer from "../components/footer";
 import Toast from "../components/toast";
 import { CartContext } from "../contexts/CartContext";
 
-const CustomerLayout = () => {
+const CustomerLayout = ({config}) => {
     const { addToCart, cartItems, setCartItems, showToast, toast } = useContext(CartContext);
     const [cartCount, setCartCount] = useState(0);
     const location = useLocation();
@@ -36,13 +36,13 @@ const CustomerLayout = () => {
     return (
         <div className="flex flex-col min-h-screen">
             {!shouldHideHeaderFooter && (
-                <Header cartCount={cartCount} cartItems={cartItems} showToast={showToast} />
+                <Header config ={config} cartCount={cartCount} cartItems={cartItems} showToast={showToast} />
             )}
             {/*{!isCheckoutPage && location.pathname !== "/" && <Breadcrumb />}*/}
             <main className="flex-1">
                 <Outlet context={{ addToCart }} />
             </main>
-            {!shouldHideHeaderFooter && <Footer />}
+            {!shouldHideHeaderFooter && <Footer config={config} />}
             {toast && <Toast message={toast} onClose={handleToastClose} />}
         </div>
     );

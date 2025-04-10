@@ -7,10 +7,8 @@ import axios from "axios";
 import { AuthContext } from "../../contexts/AuthContext";
 import { CreditCard, Truck, MapPin, Phone, Mail, User, DollarSign, CheckCircle } from "lucide-react";
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
-
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-export function ConfirmOrder() {
+export function ConfirmOrder({config}) {
+    const BASE_URL = config.baseUrl;
     const location = useLocation();
     const orderData = location.state;
     const { user } = useContext(AuthContext);

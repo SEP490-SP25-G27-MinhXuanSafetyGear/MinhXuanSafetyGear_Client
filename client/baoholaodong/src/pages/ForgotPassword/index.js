@@ -1,8 +1,8 @@
 ﻿import React, { useState } from 'react';
 import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import axios from "axios";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-function Index() {
+function Index({config}) {
+    const BASE_URL = config.baseUrl;
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);

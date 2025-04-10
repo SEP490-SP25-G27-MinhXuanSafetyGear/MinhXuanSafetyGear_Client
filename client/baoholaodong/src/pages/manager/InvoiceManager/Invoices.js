@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { Receipt, Download, Eye } from 'lucide-react';
 
-const Invoices = () => {
+const Invoices = ({config}) => {
 	return (
 		<div className="bg-white rounded-lg shadow">
 			<div className="p-6 border-b">

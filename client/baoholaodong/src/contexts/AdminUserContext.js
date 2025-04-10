@@ -1,15 +1,14 @@
 ﻿import React, {createContext, useState, useEffect, useCallback, useContext} from "react";
-import axios from "axios";
-import {setAuthToken} from '../axiosInstance';
+import {setAxiosInstance} from '../axiosInstance';
 import axiosInstance from '../axiosInstance';
 import {AuthContext} from "./AuthContext";
 export const UserContext = createContext();
 
-export const AdminUserContextProvider = ({ children }) => {
+export const AdminUserContextProvider = ({ children,config }) => {
     const {user} = useContext(AuthContext);
     useEffect(() => {
         if (user && user.token) {
-            setAuthToken(user.token);
+            setAxiosInstance(user.token,config.baseUrl);
         }
     }, [user]);
     const [pageUser, setPageUsers] = useState({

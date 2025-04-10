@@ -1,4 +1,5 @@
-﻿import React, {useState, useEffect, useContext} from 'react';
+﻿"use client";
+import React, {useState, useEffect, useContext} from 'react';
 import { motion } from 'framer-motion';
 import {
     FaUsers,
@@ -33,7 +34,7 @@ import {
 import './style.css';
 import {ProductContext} from "../../../contexts/AdminProductContext";
 import Loading from "../../../components/Loading/Loading";
-const Dashboard = () => {
+const Dashboard = ({config}) => {
     const {reports,fetchReport} = useContext(ProductContext)
     const [salesData, setSalesData] = useState([]);
     const [productData, setProductData] = useState([]);

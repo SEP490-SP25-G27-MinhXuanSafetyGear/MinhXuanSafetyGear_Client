@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './style.css';
 
-const CustomerInfo = () => {
+const CustomerInfo = ({config}) => {
     const [formData, setFormData] = useState({
         FullName: '',
         Gender: 1, // Default to Nam (1)

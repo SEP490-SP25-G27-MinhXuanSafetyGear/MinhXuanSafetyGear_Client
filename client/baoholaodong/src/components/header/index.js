@@ -8,9 +8,8 @@ import { AuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
 import logo from "../../images/logo.gif";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast }) {
+function Header({ cartItems, removeFromCart, updateCartItemQuantity, showToast ,config}) {
+    const BASE_URL = config.baseUrl;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);

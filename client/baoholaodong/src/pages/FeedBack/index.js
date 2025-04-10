@@ -6,10 +6,10 @@ import { useNavigate, useParams } from "react-router-dom"
 import noImage from "../../images/no-image-product.jpg"
 
 import axios from "axios"
-const BASE_URL = process.env.REACT_APP_BASE_URL_API
 
 
-export default function FeedBack() {
+export default function FeedBack({config}) {
+    const BASE_URL = config.baseUrl;
     const [rating, setRating] = useState(0)
     const [hover, setHover] = useState(0)
     const [reviewText, setReviewText] = useState("")

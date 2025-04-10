@@ -5,10 +5,11 @@ import Loading from '../../components/Loading/Loading';
 import RegisterByGoogle from './RegisterByGoogle';
 import { AuthContext } from '../../contexts/AuthContext';
 import logo from '../../images/logo.gif';
+import {getConfig} from "../../config";
 
-const apiUrl = process.env.REACT_APP_BASE_URL_API;
 
-const Register = () => {
+const Register = ( {config}) => {
+    const BASE_URL = config.baseUrl;
     const [formRegister, setFormRegister] = useState({
         fullName: '',
         email: '',
@@ -33,7 +34,7 @@ const Register = () => {
             setError('');
             try {
                 const response = await axios.post(
-                    `${apiUrl}/api/Authentication/authenticate/registerby-email-password`,
+                    `${BASE_URL}/api/Authentication/authenticate/registerby-email-password`,
                     formRegister
                 );
                 if (response.data !== null) {

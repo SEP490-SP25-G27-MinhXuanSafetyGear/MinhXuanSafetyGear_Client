@@ -6,7 +6,7 @@ import Loading from "../../../components/Loading/Loading"; // Giả sử bạn c
 import { motion } from "framer-motion";
 import "./BlogCategories.css"; // Import file CSS
 
-const BlogCategories = () => {
+const BlogCategories = ({config}) => {
     const { categories, createBlogCategory, updateBlogCategory, loading } = useContext(BlogPostContext);
     const [isOpenCreateCategory, setIsOpenCreateCategory] = useState(false);
     const [isOpenEditCategory, setIsOpenEditCategory] = useState(false);

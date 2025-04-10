@@ -2,17 +2,16 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../../contexts/CartContext";
 import "./style.css";
-
-function OrderHistory() {
+function OrderHistory({config}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { userId } = useParams();
-  const BASE_URL = process.env.REACT_APP_BASE_URL_API;
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+  const BASE_URL = config.baseUrl;
 
   const fetchOrders = useCallback(
     async (query = "") => {

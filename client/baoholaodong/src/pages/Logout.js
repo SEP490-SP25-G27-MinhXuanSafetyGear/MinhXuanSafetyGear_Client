@@ -1,8 +1,7 @@
 ﻿import {useContext, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import {AuthContext} from "../contexts/AuthContext";
-const Logout = () => {
+const Logout = ({config}) => {
 	const navigate = useNavigate();
 	const {logout} = useContext(AuthContext);
 	useEffect(() => {

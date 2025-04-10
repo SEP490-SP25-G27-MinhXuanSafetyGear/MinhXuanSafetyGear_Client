@@ -94,7 +94,7 @@ const ProductTable = React.memo(({ products, handleUpdate }) => {
 	);
 });
 
-const Products = () => {
+const Products = ({config}) => {
 	const query = useQuery();
 	const page = parseInt(query.get("page") ?? "1", 10);
 	const navigate = useNavigate();

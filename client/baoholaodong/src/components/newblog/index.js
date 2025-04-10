@@ -6,10 +6,11 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { toSlug } from "../../utils/SlugUtils";
+import {getConfig} from "../../config";
 
-const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
-const NewBlog = () => {
+const NewBlog = ({config}) => {
+    const BASE_URL = config.baseUrl;
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -34,7 +35,7 @@ const NewBlog = () => {
             setLoading(true);
             try {
                 const categoriesResponse = await axios.get(
-                    `${API_BASE}/api/BlogPost/get-blog-categories`
+                    `${BASE_URL}/api/BlogPost/get-blog-categories`
                 );
                 const targetCategory = categoriesResponse.data.find(
                     (cat) => cat.name === "KIẾN THỨC AN TOÀN LAO ĐỘNG"
@@ -43,7 +44,7 @@ const NewBlog = () => {
 
                 const slug = toSlug(targetCategory.name);
                 const blogsResponse = await axios.get(
-                    `${API_BASE}/api/BlogPost/get-blog-by-category/${slug}`
+                    `${BASE_URL}/api/BlogPost/get-blog-by-category/${slug}`
                 );
                 setBlogs(blogsResponse.data);
             } catch (err) {

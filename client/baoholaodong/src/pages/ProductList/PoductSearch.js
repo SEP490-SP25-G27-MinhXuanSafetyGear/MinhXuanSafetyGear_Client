@@ -28,7 +28,7 @@ const getMinVariantPrice = (product) => {
     return variant.price - (variant.price * discount / 100);
 };
 
-const ProductList = () => {
+const ProductList = ({config}) => {
     const { group, cate } = useParams();
     const query = useQuery();
     const search = query.get("search")?.trim() || "";
@@ -103,7 +103,7 @@ const ProductList = () => {
         <PageWrapper title={search || "Tất cả sản phẩm"}>
             <div className="bg-gray-100 min-h-screen">
                 <div className="relative w-full h-48 md:h-64 lg:h-80 overflow-hidden">
-                    <Banner/>
+                    <Banner config={config}/>
                 </div>
 
                 <div className="sticky top-0 z-10 bg-white shadow-md p-4 lg:hidden">

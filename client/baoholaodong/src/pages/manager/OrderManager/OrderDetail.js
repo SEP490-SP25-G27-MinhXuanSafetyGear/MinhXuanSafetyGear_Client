@@ -3,12 +3,12 @@
 import {useContext, useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CheckCircle, Clock, XCircle, Image } from "lucide-react";
-import {setAuthToken} from "../../../axiosInstance";
+import {setAxiosInstance} from "../../../axiosInstance";
 import axiosInstance from "../../../axiosInstance";
 import {AuthContext} from "../../../contexts/AuthContext";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-export default function OrderDetail() {
+export default function OrderDetail({config}) {
+  const BASE_URL = config.baseUrl;
   const { id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
@@ -18,7 +18,7 @@ export default function OrderDetail() {
   const { user } = useContext(AuthContext);
   useEffect(() => {
     if (user && user.token) {
-      setAuthToken(user.token);
+      setAxiosInstance(user.token,BASE_URL);
     }
   }, [user]);
   useEffect(() => {

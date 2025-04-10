@@ -14,7 +14,7 @@ import ManagerToast from "../../../components/managerToast/ManagerToast";
 const MAX_IMAGE_SIZE_MB = 0.2
 const TARGET_IMAGE_SIZE_KB = 0.1 * 1024
 
-const CreateProduct = () => {
+const CreateProduct = ({config}) => {
 	const navigate = useNavigate()
 	const { categories, createProduct } = useContext(ProductContext)
 	const [product, setProduct] = useState({
