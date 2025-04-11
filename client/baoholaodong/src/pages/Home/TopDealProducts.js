@@ -17,12 +17,16 @@ const getMinVariant = (product) => {
         const finalPrice = variant.price - (variant.price * discount) / 100;
         const minPrice = min.price - (min.price * (min.discount || 0)) / 100;
         return finalPrice < minPrice ? variant : min;
-    });
+    }, product.productVariants[0]);
 };
 
 const getMinVariantPrice = (product) => {
     const variant = getMinVariant(product);
-    if (!variant) return product.priceAfterDiscount || product.price;
+    if (!variant) {
+        return product.priceAfterDiscount && product.priceAfterDiscount < product.price
+            ? product.priceAfterDiscount
+            : product.price;
+    }
     const discount = variant.discount || 0;
     return variant.price - (variant.price * discount) / 100;
 };
@@ -39,7 +43,7 @@ export default function TopDealProducts({ products = [] }) {
         navigate("/products/0/0/trang-thiet-bi-bao-ho?page=1");
     };
 
-
+    // Thiết lập SignalR
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`${BASE_URL}/productHub`)
@@ -58,6 +62,7 @@ export default function TopDealProducts({ products = [] }) {
         };
     }, []);
 
+    // Xử lý cập nhật từ SignalR
     useEffect(() => {
         if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
 
@@ -71,6 +76,7 @@ export default function TopDealProducts({ products = [] }) {
         return () => hubConnection.off("ProductUpdated", handleProductChange);
     }, [hubConnection]);
 
+    // Cập nhật productList khi props products thay đổi
     useEffect(() => {
         setProductList(products);
     }, [products]);
@@ -121,7 +127,10 @@ export default function TopDealProducts({ products = [] }) {
                         {productList.map((product) => {
                             const minVariant = getMinVariant(product);
                             const minPrice = getMinVariantPrice(product);
-                            const hasDiscount = minVariant?.discount || product.discount;
+                            const hasDiscount = minVariant
+                                ? (minVariant.discount && minVariant.discount > 0)
+                                : (product.discount && product.discount > 0) ||
+                                (product.priceAfterDiscount && product.priceAfterDiscount < product.price);
 
                             return (
                                 <div key={product.id} className="top-deal-product-card flex flex-col">
@@ -152,10 +161,10 @@ export default function TopDealProducts({ products = [] }) {
                                                         {minPrice.toLocaleString()}đ
                                                     </span>
                                                     <span className="top-deal-price-original">
-                                                        {minVariant?.price?.toLocaleString() || product.price?.toLocaleString()}đ
+                                                        {(minVariant ? minVariant.price : product.price).toLocaleString()}đ
                                                     </span>
                                                     <p className="top-deal-discount-text">
-                                                        Giảm {minVariant?.discount || product.discount}%
+                                                        Giảm {(minVariant ? minVariant.discount : product.discount) || 0}%
                                                     </p>
                                                 </>
                                             ) : (

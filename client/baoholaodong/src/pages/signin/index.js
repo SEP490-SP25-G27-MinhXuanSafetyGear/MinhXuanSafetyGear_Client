@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from "../../contexts/AuthContext";
 import Loading from "../../components/Loading/Loading";
 import logo from '../../images/logo.gif';
+import regisBG from '../../images/ppe-1600x900.jpg';
 
 const Signin = () => {
     const [formSignin, setFormSignin] = useState({
@@ -109,7 +110,7 @@ const Signin = () => {
                     className="hidden md:block w-1/2 bg-cover bg-center relative"
                     style={{
                         backgroundImage:
-                            "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')",
+                            `url(${regisBG})`,
                     }}
                 >
                     <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
