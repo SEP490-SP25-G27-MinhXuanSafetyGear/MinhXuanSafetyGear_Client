@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
 import * as signalR from "@microsoft/signalr";
-
 import { getConfig } from '../../config';
+
 const getMinVariant = (product) => {
     if (!product.productVariants || product.productVariants.length === 0) return null;
     return product.productVariants.reduce((min, variant) => {
@@ -15,17 +15,21 @@ const getMinVariant = (product) => {
         const finalPrice = variant.price - (variant.price * discount) / 100;
         const minPrice = min.price - (min.price * (min.discount || 0)) / 100;
         return finalPrice < minPrice ? variant : min;
-    });
+    }, product.productVariants[0]);
 };
 
 const getMinVariantPrice = (product) => {
     const variant = getMinVariant(product);
-    if (!variant) return product.priceAfterDiscount || product.price;
+    if (!variant) {
+        return product.priceAfterDiscount && product.priceAfterDiscount < product.price
+            ? product.priceAfterDiscount
+            : product.price;
+    }
     const discount = variant.discount || 0;
     return variant.price - (variant.price * discount) / 100;
 };
 
-const TopSaleProducts = ({ products = [], title = "" ,config}) => {
+const TopSaleProducts = ({ products = [], title = "", config }) => {
     const BASE_URL = config.baseUrl;
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +41,6 @@ const TopSaleProducts = ({ products = [], title = "" ,config}) => {
     const totalPages = Math.ceil(productList.length / productsPerPage);
     const navigate = useNavigate();
     const { addToCart } = useContext(CartContext);
-
 
     const handleViewAll = () => {
         navigate("/products/0/0/trang-thiet-bi-bao-ho?page=1");
@@ -57,7 +60,7 @@ const TopSaleProducts = ({ products = [], title = "" ,config}) => {
         return () => {
             if (connection.state === signalR.HubConnectionState.Connected) connection.stop();
         };
-    }, []);
+    }, [BASE_URL]);
 
     useEffect(() => {
         if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) return;
@@ -138,16 +141,19 @@ const TopSaleProducts = ({ products = [], title = "" ,config}) => {
                 </div>
             </div>
 
-            <div className="-mx-4 px-4 py-5 flex gap-4 overflow-x-auto scrollbar-hide lg:grid lg:grid-cols-4 xl:grid-cols-5 lg:gap-4 lg:overflow-visible">
+            <div className="-mx-4 px-4 py-5 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {currentProducts.map((product, idx) => {
                     const minVariant = getMinVariant(product);
                     const minPrice = getMinVariantPrice(product);
-                    const hasDiscount = minVariant?.discount > 0 || (product.discount && product.priceAfterDiscount < product.price);
+                    const hasDiscount = minVariant
+                        ? (minVariant.discount && minVariant.discount > 0)
+                        : (product.discount && product.discount > 0) ||
+                        (product.priceAfterDiscount && product.priceAfterDiscount < product.price);
 
                     return (
                         <motion.div
                             key={product.id}
-                            className="w-[250px] flex-shrink-0 lg:w-auto group bg-white rounded-lg shadow-[0_0_10px_black] overflow-hidden cursor-pointer transition-transform duration-300 flex flex-col"
+                            className="w-full group bg-white rounded-lg shadow-[0_0_10px_black] overflow-hidden cursor-pointer transition-transform duration-300 flex flex-col"
                             initial={{ opacity: 0, y: 40 }}
                             animate={{ opacity: 1, y: 0 }}
                             whileHover={{ y: -8, transition: { duration: 0.05, ease: "easeOut" } }}
@@ -188,10 +194,10 @@ const TopSaleProducts = ({ products = [], title = "" ,config}) => {
                                                     {minPrice.toLocaleString()}đ
                                                 </span>
                                                 <span className="text-gray-400 line-through ml-2 text-sm">
-                                                    {minVariant?.price?.toLocaleString() || product.price.toLocaleString()}đ
+                                                    {(minVariant ? minVariant.price : product.price).toLocaleString()}đ
                                                 </span>
                                                 <p className="text-yellow-600 text-xs font-semibold mt-1">
-                                                    Giảm {minVariant?.discount || product.discount}%
+                                                    Giảm {(minVariant ? minVariant.discount : product.discount) || 0}%
                                                 </p>
                                             </>
                                         ) : (

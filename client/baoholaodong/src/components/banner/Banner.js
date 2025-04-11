@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 const Banner = ({config}) => {
     const BASE_URL = config.baseUrl;
     const [currentIndex, setCurrentIndex] = useState(0);
     const [banners, setBanners] = useState([]);
+    const bannerRef = useRef(null); // Ref để truy cập container .banner-main
+
     const nextSlide = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
     };
@@ -16,20 +18,43 @@ const Banner = ({config}) => {
         }catch (e){
         }
     }
+
+    // Điều chỉnh aspect-ratio dựa trên ảnh hiện tại
     useEffect(() => {
-        if (banners.length === 0) return; // Đảm bảo có ảnh
+        if (banners.length === 0 || !bannerRef.current) return;
+
+        const currentBanner = banners[currentIndex];
+        const img = new Image();
+        img.src = currentBanner.imageUrl;
+
+        img.onload = () => {
+            const aspectRatio = img.naturalWidth / img.naturalHeight;
+            if (bannerRef.current) {
+                bannerRef.current.style.aspectRatio = `${aspectRatio}`; // Đặt aspect-ratio động
+            }
+        };
+    }, [currentIndex, banners]);
+
+
+    useEffect(() => {
+        if (banners.length === 0) return;
 
         const interval = setInterval(nextSlide, 5000);
         return () => clearInterval(interval);
-    }, [currentIndex, banners.length]); // Thêm dependency để cập nhật
-    useEffect(()=>{
-        if(banners.length === 0){
-            fetchBanners();
+    }, [currentIndex, banners.length]);
 
+    useEffect(() => {
+        if (banners.length === 0) {
+            fetchBanners();
         }
-    },[banners]);
+    }, [banners]);
+
+
     return (
-        <div className="relative w-full h-[300px] md:h-[500px] overflow-hidden">
+        <div
+            ref={bannerRef}
+            className="banner-main relative w-full overflow-hidden"
+        >
             {banners.length > 0 ? (
                 banners.map(({ imageUrl, postUrl }, index) => (
                     <a
@@ -44,7 +69,7 @@ const Banner = ({config}) => {
                         <img
                             src={imageUrl}
                             alt={`Slide ${index + 1}`}
-                            className="w-full h-full object-cover object-center"
+                            className="w-full h-full object-contain object-center"
                             onError={(e) => {
                                 e.target.src = "/fallback.jpg"; // Ảnh mặc định nếu bị lỗi
                             }}
@@ -56,6 +81,7 @@ const Banner = ({config}) => {
             )}
         </div>
     );
+
 };
 
 export default Banner;

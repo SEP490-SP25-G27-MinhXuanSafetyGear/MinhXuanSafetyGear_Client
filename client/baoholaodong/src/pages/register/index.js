@@ -6,6 +6,7 @@ import RegisterByGoogle from './RegisterByGoogle';
 import { AuthContext } from '../../contexts/AuthContext';
 import logo from '../../images/logo.gif';
 import {getConfig} from "../../config";
+import regisBG from '../../images/regisandsign-BG.jpg';
 
 
 const Register = ( {config}) => {
@@ -204,7 +205,7 @@ const Register = ( {config}) => {
                     className="hidden lg:block w-1/2 bg-cover bg-center relative"
                     style={{
                         backgroundImage:
-                            "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')",
+                            `url(${regisBG})`,
                     }}
                 >
                     <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
