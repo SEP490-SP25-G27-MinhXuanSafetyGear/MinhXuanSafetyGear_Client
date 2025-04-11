@@ -1,7 +1,8 @@
 import { createContext, useCallback } from "react";
 import axios from "axios";
+import {getConfig} from "../config";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+const BASE_URL = getConfig('REACT_APP_BASE_URL_API');
 
 export const OrderContext = createContext();
 export const OrderProvider = ({ children }) => {

@@ -9,9 +9,9 @@ import { BlogPostContext } from "../../../contexts/BlogPostContext";
 import { TextEditor } from "../../../components/TextEditor";
 import type React from "react";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-export default function UpdateBlog() {
+export default function UpdateBlog({config}) {
+	const BASE_URL = config.baseUrl;
 	const navigate = useNavigate();
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");

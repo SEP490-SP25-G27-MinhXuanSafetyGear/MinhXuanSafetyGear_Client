@@ -6,9 +6,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
 
-const API_BASE = process.env.REACT_APP_BASE_URL_API;
-
-const BlogList = () => {
+const BlogList = ({config}) => {
+    const BASE_URL = config.baseUrl;
     const [blogs, setBlogs] = useState([]);
     const [filters, setFilters] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +28,7 @@ const BlogList = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get(`${API_BASE}/api/BlogPost/get-blog-categories`);
+                const response = await axios.get(`${BASE_URL}/api/BlogPost/get-blog-categories`);
                 const categoriesWithSlug = response.data.map(category => ({
                     ...category,
                     slug: toSlug(category.name),
@@ -61,7 +60,7 @@ const BlogList = () => {
             setError(null);
             try {
                 const response = await axios.get(
-                    `${API_BASE}/api/BlogPost/get-blog-page?categoryId=${categoryId}&page=${page}&size=${pageSize}`
+                    `${BASE_URL}/api/BlogPost/get-blog-page?categoryId=${categoryId}&page=${page}&size=${pageSize}`
                 );
                 setBlogs(response.data.items);
                 setTotalPages(response.data.totalPages);

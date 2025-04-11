@@ -7,8 +7,7 @@ import ProductPopup from "../../components/productpopup";
 import { CartContext } from "../../contexts/CartContext";
 import * as signalR from "@microsoft/signalr";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
+import { getConfig } from '../../config';
 const getMinVariant = (product) => {
     if (!product.productVariants || product.productVariants.length === 0) return null;
     return product.productVariants.reduce((min, variant) => {
@@ -26,7 +25,8 @@ const getMinVariantPrice = (product) => {
     return variant.price - (variant.price * discount) / 100;
 };
 
-const TopSaleProducts = ({ products = [], title = "" }) => {
+const TopSaleProducts = ({ products = [], title = "" ,config}) => {
+    const BASE_URL = config.baseUrl;
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);

@@ -8,8 +8,7 @@ import noImage from "../../images/no-image-product.jpg";
 import * as signalR from "@microsoft/signalr";
 import './TopDealProductsStyle.css';
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
+import { getConfig } from '../../config';
 const getMinVariant = (product) => {
     if (!product.productVariants || product.productVariants.length === 0) return null;
     return product.productVariants.reduce((min, variant) => {
@@ -27,7 +26,8 @@ const getMinVariantPrice = (product) => {
     return variant.price - (variant.price * discount) / 100;
 };
 
-export default function TopDealProducts({ products = [] }) {
+export default function TopDealProducts({ products = [] ,config}) {
+    const BASE_URL = config.baseUrl;
     const scrollRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [productList, setProductList] = useState(products);

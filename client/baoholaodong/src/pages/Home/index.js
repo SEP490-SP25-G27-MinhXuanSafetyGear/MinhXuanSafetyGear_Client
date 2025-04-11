@@ -11,9 +11,8 @@ import PageWrapper from "../../components/pageWrapper/PageWrapper";
 import "./home.css";
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-function Index() {
+function Index({config}) {
+    const BASE_URL = config.baseUrl;
     const [showWelcome, setShowWelcome] = useState(false);
     const [topSaleProducts, setTopSaleProducts] = useState([]);
     const [topDealProducts, setTopDealProducts] = useState([]);
@@ -67,11 +66,11 @@ function Index() {
         <PageWrapper title="Bảo hộ lao động Minh Xuân">
             <div className="home-container">
                 {showWelcome && <div className="welcome-message">🎉 Welcome back!</div>}
-                <Banner />
-                <TopDealProducts products={topDealProducts} />
-                <TopSaleProducts products={topSaleProducts} title="TOP SẢN PHẨM BÁN CHẠY" />
-                <Feedbacks blogpost={customerSayAboutUs} />
-                <NewBlog />
+                <Banner config={config} />
+                <TopDealProducts products={topDealProducts} config={config} />
+                <TopSaleProducts products={topSaleProducts} config={config} title="TOP SẢN PHẨM BÁN CHẠY" />
+                <Feedbacks blogpost={customerSayAboutUs}  />
+                <NewBlog config={config} />
                 <StoreLocation /> {/* Thêm component StoreLocation */}
             </div>
         </PageWrapper>

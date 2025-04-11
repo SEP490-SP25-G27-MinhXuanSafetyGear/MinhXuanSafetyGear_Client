@@ -2,7 +2,7 @@
 import { User, Edit, Trash2 } from 'lucide-react';
 import {UserContext} from "../../../contexts/AdminUserContext";
 
-const Users = () => {
+const Users = ({config}) => {
 	const {pageUser} = useContext(UserContext);
 	return (
 		<div className="bg-white min-h-[800px] rounded-lg shadow">

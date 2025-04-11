@@ -2,10 +2,11 @@
 import axios from "axios";
 import * as signalR from "@microsoft/signalr";
 import {useNavigate} from "react-router-dom";
+import {getConfig} from "../config";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 export const CustomerProductContext = createContext();
-export const CustomerProductProvider =({ children }) => {
+export const CustomerProductProvider =({ children ,config }) => {
+    const BASE_URL = config.baseUrl;
     const [topSaleProducts,setTopSaleProducts] = useState([]);
     const [topDealProducts,setTopDealProducts] = useState([]);
     const [hubConnection, setHubConnection] = useState(null);

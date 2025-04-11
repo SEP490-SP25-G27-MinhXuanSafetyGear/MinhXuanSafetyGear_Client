@@ -7,7 +7,7 @@ import CreateTaxForm from "./CreateTaxeForm";
 import Loading from "../../../components/Loading/Loading";
 import UpdateTaxForm from "./UpdateTaxeForm";
 
-const Taxes = () => {
+const Taxes = ({config}) => {
 
     const { taxes,createTax,updateTax } = useContext(ProductContext);
     const [isCreateModal,setIsCreateModal ] = useState(false);

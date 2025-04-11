@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { toSlug } from "../../utils/SlugUtils";
 import logo from '../../images/logo.gif';
 
-const API_BASE = process.env.REACT_APP_BASE_URL_API;
 
-const Footer = () => {
+const Footer = ({config}) => {
+    const API_BASE = config.baseUrl;
     const [contactBlogs, setContactBlogs] = useState([]);
     const [policyBlogs, setPolicyBlogs] = useState([]);
     const [guideBlogs, setGuideBlogs] = useState([]);

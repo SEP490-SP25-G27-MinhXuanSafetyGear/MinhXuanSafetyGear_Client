@@ -4,7 +4,7 @@ import { Edit, Plus, Trash2,EyeIcon } from "lucide-react";
 import Modal from "../../../components/Modal/Modal";
 import Loading from "../../../components/Loading/Loading";
 import {motion} from "framer-motion";
-const ProductCategories = () => {
+const ProductCategories = ({config}) => {
     const {createCategory,updateCategory,groupCategories,createGroup,updateGroupCategory} = useContext(ProductContext);
     const [isOpenCreateCategory, setIsOpenCreateCategory] = useState(false);
     const [isOpenEditCategory, setIsOpenEditCategory] = useState(false);

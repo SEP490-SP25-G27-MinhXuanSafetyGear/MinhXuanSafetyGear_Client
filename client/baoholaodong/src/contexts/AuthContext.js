@@ -5,12 +5,11 @@ import {useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 import {GoogleLogin} from "@react-oauth/google";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
 // Tạo context
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children,config }) => {
+    const BASE_URL = config.baseUrl;
     // Lấy user từ Cookies nếu có, nếu không thì null
     const [user, setUser] = useState(() => {
         try {

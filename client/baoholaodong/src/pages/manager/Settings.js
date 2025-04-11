@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { User, Lock, Bell, Globe } from 'lucide-react';
 
-const Settings = () => {
+const Settings = ({config}) => {
 	return (
 		<div className="space-y-6">
 			<div className="bg-white rounded-lg shadow">

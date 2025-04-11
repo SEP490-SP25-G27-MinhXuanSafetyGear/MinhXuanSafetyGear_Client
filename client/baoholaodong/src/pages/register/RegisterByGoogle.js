@@ -2,7 +2,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import {useNavigate} from "react-router-dom";
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+import {getConfig} from "../../config";
+const BASE_URL = getConfig('REACT_APP_BASE_URL_API');
 
 function RegisterByGoogle({ setUserData }) {
     const navigate = useNavigate();

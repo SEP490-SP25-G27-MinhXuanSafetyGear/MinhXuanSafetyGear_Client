@@ -9,9 +9,8 @@ import * as signalR from "@microsoft/signalr";
 import { CheckCircle, X, Upload, CreditCard, ArrowLeft, ShoppingBag, Truck, Clock } from 'lucide-react';
 import PageWrapper from "../../components/pageWrapper/PageWrapper";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-const Checkout = () => {
+const Checkout = ({config}) => {
+    const BASE_URL = config.baseUrl;
     const navigate = useNavigate();
     const bankName = 'tpb';
     const accountNumber = '29909302002';

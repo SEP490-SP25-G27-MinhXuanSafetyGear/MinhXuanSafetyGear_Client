@@ -1,9 +1,9 @@
 import React from "react";
 import UserRouter from "./routers/UserRouter";
-function App() {
+function App({ config }) {
     return (
         <div className="App">
-            <UserRouter/>
+            <UserRouter config={config} />
         </div>
     );
 }

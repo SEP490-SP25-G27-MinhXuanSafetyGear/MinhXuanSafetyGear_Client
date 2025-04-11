@@ -4,9 +4,8 @@ import { useState, useEffect } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import axios from "axios"
 
-const BASE_URL = process.env.REACT_APP_BASE_URL_API
-
-const VerificationPage = () => {
+const VerificationPage = ({config}) => {
+    const BASE_URL = config.baseUrl;
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
     const email = searchParams.get("email")
